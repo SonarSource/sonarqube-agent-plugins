@@ -1,0 +1,39 @@
+{
+  "sonarqube-python": {
+    "command": "java",
+    "args": [
+      "-jar",
+      "${CLAUDE_PLUGIN_ROOT}/binaries/sonarlint-language-server-4.13-SNAPSHOT.jar",
+      "-stdio",
+      "-analyzers",
+      "${CLAUDE_PLUGIN_ROOT}/binaries/sonarpython.jar"
+    ],
+    "transport": "stdio",
+    "initializationOptions": {
+      "productKey": "claude-code",
+      "telemetryStorage": "Not used",
+      "productName": "Claude Code",
+      "productVersion": "0.0.1",
+      "firstSecretDetected": false,
+      "showVerboseLogs": true,
+      "platform": "MacOS",
+      "architecture": "Apple Silicon",
+      "additionalAttributes": {
+        "claude-code": {
+          "installTime": "2025.02.02",
+          "isTelemetryEnabled": false
+        }
+      },
+      "connections": {
+        "sonarqube": [],
+        "sonarcloud": []
+      },
+      "rules": {},
+      "focusOnNewCode": false,
+      "automaticAnalysis": true
+    },
+    "extensionToLanguage": {
+      ".py": "python"
+    }
+  }
+}
