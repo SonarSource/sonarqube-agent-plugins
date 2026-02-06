@@ -1,0 +1,21 @@
+{
+  "name": "sonarqube",
+  "version": "0.1.0",
+  "description": "SonarQube integration plugin for Claude Code - analyze code quality, fix issues, and understand code quality rules",
+  "author": {
+    "name": "Sonar",
+    "email": "support@sonarsource.com"
+  },
+  "homepage": "https://www.sonarsource.com",
+  "repository": "https://github.com/SonarSource/sonar-claude-code-plugin",
+  "license": "LGPL-3.0",
+  "keywords": [
+    "sonarqube",
+    "sonarlint",
+    "code-quality",
+    "static-analysis",
+    "security",
+    "clean-code"
+  ],
+  "skills": "./skills/"
+}

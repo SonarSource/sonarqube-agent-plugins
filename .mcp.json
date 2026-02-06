@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "sonarqube": {
+      "command": "bash",
+      "args": [
+        "scripts/start-mcp-server.sh"
+      ]
+    }
+  }
+}

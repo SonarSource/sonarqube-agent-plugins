@@ -1,0 +1,19 @@
+{
+  "name": "sonar-local-marketplace",
+  "owner": {
+    "name": "Sonar Team",
+    "email": "support@sonarsource.com"
+  },
+  "plugins": [
+    {
+      "name": "sonarqube",
+      "source": ".",
+      "description": "SonarQube integration plugin for Claude Code",
+      "version": "0.1.0",
+      "author": {
+        "name": "Sonar",
+        "email": "support@sonarsource.com"
+      }
+    }
+  ]
+}
