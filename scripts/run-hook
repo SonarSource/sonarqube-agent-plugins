@@ -1,0 +1,29 @@
+#!/bin/sh
+# Launcher for hook scripts — detects Python interpreter (Unix + Windows/Git Bash)
+SCRIPT_DIR="$(dirname "$0")"
+
+if [ -z "$1" ]; then
+    echo "Usage: $(basename "$0") <hook-name>" >&2
+    exit 1
+fi
+
+HOOK_SCRIPT="$SCRIPT_DIR/$1.py"
+
+if [ ! -f "$HOOK_SCRIPT" ]; then
+    echo "Hook script not found: $HOOK_SCRIPT" >&2
+    exit 1
+fi
+
+if command -v python3 >/dev/null 2>&1; then
+    exec python3 "$HOOK_SCRIPT"
+elif command -v py >/dev/null 2>&1; then
+    exec py -3 "$HOOK_SCRIPT"
+elif command -v python >/dev/null 2>&1; then
+    case "$(python --version 2>&1)" in
+        Python\ 3.*) exec python "$HOOK_SCRIPT" ;;
+        *) echo "Python 3 is required but '$(python --version 2>&1)' was found. Please install Python 3 (https://python.org)." >&2; exit 1 ;;
+    esac
+else
+    echo "Python 3 not found. Please install Python 3 (https://python.org)." >&2
+    exit 1
+fi

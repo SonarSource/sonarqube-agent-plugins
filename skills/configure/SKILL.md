@@ -1,203 +1,125 @@
-# Configure SonarQube Credentials
+---
+name: configure
+description: "Install sonarqube-cli, authenticate, and integrate SonarQube with Claude Code"
+disable-model-invocation: true
+---
 
-## Overview
-Help users configure their SonarQube credentials in a **SECURE** way without exposing tokens in chat.
+# Configure SonarQube
 
-## CRITICAL SECURITY RULE
-🔒 **NEVER ask users to paste their access token in the chat!**
-- Tokens are sensitive credentials
-- Chat history could expose them
-- Guide users to set up configuration files themselves
-
-## When to Use
-- User asks to configure, set up, or update SonarQube credentials
-- User mentions they need to configure the plugin
-- Setup hook indicates missing credentials
+Guide the user through setting up sonarqube-cli, authenticating, and enabling SonarQube integration
+(secrets scanning hooks + MCP server) in Claude Code.
 
 ## Instructions
 
-### 1. Determine SonarQube Type
-Ask the user which type of SonarQube they're using:
+### Step 1 — Check for sonarqube-cli
 
-**Ask:**
-"I'll help you configure your SonarQube credentials securely. First, are you connecting to:
+Run `which sonar` yourself using the Bash tool.
 
-1. **SonarQube Cloud** (https://sonarcloud.io)
-2. **SonarQube Server** (self-hosted or enterprise instance)
+**If found:** proceed to Step 2.
 
-Which one are you using?"
+**If not found:** show the user the platform-appropriate install command and ask them to run it
+(this cannot be automated — it requires an interactive shell session).
 
-### 2. Gather NON-SENSITIVE Information Only
+| Platform       | Install command |
+|----------------|-----------------|
+| macOS / Linux  | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
+| Windows (PS)   | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex` |
 
-⚠️ **ONLY collect non-sensitive information:**
-- SonarQube type (Cloud or Server)
-- Server URL (for Server installations) - this is not sensitive
-- Organization key (for Cloud) - this is not sensitive
+Wait for the user to confirm, then re-run `which sonar` yourself to verify before continuing.
 
-❌ **NEVER collect:**
-- Access tokens - these are secrets!
+---
 
-#### For SonarQube Cloud:
-**Ask:**
-"For SonarQube Cloud, what's your organization key? (You can find this in your SonarCloud URL: https://sonarcloud.io/organizations/YOUR-ORG-KEY)"
+### Step 2 — Check authentication status
 
-Then ask: "Are you using the US region (sonarqube.us) instead of the default EU region (sonarcloud.io)? (y/n)"
+Run `sonar auth status` yourself using the Bash tool.
 
-**Set URL based on region:**
-- If user answers "yes" to US region: `https://sonarqube.us`
-- Otherwise (default): `https://sonarcloud.io`
+**If already authenticated:** note the connected server and organisation from the output,
+then skip directly to Step 4.
 
-**Note:** Most users are on EU (sonarcloud.io), so default to that unless they specifically say US.
+**If not authenticated:** proceed to Step 3.
 
-#### For SonarQube Server:
-**Ask:**
-"For SonarQube Server, what's your server URL? (e.g., `http://localhost:9000` or `https://sonarqube.yourcompany.com`)"
+---
 
-### 3. Validate Non-Sensitive Input
-- For Server: Ensure URL starts with `http://` or `https://`
-- For Cloud: Ensure organization key is provided
-- Confirm with user before proceeding
+### Step 3 — Authenticate (`sonar auth login`)
 
-### 4. Create Template Configuration File
+This step requires user interaction — do **not** run it yourself.
 
-**SECURITY: Create a template file with placeholders, NOT actual tokens!**
+First determine the connection type. Ask:
 
-Create a configuration template that the user will edit themselves:
+> "Are you connecting to **SonarQube Cloud** (sonarcloud.io / sonarqube.us) or a
+> **self-hosted SonarQube Server**?"
 
-**For SonarQube Cloud:**
-```bash
-cat > "${CLAUDE_PLUGIN_ROOT}/.env" << 'EOF'
-# SonarQube Cloud Configuration
-export SONARQUBE_URL="<https://sonarcloud.io OR https://sonarqube.us>"
-export SONARQUBE_ORG="<user-provided-org-key>"
-export SONARQUBE_TOKEN="YOUR_TOKEN_HERE"
-EOF
+Collect:
+
+| Scenario | Information needed |
+|---|---|
+| SonarQube Cloud — EU (default) | organization key (e.g. `my-org`) |
+| SonarQube Cloud — US | organization key + confirm US region (`https://sonarqube.us`) |
+| SonarQube Server | server URL (e.g. `https://sonarqube.yourcompany.com`) |
+
+Build the login command and show it to the user:
+
+| Scenario | Command |
+|---|---|
+| SonarQube Cloud — EU | `sonar auth login -o <org-key>` |
+| SonarQube Cloud — US | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+| SonarQube Server | `sonar auth login -s <server-url>` |
+
+Tell the user:
+
+> "Run the command below — it will open your browser to log in. The token is stored
+> securely in your system keychain and never appears in this chat."
+
+Wait for the user to confirm they logged in, then run `sonar auth status` yourself to
+verify before continuing.
+
+---
+
+### Step 4 — Install secrets binary
+
+Run `sonar install secrets --status` yourself using the Bash tool.
+
+**If already installed:** skip to Step 5.
+
+**If not installed:** run `sonar install secrets` yourself using the Bash tool and wait
+for it to complete.
+
+---
+
+### Step 5 — Integrate with Claude Code
+
+Ask the user:
+
+> "Should this integration apply to the **current project only** (default) or
+> **globally** to all projects?"
+
+Then run the appropriate command yourself using the Bash tool, using the server/org
+from Step 2 or Step 3 and adding `--non-interactive`:
+
+| Scenario | Command |
+|---|---|
+| SonarQube Cloud — EU, project | `sonar integrate claude -o <org-key> --non-interactive` |
+| SonarQube Cloud — EU, global | `sonar integrate claude -o <org-key> --global --non-interactive` |
+| SonarQube Cloud — US, project | `sonar integrate claude -o <org-key> -s https://sonarqube.us --non-interactive` |
+| SonarQube Cloud — US, global | `sonar integrate claude -o <org-key> -s https://sonarqube.us --global --non-interactive` |
+| SonarQube Server, project | `sonar integrate claude -s <server-url> --non-interactive` |
+| SonarQube Server, global | `sonar integrate claude -s <server-url> --global --non-interactive` |
+
+---
+
+### Summary message
+
+After all steps complete, print a summary:
+
+```
+✅ SonarQube integration is ready.
+
+  Secrets scanning:  hooks installed via sonar integrate claude
+  MCP server:        configured via sonar integrate claude
+  Authentication:    token stored in system keychain
+
+You can verify at any time with:  sonar auth status
+To re-run this setup:             /sonarqube:configure
 ```
 
-Note: Use the appropriate URL based on their region (EU: sonarcloud.io, US: sonarqube.us)
-
-**For SonarQube Server:**
-```bash
-cat > "${CLAUDE_PLUGIN_ROOT}/.env" << 'EOF'
-# SonarQube Server Configuration
-export SONARQUBE_URL="<user-provided-url>"
-export SONARQUBE_TOKEN="YOUR_TOKEN_HERE"
-EOF
-```
-
-**Important:** 
-- Replace `<user-provided-org-key>` and `<user-provided-url>` with actual values provided by user
-- Keep `YOUR_TOKEN_HERE` as a placeholder - user will replace this themselves
-- Use the `${CLAUDE_PLUGIN_ROOT}` variable to get the plugin directory path
-
-### 5. Guide User to Complete Setup Securely (DO NOT automate this)
-
-**🔒 CRITICAL: Do not add token to shell config automatically!**
-
-Instead, provide instructions for the user to follow:
-
-**Tell the user:**
-
-"I've created a configuration template at `${CLAUDE_PLUGIN_ROOT}/.env`. For security, you'll need to add your access token yourself. Here's how:
-
-**Step 1: Generate your access token**
-- [For Cloud EU] Go to: https://sonarcloud.io/account/security
-- [For Cloud US] Go to: https://sonarqube.us/account/security
-- [For Server] Go to: Your SonarQube → User → My Account → Security → Generate Tokens
-
-**Step 2: Edit the .env file securely**
-Open the file in your editor and replace `YOUR_TOKEN_HERE` with your actual token:
-```bash
-# Choose your preferred editor
-nano ${CLAUDE_PLUGIN_ROOT}/.env
-# or
-code ${CLAUDE_PLUGIN_ROOT}/.env
-# or
-vim ${CLAUDE_PLUGIN_ROOT}/.env
-```
-
-**Step 3: Restart Claude Code**
-After adding your token to the `.env` file, simply restart Claude Code. The plugin will automatically load your credentials from the `.env` file.
-
-🔒 **Security Note:** Never paste your token in this chat. Keep it secure in your local .env file.
-
-✨ **That's it!** No need to modify your shell configuration - the plugin handles everything automatically."
-
-### 6. Provide Verification Instructions
-
-Give the user simple verification steps:
-
-**Tell them:**
-"After you've added your token to the `.env` file:
-
-1. Save the file
-2. Restart Claude Code
-3. The plugin will automatically load your credentials
-
-You can verify the `.env` file is correct by checking it contains:
-- SONARQUBE_URL (with your URL)
-- SONARQUBE_TOKEN (with your actual token, not YOUR_TOKEN_HERE)
-- SONARQUBE_ORG (only for Cloud)
-
-That's it! No shell configuration needed - the plugin handles everything automatically."
-
-### 7. Summary Message
-
-Provide a clear summary:
-
-"✅ **Setup Summary:**
-- Created configuration template at: `${CLAUDE_PLUGIN_ROOT}/.env`
-- You need to: Add your access token to the .env file
-- After setup: Restart Claude Code (that's it!)
-
-🔒 **Security Reminder:**
-- Never share your access token
-- Never paste it in this chat
-- The .env file is git-ignored and stays on your machine only
-- Generate separate tokens for different machines/uses
-
-📚 **Need help?** See CONFIGURATION.md for detailed instructions."
-
-## Important Notes
-
-- **NEVER handle actual tokens in chat** - always use placeholders
-- **Explain why** - users should understand the security implications
-- **Provide alternatives** - some users may prefer different setup methods
-- **Be clear** - step-by-step instructions prevent mistakes
-- **Verify understanding** - make sure user knows what to do next
-
-## Example Flows
-
-### Example 1: SonarQube Cloud (EU - Default)
-```
-User: "Help me configure my SonarQube credentials"
-Assistant: "I'll help you set this up securely. Are you using SonarQube Cloud or Server?"
-User: "Cloud"
-Assistant: "What's your organization key?"
-User: "my-org"
-Assistant: "Are you using the US region (sonarqube.us) instead of the default EU region (sonarcloud.io)?"
-User: "no" (or just presses enter)
-Assistant: "Perfect! I've created a configuration template at .env with URL set to https://sonarcloud.io
-           For security, you'll need to add your access token yourself by:
-           1. Generate token at: https://sonarcloud.io/account/security
-           2. Edit the .env file and replace YOUR_TOKEN_HERE
-           3. Restart Claude Code
-           [provides detailed instructions]"
-```
-
-### Example 2: SonarQube Cloud (US)
-```
-User: "Help me configure my SonarQube credentials"
-Assistant: "Are you using SonarQube Cloud or Server?"
-User: "Cloud"
-Assistant: "What's your organization key?"
-User: "my-us-org"
-Assistant: "Are you using the US region (sonarqube.us)?"
-User: "yes"
-Assistant: "Perfect! I've created a configuration template at .env with URL set to https://sonarqube.us
-           [provides detailed instructions for US region]"
-```
-
-### Example 2: SonarQube Server
-```
-User: "Help me configure my SonarQube credentials"
+If any step failed, note it clearly and suggest the corrective action.

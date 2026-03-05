@@ -1,24 +1,13 @@
 {
   "hooks": {
-    "PostToolUse": [
+    "SessionStart": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-sonar.sh",
-            "description": "Check modified files with SonarLint"
-          }
-        ]
-      }
-    ],
-    "Setup": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/setup.sh",
-            "description": "Verify SonarLint/SonarQube setup"
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/scripts/run-hook\" setup",
+            "timeout": 30
           }
         ]
       }

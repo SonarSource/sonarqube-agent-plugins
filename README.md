@@ -1,140 +1,111 @@
 # SonarQube Plugin for Claude Code
 
-Integrate SonarQube and SonarLint code quality analysis directly into your Claude Code workflow.
+Integrate SonarQube code quality and security analysis directly into your Claude Code workflow.
 
 ## Features
 
-- **Code Analysis**: Run SonarQube/SonarLint analysis on your codebase
-- **Issue Fixing**: Automatically fix code quality issues following SonarQube rules
+- **Code Analysis**: Analyze files for quality and security issues using the SonarQube MCP server
+- **Issue Fixing**: Fix specific code quality issues by rule key and location
 - **Rule Explanation**: Get detailed explanations of SonarQube rules
-- **Automatic Checks**: Post-edit hooks to check code quality after modifications
+- **Issue Listing**: Search and filter issues in your SonarQube project
+- **Project Health**: View key metrics (coverage, duplication ...)
+- **Secrets Scanning**: Prevent secrets from being propagated to AI agents via pre-tool hooks
+- **Session Check**: On startup, reports whether prerequisites are installed and configured
 
 ## Installation
-
-### Prerequisites
-
-Install SonarLint CLI or SonarScanner:
-
-```bash
-# SonarLint CLI (recommended for quick checks)
-npm install -g sonarlint-cli
-
-# OR SonarScanner (for full analysis)
-# Download from: https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
-```
 
 ### Add Plugin to Claude Code
 
 ```bash
-# From GitHub (once published)
-/plugin marketplace add SonarSource/sonar-claude-code-plugin
-
 # Local development
-claude --plugin-dir ./path/to/sonar-claude-code-plugin
+claude --plugin-dir ./path/to/sonarqube-claude-code-plugin
 ```
+
+### Prerequisites
+
+- **Python 3** — required for the `SessionStart` hook (`python3` or `py` must be in `PATH`)
+- **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:configure`:
+
+  | Platform | Command |
+  |---|---|
+  | macOS / Linux | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
+  | Windows (PowerShell) | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex` |
+
+### Set Up
+
+Once `sonarqube-cli` is installed, run the guided setup skill:
+
+```
+/sonarqube:configure
+```
+
+This will:
+1. Verify `sonarqube-cli` is available
+2. Authenticate with SonarQube Cloud or a self-hosted SonarQube Server via `sonar auth login` (opens browser — token stored in your system keychain, never pasted in chat)
+3. Install the secrets scanning binary
+4. Run `sonar integrate claude` to register hooks and the MCP server with Claude Code
 
 ## Usage
 
-### Analyze Code Quality
+### Set Up
 
-```bash
-# Analyze entire project
-/sonarqube:analyze
-
-# Analyze specific files
-/sonarqube:analyze src/main/java/MyClass.java
-
-# Analyze directory
-/sonarqube:analyze src/main/java/
+```
+/sonarqube:configure
 ```
 
-### Fix Issues
+### Analyze a File
 
-```bash
-# Fix by rule key and location
+```
+/sonarqube:analyze                      # analyze the file currently in context
+/sonarqube:analyze src/auth/login.py   # analyze a specific file
+```
+
+### List Issues
+
+```
+/sonarqube:list-issues
+```
+
+### View Project Health
+
+```
+/sonarqube:project-health
+```
+
+### Fix an Issue
+
+```
 /sonarqube:fix-issue java:S1481 src/main/java/MyClass.java:42
-
-# Fix by description
-/sonarqube:fix-issue Remove unused variable in MyClass.java
 ```
 
-### Understand Rules
+### Explain a Rule
 
-```bash
-# Explain a specific rule
+```
 /sonarqube:explain-rule java:S1481
-
-# Search by description
 /sonarqube:explain-rule unused local variables
 ```
 
 ## Configuration
 
-### Setup SonarQube Credentials
+Run `/sonarqube:configure` — it handles everything interactively.
 
-🔒 **Security First:** This plugin uses a secure configuration process where **you never paste your access token in chat**. 
+For reference, the connection scenarios and corresponding `sonar auth login` commands are:
 
-When you first use the plugin, simply ask:
+| Scenario | Command |
+|---|---|
+| SonarQube Cloud — EU (default) | `sonar auth login -o <org-key>` |
+| SonarQube Cloud — US | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+| SonarQube Server | `sonar auth login -s <server-url>` |
 
-```
-"Help me configure my SonarQube credentials"
-```
+Credentials are stored in your system keychain. You can verify the current auth status with:
 
-Claude will create a configuration template and guide you to add your token securely in a local file.
-
-Claude will guide you through configuring for either:
-
-**SonarQube Cloud:**
-- URL: `https://sonarcloud.io` (default EU region, or `https://sonarqube.us` for US)
-- Organization key (required)
-- Access token
-
-**SonarQube Server:**
-- Your server URL (e.g., `http://localhost:9000`)
-- Access token (organization not needed)
-
-**Manual Configuration** (alternative):
-
-Create a `.env` file in the plugin directory and restart Claude Code:
-
-**For SonarQube Cloud (most users - EU region):**
 ```bash
-export SONARQUBE_URL="https://sonarcloud.io"
-export SONARQUBE_ORG="your-org-key"
-export SONARQUBE_TOKEN="your-token"
+sonar auth status
 ```
-
-**For SonarQube Cloud US region (if applicable):**
-```bash
-export SONARQUBE_URL="https://sonarqube.us"
-export SONARQUBE_ORG="your-org-key"
-export SONARQUBE_TOKEN="your-token"
-```
-
-**For SonarQube Server:**
-```bash
-export SONARQUBE_URL="http://localhost:9000"
-export SONARQUBE_TOKEN="your-token"
-```
-
-✨ **No shell configuration needed!** The plugin automatically loads the `.env` file when starting.
-
-**Generate a Token:**
-- **SonarCloud EU:** https://sonarcloud.io/account/security
-- **SonarCloud US:** https://sonarqube.us/account/security
-- **SonarQube Server:** User → My Account → Security → Generate Tokens
-
-**Not sure which one you have?** See [CLOUD_VS_SERVER.md](./CLOUD_VS_SERVER.md) for a detailed comparison.
-
-**Documentation:**
-- [CONFIGURATION.md](./CONFIGURATION.md) - Complete configuration guide
-- [SECURITY.md](./SECURITY.md) - Security best practices (read this first!)
-- [MCP_CONFIG.md](./MCP_CONFIG.md) - How the MCP server configuration works
-- [CLOUD_VS_SERVER.md](./CLOUD_VS_SERVER.md) - Cloud vs Server comparison
 
 ### Optional: sonar-project.properties
 
-Create a `sonar-project.properties` file in your project root:
+Create a `sonar-project.properties` file in your project root to set a project key for analysis:
 
 ```properties
 sonar.projectKey=my-project
@@ -144,38 +115,34 @@ sonar.sources=src
 sonar.sourceEncoding=UTF-8
 ```
 
-## Automatic Hooks
+## Project Structure
 
-The plugin automatically checks modified files after Write/Edit operations. To disable:
-
-In `.claude/settings.json`
-```json
-{
-  "disabledHooks": {
-    "sonarqube": ["PostToolUse"]
-  }
-}
+```
+sonarqube-claude-code-plugin/
+├── .claude-plugin/
+│   ├── plugin.json           # Plugin manifest
+│   └── marketplace.json      # Marketplace metadata
+├── skills/
+│   └── configure/
+│       └── SKILL.md          # /sonarqube:configure guided setup wizard
+├── commands/
+│   ├── analyze.md            # /sonarqube:analyze
+│   ├── list-issues.md        # /sonarqube:list-issues
+│   ├── project-health.md     # /sonarqube:project-health
+│   ├── fix-issue.md          # /sonarqube:fix-issue
+│   └── explain-rule.md       # /sonarqube:explain-rule
+├── hooks/
+│   └── hooks.json            # SessionStart hook
+├── scripts/
+│   ├── run-hook              # Hook launcher
+│   ├── setup.py              # SessionStart: prerequisite status check
+│   └── _common.py            # Shared utilities
+├── CHANGELOG.md
+├── SECURITY.md
+└── README.md
 ```
 
 ## Development
-
-### Project Structure
-
-```
-sonar-claude-code-plugin/
-├── .claude-plugin/
-│   └── plugin.json           # Plugin manifest
-├── skills/                   # Agent skills
-│   ├── analyze/
-│   ├── fix-issue/
-│   └── explain-rule/
-├── hooks/
-│   └── hooks.json           # Event hooks
-├── scripts/                 # Shell scripts
-│   ├── setup.sh
-│   └── check-sonar.sh
-└── README.md
-```
 
 ### Testing Locally
 
@@ -183,15 +150,10 @@ sonar-claude-code-plugin/
 claude --plugin-dir .
 ```
 
-## Contributing
-
-Contributions are welcome! Please read our contributing guidelines.
-
 ## License
 
 LGPL-3.0
 
 ## Support
 
-- Documentation: https://docs.sonarsource.com
 - Issues: https://github.com/SonarSource/sonar-claude-code-plugin/issues
