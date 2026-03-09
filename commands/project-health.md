@@ -1,6 +1,6 @@
 ---
 name: project-health
-description: Show a health overview of a SonarQube project — bugs, vulnerabilities, coverage, and technical debt
+description: Show a health overview of a SonarQube project — bugs, vulnerabilities, coverage, complexity, and technical debt
 ---
 
 # SonarQube — Project Health
@@ -38,6 +38,7 @@ Fetch all of the following metric keys in a single call:
 {
   "projectKey": "<project-key>",
   "metricKeys": [
+    "ncloc",
     "bugs",
     "vulnerabilities",
     "code_smells",
@@ -46,8 +47,12 @@ Fetch all of the following metric keys in a single call:
     "security_rating",
     "reliability_rating",
     "coverage",
-    "duplicated_lines_density",
-    "ncloc"
+    "line_coverage",
+    "branch_coverage",
+    "uncovered_lines",
+    "complexity",
+    "cognitive_complexity",
+    "duplicated_lines_density"
   ],
   "branch": "<name>",      // if --branch was given
   "pullRequest": "<id>"    // if --pr was given
@@ -80,11 +85,20 @@ Present the metrics as a structured health card:
 | Technical debt | 3h 20min |
 | Maintainability rating | A |
 
-### Coverage & Duplication
+### Coverage
 | Metric | Value |
 |--------|-------|
-| Coverage | 74.2% |
-| Duplicated lines | 3.1% |
+| Overall coverage | 74.2% |
+| Line coverage | 76.1% |
+| Branch coverage | 68.4% |
+| Uncovered lines | 312 |
+
+### Complexity
+| Metric | Value |
+|--------|-------|
+| Cyclomatic complexity | 847 |
+| Cognitive complexity | 612 |
+| Duplication | 3.1% |
 
 ### Size
 | Metric | Value |
@@ -96,14 +110,17 @@ Present the metrics as a structured health card:
 - A: 0 vulnerabilities / 0 bugs / debt ratio ≤ 5 %
 - B–E: increasing levels of risk
 
+Omit a metric row if the value was not returned by the API (e.g. branch/line coverage may be absent for some project configurations).
+
 Add a one-sentence overall assessment, for example:
 - *"The project is in good shape — one vulnerability to address and coverage could be improved."*
-- *"High technical debt and a B reliability rating suggest refactoring is overdue."*
+- *"High cognitive complexity and low branch coverage suggest the core logic needs tests and simplification."*
 
 ### Step 5: Next steps
 
 - To see the full issue list: *"Run `/sonarqube:list-issues <project-key>`."*
-- To drill into uncovered code: *"Ask me to analyze a specific file with `/sonarqube:analyze <file>`."*
+- If coverage is low: *"Run `/sonarqube:coverage <project-key>` to find the worst-covered files and uncovered lines."*
+- To drill into a specific file: *"Run `/sonarqube:analyze <file>`."*
 
 ## Error Handling
 
@@ -113,7 +130,7 @@ If the MCP server is unavailable or the project key is not found:
 Unable to reach the SonarQube MCP server, or project key not found.
 
 **Possible causes:**
-- MCP server is not running — check `.mcp.json` and restart Claude Code
+- MCP server is not running — restart Claude Code and run `/sonarqube:configure`
 - Credentials not configured — run `/sonarqube:configure`
 - Project key is wrong — verify `sonar-project.properties`
 ```

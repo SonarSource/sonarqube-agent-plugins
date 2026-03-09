@@ -5,10 +5,6 @@ import json
 import os
 import shutil
 import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _common import continue_with_comment
 
 
 def check_sonar_cli():
@@ -42,7 +38,7 @@ def main():
         else "✗ not set up — run /sonarqube:configure"
     ))
 
-    continue_with_comment("\n".join(lines))
+    print(json.dumps({"reason": "\n".join(lines)}))
     sys.exit(0)
 
 

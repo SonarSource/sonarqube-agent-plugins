@@ -5,16 +5,22 @@ description: Search and filter SonarQube issues for a project, branch, or pull r
 
 # SonarQube — List Issues
 
-Search for issues in a SonarQube project using the MCP server.
+Search for issues in a SonarQube project using the `sonarqube-cli`.
 
 ## Usage
 
 ```
-/sonarqube:list-issues                              # issues in the current project
-/sonarqube:list-issues my-project                   # issues in a specific project key
-/sonarqube:list-issues my-project --severity HIGH   # filter by severity
-/sonarqube:list-issues my-project --pr 42           # issues on pull request #42
-/sonarqube:list-issues my-project --branch main     # issues on a specific branch
+/sonarqube:list-issues                                           # issues in the current project
+/sonarqube:list-issues my-project                               # issues in a specific project key
+/sonarqube:list-issues my-project --severity CRITICAL           # filter by severity
+/sonarqube:list-issues my-project --types BUG,VULNERABILITY     # filter by type
+/sonarqube:list-issues my-project --statuses OPEN,CONFIRMED     # filter by status
+/sonarqube:list-issues my-project --rules python:S2077          # filter by rule key
+/sonarqube:list-issues my-project --tags security               # filter by tag
+/sonarqube:list-issues my-project --component src/auth/login.py # issues in a specific file
+/sonarqube:list-issues my-project --resolved                    # only resolved issues
+/sonarqube:list-issues my-project --branch main                 # on a specific branch
+/sonarqube:list-issues my-project --pr 42                       # on a pull request
 ```
 
 ## Instructions
@@ -23,31 +29,33 @@ Search for issues in a SonarQube project using the MCP server.
 
 - If `$ARGUMENTS` contains a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
-- If still not found, ask: *"Which SonarQube project would you like to list issues for?"*
+- If still not found, suggest: *"Run `/sonarqube:list-projects` to find your project key, then re-run this command."*
 
-### Step 2: Parse optional filters from `$ARGUMENTS`
+### Step 2: Parse optional flags from `$ARGUMENTS`
 
-| Flag | Maps to parameter |
-|------|-------------------|
-| `--severity HIGH\|MEDIUM\|LOW\|INFO\|BLOCKER` | `severities` |
-| `--pr <id>` | `pullRequestId` |
-| `--branch <name>` | `branch` |
-| `--status OPEN\|CONFIRMED\|FALSE_POSITIVE\|ACCEPTED\|FIXED` | `issueStatuses` |
-| `--file <path>` | `files` (use the SonarQube component key format `project:src/path`) |
+| Flag | Maps to CLI option |
+|------|--------------------|
+| `--severity <value>` | `--severity` |
+| `--types <values>` | `--types` |
+| `--statuses <values>` | `--statuses` |
+| `--rules <values>` | `--rules` |
+| `--tags <values>` | `--tags` |
+| `--component <path>` | `--component-keys` (file key format: `project-key:src/path`) |
+| `--resolved` | `--resolved` |
+| `--branch <name>` | `--branch` |
+| `--pr <id>` | `--pull-request` |
 
-### Step 3: Call `mcp__sonarqube__search_sonar_issues_in_projects`
+When `--component` is given as a plain path, prepend the resolved project key to form the component key (e.g. `my-project:src/auth/login.py`).
 
-```json
-{
-  "projects": ["<project-key>"],
-  "severities": ["<severity>"],        // if --severity was given
-  "pullRequestId": "<id>",             // if --pr was given
-  "branch": "<name>",                  // if --branch was given
-  "issueStatuses": ["<status>"],       // if --status was given
-  "files": ["<component-key>"],        // if --file was given
-  "ps": 50
-}
+### Step 3: Run `sonar list issues`
+
+Build and run the command using the Bash tool:
+
+```bash
+sonar list issues -p <project-key> --format toon [--severity <value>] [--types <values>] [--statuses <values>] [--rules <values>] [--tags <values>] [--component-keys <key>] [--resolved] [--branch <name>] [--pull-request <id>] --all
 ```
+
+Use `--all` to fetch all matching issues with automatic pagination. Only include optional flags that were provided.
 
 ### Step 4: Format the results
 
@@ -58,11 +66,11 @@ Search for issues in a SonarQube project using the MCP server.
 
 Found **12 issue(s)**:
 
-| File | Line | Severity | Type | Message |
+| File | Line | Severity | Rule | Message |
 |------|------|----------|------|---------|
-| src/auth/login.py | 12 | 🔴 Blocker | Vulnerability | SQL injection risk |
-| src/utils/helpers.py | 34 | 🟠 High | Bug | Null dereference |
-| src/api/routes.py | 67 | 🟡 Medium | Code Smell | Cognitive complexity too high |
+| src/auth/login.py | 12 | 🔴 Blocker | python:S2077 | SQL injection risk |
+| src/utils/helpers.py | 34 | 🟠 High | python:S2259 | Null dereference |
+| src/api/routes.py | 67 | 🟡 Medium | python:S3776 | Cognitive complexity too high |
 ```
 
 Severity icons:
@@ -79,23 +87,19 @@ Severity icons:
 ✅ No issues found.
 ```
 
-**If the result is paginated** (total > 50), note: *"Showing first 50 of N issues. Add `--severity` or `--file` to narrow results."*
-
 ### Step 5: Next steps
 
 - To fix a specific issue: *"Ask me to fix `<rule>` at `<file>:<line>`."*
-- To check overall project health and key quality metrics: *"Run `/sonarqube:project-health`."*
-- To triage (accept / mark false positive): *"Ask me to accept or mark as false positive any issue by its key."*
+- To check overall project health: *"Run `/sonarqube:project-health`."*
 
 ## Error Handling
 
-If the MCP server is unavailable or the project key is not found:
+If the command fails:
 
 ```markdown
-Unable to reach the SonarQube MCP server, or project key not found.
+Unable to list issues.
 
 **Possible causes:**
-- MCP server is not running — check `.mcp.json` and restart Claude Code
-- Credentials not configured — run `/sonarqube:configure`
-- Project key is wrong — verify `sonar-project.properties`
+- `sonarqube-cli` not installed or not authenticated — run `/sonarqube:configure`
+- Project key is wrong — run `/sonarqube:list-projects` to find the correct key
 ```

@@ -6,9 +6,11 @@ Integrate SonarQube code quality and security analysis directly into your Claude
 
 - **Code Analysis**: Analyze files for quality and security issues using the SonarQube MCP server
 - **Issue Fixing**: Fix specific code quality issues by rule key and location
-- **Rule Explanation**: Get detailed explanations of SonarQube rules
 - **Issue Listing**: Search and filter issues in your SonarQube project
+- **Project Discovery**: List accessible SonarQube projects to find project keys
 - **Project Health**: View key metrics (coverage, duplication ...)
+- **Coverage Inspection**: Find files with low coverage and pinpoint uncovered lines
+- **Dependency Risks**: Search for SCA issues in project dependencies (requires SonarQube Advanced Security — Cloud Enterprise edition or Server 2025.4 Enterprise+)
 - **Secrets Scanning**: Prevent secrets from being propagated to AI agents via pre-tool hooks
 - **Session Check**: On startup, reports whether prerequisites are installed and configured
 
@@ -23,7 +25,7 @@ claude --plugin-dir ./path/to/sonarqube-claude-code-plugin
 
 ### Prerequisites
 
-- **Python 3** — required for the `SessionStart` hook (`python3` or `py` must be in `PATH`)
+- **Python 3** — `python3` must be in `PATH` for the `SessionStart` hook. On Windows, the easiest way is [Python from the Microsoft Store](https://apps.microsoft.com/detail/9PJPW5LDXLZ5), which adds `python3.exe` automatically. The official python.org installer adds `python`/`py` but not `python3` by default — if that's your setup, add a `python3` alias or use the Microsoft Store version.
 - **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:configure`:
 
   | Platform | Command |
@@ -60,10 +62,18 @@ This will:
 /sonarqube:analyze src/auth/login.py   # analyze a specific file
 ```
 
+### List Projects
+
+```
+/sonarqube:list-projects             # all accessible projects
+/sonarqube:list-projects my-team     # search by name or key
+```
+
 ### List Issues
 
 ```
-/sonarqube:list-issues
+/sonarqube:list-issues                              # issues in the current project
+/sonarqube:list-issues my-project --severity CRITICAL --all
 ```
 
 ### View Project Health
@@ -72,17 +82,27 @@ This will:
 /sonarqube:project-health
 ```
 
+### Inspect Coverage
+
+```
+/sonarqube:coverage                        # worst-covered files in the current project
+/sonarqube:coverage my-project --max 50   # files with coverage <= 50%
+/sonarqube:coverage my-project --file src/auth/login.py  # line-by-line detail
+```
+
+### Check Dependency Risks
+
+```
+/sonarqube:dependency-risks                    # risks in the current project
+/sonarqube:dependency-risks my-project --branch feature/auth
+```
+
+> Requires SonarQube Advanced Security (Cloud Enterprise edition or Server 2025.4 Enterprise+).
+
 ### Fix an Issue
 
 ```
 /sonarqube:fix-issue java:S1481 src/main/java/MyClass.java:42
-```
-
-### Explain a Rule
-
-```
-/sonarqube:explain-rule java:S1481
-/sonarqube:explain-rule unused local variables
 ```
 
 ## Configuration
@@ -127,16 +147,16 @@ sonarqube-claude-code-plugin/
 │       └── SKILL.md          # /sonarqube:configure guided setup wizard
 ├── commands/
 │   ├── analyze.md            # /sonarqube:analyze
+│   ├── list-projects.md      # /sonarqube:list-projects
 │   ├── list-issues.md        # /sonarqube:list-issues
 │   ├── project-health.md     # /sonarqube:project-health
-│   ├── fix-issue.md          # /sonarqube:fix-issue
-│   └── explain-rule.md       # /sonarqube:explain-rule
+│   ├── coverage.md           # /sonarqube:coverage
+│   ├── dependency-risks.md   # /sonarqube:dependency-risks
+│   └── fix-issue.md          # /sonarqube:fix-issue
 ├── hooks/
 │   └── hooks.json            # SessionStart hook
 ├── scripts/
-│   ├── run-hook              # Hook launcher
-│   ├── setup.py              # SessionStart: prerequisite status check
-│   └── _common.py            # Shared utilities
+│   └── setup.py              # SessionStart: prerequisite status check
 ├── CHANGELOG.md
 ├── SECURITY.md
 └── README.md
