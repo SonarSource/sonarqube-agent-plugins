@@ -70,9 +70,6 @@ Tell the user:
 > "Run the command below — it will open your browser to log in. The token is stored
 > securely in your system keychain and never appears in this chat."
 
-Wait for the user to confirm they logged in, then run `sonar auth status` yourself to
-verify before continuing.
-
 ---
 
 ### Step 4 — Install secrets binary
@@ -84,9 +81,16 @@ Run `sonar install secrets --status` yourself using the Bash tool.
 **If not installed:** run `sonar install secrets` yourself using the Bash tool and wait
 for it to complete.
 
+Wait for the user to confirm they logged in, then run `sonar auth status` yourself to
+verify before continuing.
 ---
 
 ### Step 5 — Integrate with Claude Code
+
+Before running any command, validate the values collected in Step 3:
+
+- **Organization key** must match `^[a-zA-Z0-9_\-]+$` — reject and ask again if it contains anything else.
+- **Server URL** must start with `https://` or `http://` and contain no shell metacharacters (spaces, quotes, semicolons, backticks, `$`, `&`, `|`, `>`). Reject and ask again if it does not.
 
 Ask the user:
 

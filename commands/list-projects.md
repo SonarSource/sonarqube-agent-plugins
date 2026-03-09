@@ -20,7 +20,11 @@ List SonarQube projects accessible to the authenticated user. Useful for discove
 
 - If `$ARGUMENTS` contains a search term (not a flag), pass it as `--query`.
 
-### Step 2: Run `sonar list projects`
+### Step 2: Validate arguments
+
+If a `--query` search term was provided, validate it matches `^[a-zA-Z0-9_\-\. ]+$`. If it does not, stop and tell the user what was rejected — do not run the command.
+
+### Step 3: Run `sonar list projects`
 
 Build and run the command using the Bash tool:
 
@@ -30,7 +34,7 @@ sonar list projects [--query <search-term>]
 
 Only include `--query` if a search term was provided.
 
-### Step 3: Format the results
+### Step 4: Format the results
 
 **If projects are found**:
 
@@ -56,7 +60,7 @@ No projects found. If you expected results, check your authentication with `sona
 
 **If the result is paginated** (500 projects returned), note: *"Showing first 500 projects. Use a search term to narrow results — e.g. `/sonarqube:list-projects <query>`."*
 
-### Step 4: Next steps
+### Step 5: Next steps
 
 - To list issues in a project: *"Run `/sonarqube:list-issues <project-key>`."*
 - To view project health: *"Run `/sonarqube:project-health <project-key>`."*

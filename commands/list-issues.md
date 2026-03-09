@@ -10,7 +10,7 @@ Search for issues in a SonarQube project using the `sonarqube-cli`.
 ## Usage
 
 ```
-/sonarqube:list-issues                                           # issues in the current project
+/sonarqube:list-issues                                          # issues in the current project
 /sonarqube:list-issues my-project                               # issues in a specific project key
 /sonarqube:list-issues my-project --severity CRITICAL           # filter by severity
 /sonarqube:list-issues my-project --types BUG,VULNERABILITY     # filter by type
@@ -47,7 +47,23 @@ Search for issues in a SonarQube project using the `sonarqube-cli`.
 
 When `--component` is given as a plain path, prepend the resolved project key to form the component key (e.g. `my-project:src/auth/login.py`).
 
-### Step 3: Run `sonar list issues`
+### Step 3: Validate arguments
+
+Before building the command, validate each user-supplied value against the following rules. If any value fails validation, stop and tell the user what was rejected and why — do not run the command.
+
+| Argument | Allowed pattern |
+|----------|----------------|
+| project key | `^[a-zA-Z0-9_\-\.:]+$` |
+| `--severity` | one of: `BLOCKER`, `CRITICAL`, `MAJOR`, `MINOR`, `INFO`, `HIGH`, `MEDIUM`, `LOW` |
+| `--types` | comma-separated subset of: `BUG`, `VULNERABILITY`, `CODE_SMELL`, `SECURITY_HOTSPOT` |
+| `--statuses` | comma-separated subset of: `OPEN`, `CONFIRMED`, `REOPENED`, `RESOLVED`, `CLOSED`, `ACCEPTED`, `FALSE_POSITIVE` |
+| `--rules` | comma-separated values matching `^[a-zA-Z0-9_\-:]+$` |
+| `--tags` | comma-separated values matching `^[a-zA-Z0-9_\-]+$` |
+| `--component` | file path matching `^[a-zA-Z0-9_\-\./:,]+$` |
+| `--branch` | `^[a-zA-Z0-9_\-\./]+$` |
+| `--pr` | digits only |
+
+### Step 4: Run `sonar list issues`
 
 Build and run the command using the Bash tool:
 
@@ -57,7 +73,7 @@ sonar list issues -p <project-key> --format toon [--severity <value>] [--types <
 
 Use `--all` to fetch all matching issues with automatic pagination. Only include optional flags that were provided.
 
-### Step 4: Format the results
+### Step 5: Format the results
 
 **If issues are found**, present a summary line then a table sorted by severity then line number:
 
@@ -87,7 +103,7 @@ Severity icons:
 ✅ No issues found.
 ```
 
-### Step 5: Next steps
+### Step 6: Next steps
 
 - To fix a specific issue: *"Ask me to fix `<rule>` at `<file>:<line>`."*
 - To check overall project health: *"Run `/sonarqube:project-health`."*

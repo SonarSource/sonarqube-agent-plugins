@@ -19,7 +19,7 @@ def check_sonar_integrated():
         with open(state_path) as f:
             state = json.load(f)
         return state.get("agents", {}).get("claude-code", {}).get("configured", False)
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         return False
 
 
