@@ -68,10 +68,10 @@ Before building the command, validate each user-supplied value against the follo
 Build and run the command using the Bash tool:
 
 ```bash
-sonar list issues -p <project-key> --format toon [--severity <value>] [--types <values>] [--statuses <values>] [--rules <values>] [--tags <values>] [--component-keys <key>] [--resolved] [--branch <name>] [--pull-request <id>] --all
+sonar list issues -p <project-key> --format toon [--severity <value>] [--types <values>] [--statuses <values>] [--rules <values>] [--tags <values>] [--component-keys <key>] [--resolved] [--branch <name>] [--pull-request <id>]
 ```
 
-Use `--all` to fetch all matching issues with automatic pagination. Only include optional flags that were provided.
+Only include optional flags that were provided.
 
 ### Step 5: Format the results
 

@@ -4,7 +4,7 @@
   "description": "SonarQube plugin for Claude Code - analyze code, improve quality and security of your codebase, make sure secrets are not propagated to AI agents",
   "author": {
     "name": "Sonar",
-    "url": "https://github.com/SonarSource"
+    "url": "https://www.sonarsource.com/"
   },
   "keywords": [
     "sonarqube",
@@ -14,5 +14,6 @@
     "secrets"
   ],
   "license": "LGPL-3.0",
-  "repository": "https://github.com/SonarSource/sonar-claude-code-plugin"
+  "repository": "https://github.com/SonarSource/sonar-claude-code-plugin",
+  "homepage": "https://www.sonarsource.com"
 }

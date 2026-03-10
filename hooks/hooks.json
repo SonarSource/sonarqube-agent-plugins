@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/setup.py\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/setup.js\"",
             "timeout": 30
           }
         ]

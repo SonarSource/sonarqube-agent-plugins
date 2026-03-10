@@ -7,7 +7,7 @@ disable-model-invocation: true
 # Configure SonarQube
 
 Guide the user through setting up sonarqube-cli, authenticating, and enabling SonarQube integration
-(secrets scanning hooks + MCP server) in Claude Code.
+(secrets scanning hooks) in Claude Code.
 
 ## Instructions
 
@@ -119,7 +119,6 @@ After all steps complete, print a summary:
 ✅ SonarQube integration is ready.
 
   Secrets scanning:  hooks installed via sonar integrate claude
-  MCP server:        configured via sonar integrate claude
   Authentication:    token stored in system keychain
 
 You can verify at any time with:  sonar auth status
