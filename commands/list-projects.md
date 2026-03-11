@@ -1,0 +1,77 @@
+---
+name: list-projects
+description: List SonarQube projects accessible to the current user
+---
+
+# SonarQube — List Projects
+
+List SonarQube projects accessible to the authenticated user. Useful for discovering project keys before running other commands.
+
+## Usage
+
+```
+/sonarqube:list-projects                      # list all accessible projects
+/sonarqube:list-projects my-team              # search by name or key
+```
+
+## Instructions
+
+### Step 1: Parse optional flags from `$ARGUMENTS`
+
+- If `$ARGUMENTS` contains a search term (not a flag), pass it as `--query`.
+
+### Step 2: Validate arguments
+
+If a `--query` search term was provided, validate it matches `^[a-zA-Z0-9_\-\. ]+$`. If it does not, stop and tell the user what was rejected — do not run the command.
+
+### Step 3: Run `sonar list projects`
+
+Build and run the command using the Bash tool:
+
+```bash
+sonar list projects [--query <search-term>]
+```
+
+Only include `--query` if a search term was provided.
+
+### Step 4: Format the results
+
+**If projects are found**:
+
+```markdown
+## SonarQube Projects
+
+Found **8 project(s)**:
+
+| Project key | Name |
+|-------------|------|
+| my-org_backend | Backend Service |
+| my-org_frontend | Frontend App |
+| my-org_shared-lib | Shared Library |
+```
+
+**If no projects are found**:
+
+```markdown
+## SonarQube Projects
+
+No projects found. If you expected results, check your authentication with `sonar auth status`.
+```
+
+**If the result is paginated** (500 projects returned), note: *"Showing first 500 projects. Use a search term to narrow results — e.g. `/sonarqube:list-projects <query>`."*
+
+### Step 5: Next steps
+
+- To list issues in a project: *"Run `/sonarqube:list-issues <project-key>`."*
+- To view project health: *"Run `/sonarqube:project-health <project-key>`."*
+
+## Error Handling
+
+If the command fails:
+
+```markdown
+Unable to list projects.
+
+**Possible causes:**
+- `sonarqube-cli` not installed or not authenticated — run `/sonarqube:configure`
+```
