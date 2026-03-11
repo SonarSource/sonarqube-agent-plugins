@@ -24,10 +24,10 @@ claude --plugin-dir ./path/to/sonarqube-claude-code-plugin
 - **Node.js** — required to run the `SessionStart` hook (`scripts/setup.js`).
 - **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:configure`:
 
-  | Platform | Command |
-  |---|---|
-  | macOS / Linux | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
-  | Windows (PowerShell) | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex` |
+  | Platform              | Command                                                                                                                    |
+  |---------------------- |----------------------------------------------------------------------------------------------------------------------------|
+  | macOS / Linux         | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash`   |
+  | Windows (PowerShell)  | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`        |
 
 ### Set Up
 
@@ -78,11 +78,11 @@ Run `/sonarqube:configure` — it handles everything interactively.
 
 For reference, the connection scenarios and corresponding `sonar auth login` commands are:
 
-| Scenario | Command |
-|---|---|
-| SonarQube Cloud — EU (default) | `sonar auth login -o <org-key>` |
-| SonarQube Cloud — US | `sonar auth login -o <org-key> -s https://sonarqube.us` |
-| SonarQube Server | `sonar auth login -s <server-url>` |
+| Scenario                        | Command                                                   |
+|---------------------------------|-----------------------------------------------------------|
+| SonarQube Cloud — EU (default)  | `sonar auth login -o <org-key>`                           |
+| SonarQube Cloud — US            | `sonar auth login -o <org-key> -s https://sonarqube.us`   |
+| SonarQube Server                | `sonar auth login -s <server-url>`                        |
 
 Credentials are stored in your system keychain. You can verify the current auth status with:
 
@@ -102,29 +102,6 @@ sonar.sources=src
 sonar.sourceEncoding=UTF-8
 ```
 
-## Project Structure
-
-```
-sonarqube-claude-code-plugin/
-├── .claude-plugin/
-│   ├── plugin.json           # Plugin manifest
-│   └── marketplace.json      # Marketplace metadata
-├── skills/
-│   └── configure/
-│       └── SKILL.md          # /sonarqube:configure guided setup wizard
-├── commands/
-│   ├── list-projects.md      # /sonarqube:list-projects
-│   ├── list-issues.md        # /sonarqube:list-issues
-│   └── fix-issue.md          # /sonarqube:fix-issue
-├── hooks/
-│   └── hooks.json            # SessionStart hook
-├── scripts/
-│   └── setup.js              # SessionStart: prerequisite status check
-├── CHANGELOG.md
-├── SECURITY.md
-└── README.md
-```
-
 ## Development
 
 ### Testing Locally
@@ -133,10 +110,6 @@ sonarqube-claude-code-plugin/
 claude --plugin-dir .
 ```
 
-## License
-
-LGPL-3.0
-
 ## Support
 
-- Issues: https://github.com/SonarSource/sonar-claude-code-plugin/issues
+- Issues: https://community.sonarsource.com/

@@ -21,7 +21,7 @@ Fix a code quality or security issue identified by SonarQube.
 
 Extract:
 - **Rule key** — e.g. `java:S1481`, `python:S2077` (required)
-- **File path** — e.g. `src/auth/login.py` or `src/auth/login.py:34` (strip line number if present)
+- **File path** — Path relative to the root of the repository. e.g. `src/auth/login.py` or `src/auth/login.py:34` (strip line number if present)
 - **`--branch <name>`** and/or **`--pr <id>`** — optional filters, passed through as-is
 
 If rule key or file path cannot be determined, ask: *"Which rule and file should I fix? For example: `/sonarqube:fix-issue java:S1481 src/MyClass.java`"*
