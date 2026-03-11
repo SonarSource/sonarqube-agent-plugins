@@ -73,5 +73,5 @@ If the command fails:
 Unable to list projects.
 
 **Possible causes:**
-- `sonarqube-cli` not installed or not authenticated — run `/sonarqube:configure`
+- `sonarqube-cli` not installed or not authenticated — run `/sonarqube:configuring-sonarqube`
 ```

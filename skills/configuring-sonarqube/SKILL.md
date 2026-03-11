@@ -122,7 +122,7 @@ After all steps complete, print a summary:
   Authentication:    token stored in system keychain
 
 You can verify at any time with:  sonar auth status
-To re-run this setup:             /sonarqube:configure
+To re-run this setup:             /sonarqube:configuring-sonarqube
 ```
 
 If any step failed, note it clearly and suggest the corrective action.
