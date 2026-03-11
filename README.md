@@ -22,7 +22,7 @@ claude --plugin-dir ./path/to/sonarqube-claude-code-plugin
 ### Prerequisites
 
 - **Node.js** — required to run the `SessionStart` hook (`scripts/setup.js`).
-- **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:configure`:
+- **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:configuring-sonarqube`:
 
   | Platform              | Command                                                                                                                    |
   |---------------------- |----------------------------------------------------------------------------------------------------------------------------|
@@ -34,7 +34,7 @@ claude --plugin-dir ./path/to/sonarqube-claude-code-plugin
 Once `sonarqube-cli` is installed, run the guided setup skill:
 
 ```
-/sonarqube:configure
+/sonarqube:configuring-sonarqube
 ```
 
 This will:
@@ -48,7 +48,7 @@ This will:
 ### Set Up
 
 ```
-/sonarqube:configure
+/sonarqube:configuring-sonarqube
 ```
 
 ### List Projects
@@ -74,7 +74,7 @@ This will:
 
 ## Configuration
 
-Run `/sonarqube:configure` — it handles everything interactively.
+Run `/sonarqube:configuring-sonarqube` — it handles everything interactively.
 
 For reference, the connection scenarios and corresponding `sonar auth login` commands are:
 

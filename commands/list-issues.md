@@ -116,6 +116,6 @@ If the command fails:
 Unable to list issues.
 
 **Possible causes:**
-- `sonarqube-cli` not installed or not authenticated — run `/sonarqube:configure`
+- `sonarqube-cli` not installed or not authenticated — run `/sonarqube:configuring-sonarqube`
 - Project key is wrong — run `/sonarqube:list-projects` to find the correct key
 ```
