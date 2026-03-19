@@ -13,7 +13,7 @@
     "security",
     "secrets"
   ],
-  "license": "LGPL-3.0",
+  "license": "SSAL-1.0",
   "repository": "https://github.com/SonarSource/sonarqube-claude-code-plugin",
   "homepage": "https://www.sonarsource.com"
 }

@@ -110,6 +110,10 @@ sonar.sourceEncoding=UTF-8
 claude --plugin-dir .
 ```
 
+## License
+
+Copyright (C) 2025-2026 SonarSource Sàrl. Licensed under [SSAL-1.0](LICENSE).
+
 ## Support
 
 - Issues: https://community.sonarsource.com/
