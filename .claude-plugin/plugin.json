@@ -1,7 +1,7 @@
 {
   "name": "sonarqube",
   "version": "0.1.0",
-  "description": "SonarQube plugin for Claude Code - analyze code, improve quality and security of your codebase, make sure secrets are not propagated to AI agents",
+  "description": "SonarQube plugin for Claude Code: slash commands and setup skill. sonarqube-cli (sonar integrate claude) registers the SonarQube MCP server and analysis hooks on your machine.",
   "author": {
     "name": "Sonar",
     "url": "https://www.sonarsource.com/"
@@ -14,6 +14,6 @@
     "secrets"
   ],
   "license": "SSAL-1.0",
-  "repository": "https://github.com/SonarSource/sonarqube-claude-code-plugin",
+  "repository": "https://github.com/SonarSource/sonarqube-agent-plugins",
   "homepage": "https://www.sonarsource.com"
 }

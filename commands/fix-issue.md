@@ -1,6 +1,6 @@
 ---
 name: fix-issue
-description: Fix a specific SonarQube issue in code by rule key and file location
+description: Fix a specific SonarQube issue in code by rule key and location
 ---
 
 # SonarQube — Fix Issue
@@ -10,53 +10,48 @@ Fix a code quality or security issue identified by SonarQube.
 ## Usage
 
 ```
-/sonarqube:fix-issue java:S1481 src/main/java/MyClass.java
-/sonarqube:fix-issue python:S2077 src/auth/login.py:34
-/sonarqube:fix-issue java:S1481 src/main/java/MyClass.java --branch feature/auth
+/sonarqube:fix-issue java:S1481 src/main/java/MyClass.java:42
+/sonarqube:fix-issue python:S2077 src/auth/login.py
+/sonarqube:fix-issue Remove unused variable in MyClass.java
 ```
 
 ## Instructions
 
-### Step 1: Parse `$ARGUMENTS`
+### Step 1: Identify the issue
 
-Extract:
-- **Rule key** — e.g. `java:S1481`, `python:S2077` (required)
-- **File path** — Path relative to the root of the repository. e.g. `src/auth/login.py` or `src/auth/login.py:34` (strip line number if present)
-- **`--branch <name>`** and/or **`--pr <id>`** — optional filters, passed through as-is
+Parse `$ARGUMENTS` for:
+- A rule key (e.g. `java:S1481`, `python:S2077`)
+- A file path and optional line number (e.g. `src/auth/login.py:34`)
+- Or a plain-language description if no rule key is given
 
-If rule key or file path cannot be determined, ask: *"Which rule and file should I fix? For example: `/sonarqube:fix-issue java:S1481 src/MyClass.java`"*
+If neither a rule key nor a file path can be determined, ask: *"Which rule and file should I fix?"*
 
-### Steps 2–4: Fetch the matching issues
+### Step 2: Look up the rule (if a key was given)
 
-Follow the same project key resolution, input validation, and `sonar list issues` steps defined in the `/sonarqube:list-issues` command, using these specific filters:
+Call `mcp__sonarqube__show_rule` with the rule key to retrieve the full rule description,
+rationale, and remediation guidance before touching any code.
 
-- `--rules <rule-key>`
-- `--component <file-path>` (will be expanded to `<project-key>:<file-path>` per the list-issues instructions)
-- `--branch` / `--pr` if provided
+If the MCP server is unavailable, rely on built-in knowledge of SonarQube rules.
 
-If no issues are returned, tell the user:
+### Step 3: Read the file
 
-> "No open issues found for rule `<rule-key>` in `<file-path>`. The issue may already be resolved, or the project/branch may not match. Run `/sonarqube:list-issues` to see all open issues."
+Read the full file content. If a line number was given, focus analysis around that line
+but read the whole file to understand context.
 
-If multiple issues are returned for the same rule in the same file, fix all of them.
+### Step 4: Apply the fix
 
-### Step 5: Read the file
-
-Read the full file. Use line numbers from the issue results to focus analysis, but read the whole file to understand context.
-
-### Step 6: Apply the fix
-
-- Make the **minimal change** that resolves each flagged violation
+- Make the **minimal change** that resolves the rule violation
 - Do not refactor surrounding code or fix unrelated issues
 - Preserve existing behaviour — the fix must not change what the code does
 
-### Step 7: Explain the change
+### Step 5: Explain the change
 
 After editing, briefly explain:
-- What the violation was (using the issue message from Step 2–4)
+- What the violation was
 - Why the rule flags it
 - What was changed and why it resolves the issue
 
-### Step 8: Suggest next steps
+### Step 6: Suggest next steps
 
-- *"Run `/sonarqube:list-issues <project-key>` to see remaining issues in the project."*
+- *"Run `/sonarqube:analyze <file>` to confirm no new issues were introduced."*
+- *"Run `/sonarqube:list-issues` to see remaining issues in the project."*

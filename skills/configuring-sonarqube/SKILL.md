@@ -5,8 +5,7 @@ description: "Installs sonarqube-cli if not already installed, authenticates, an
 
 # Configuring SonarQube
 
-Guide the user through setting up sonarqube-cli, authenticating, and enabling SonarQube integration
-(secrets scanning hooks) in Claude Code.
+Guide the user through setting up sonarqube-cli, authenticating, and running **`sonar integrate claude`**. That command is what registers the **SonarQube MCP server** and **secrets-scanning hooks** in Claude Code on the user’s machine. This plugin repo only ships commands and skills; it does not embed MCP or hook definitions.
 
 ## Instructions
 
@@ -85,7 +84,9 @@ for it to complete.
 
 ---
 
-### Step 5 — Integrate with Claude Code
+### Step 5 — Integrate with Claude Code (`sonar integrate claude`)
+
+This step wires **MCP** (for commands like `/sonarqube:project-health`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:dependency-risks`) and **secrets hooks** into the user’s Claude Code config. Do not tell users to hand-edit `.mcp.json` unless they are troubleshooting with Sonar’s documentation.
 
 Before running any command, validate the values collected in Step 3:
 
@@ -118,6 +119,7 @@ After all steps complete, print a summary:
 ```
 ✅ SonarQube integration is ready.
 
+  MCP + hooks:       registered via sonar integrate claude (restart Claude Code if tools do not appear)
   Secrets scanning:  hooks installed via sonar integrate claude
   Authentication:    token stored in system keychain
 
