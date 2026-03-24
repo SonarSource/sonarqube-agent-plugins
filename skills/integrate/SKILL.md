@@ -1,19 +1,23 @@
 ---
 name: integrate
-description: "Connect an existing SonarQube Cloud or Server account to Claude Code: sonarqube-cli, auth, secrets binary, and sonar integrate claude. Use when the user wants SonarQube in Claude Code, MCP/hooks integration, or asks to connect or integrate SonarQube."
+description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with Claude Code (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
 ---
 
 # Integrate SonarQube with Claude Code
 
-Guide the user through installing **sonarqube-cli** (if needed), authenticating, and running **`sonar integrate claude`**. That command registers the **SonarQube MCP server** and **secrets-scanning hooks** in Claude Code. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the CLI writes the config Claude loads.
+Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate claude`**. That command configures the **SonarQube MCP server** and **secrets-scanning hooks** in Claude Code. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the SonarQube CLI writes the config Claude loads.
 
 ## Instructions
 
-### Step 1 — Check for sonarqube-cli
+### Step 1 — Check for sonarqube-cli and update it
 
 Run `which sonar` yourself using the Bash tool.
 
-**If found:** proceed to Step 2.
+**If found:**
+
+1. Run **`sonar self-update`** yourself using the Bash tool and wait for it to finish.
+   - **If it succeeds:** briefly tell the user the CLI is up to date (or was upgraded), then go to Step 2.
+   - **If it fails:** show the relevant output, suggest they run `sonar self-update` manually (e.g. offline or network issues), then **still continue** to Step 2 if `sonar` remains usable — do not block the rest of the flow unless the binary is missing or broken.
 
 **If not found:** show the user the platform-appropriate install command and ask them to run it
 (this cannot be automated — it requires an interactive shell session).
@@ -119,12 +123,15 @@ After all steps complete, print a summary:
 ```
 ✅ SonarQube integration is ready.
 
+  sonarqube-cli:     updated via sonar self-update (when Step 1 ran successfully)
   MCP + hooks:       registered via sonar integrate claude (restart Claude Code if tools do not appear)
   Secrets scanning:  hooks installed via sonar integrate claude
   Authentication:    token stored in system keychain
 
 You can verify at any time with:  sonar auth status
-To re-run this setup:             /sonarqube:integrate
+To refresh CLI + wiring later:     run /sonarqube:integrate again (self-update + integrate)
 ```
 
-If any step failed, note it clearly and suggest the corrective action.
+If **`sonar self-update`** failed in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest `sonar self-update` in a terminal.
+
+If any other step failed, note it clearly and suggest the corrective action.
