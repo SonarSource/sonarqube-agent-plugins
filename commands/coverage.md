@@ -113,7 +113,7 @@ If the MCP server is unavailable or the project key is not found:
 Unable to reach the SonarQube MCP server, or project key not found.
 
 **Possible causes:**
-- MCP server not registered — run `/sonarqube:configuring-sonarqube` so `sonar integrate claude` can wire the SonarQube MCP server, then restart Claude Code
-- Credentials not configured — run `/sonarqube:configuring-sonarqube`
+- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP server, then restart Claude Code
+- Credentials not configured — run `/sonarqube:integrate`
 - Project key is wrong — verify `sonar-project.properties`
 ```

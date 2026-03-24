@@ -95,7 +95,7 @@ Unable to fetch dependency risks.
 
 **Possible causes:**
 - This feature requires SonarQube Advanced Security — available on SonarQube Cloud Enterprise edition, or SonarQube Server 2025.4 Enterprise or higher
-- MCP server not registered — run `/sonarqube:configuring-sonarqube` so `sonar integrate claude` can wire the SonarQube MCP server, then restart Claude Code
-- Credentials not configured — run `/sonarqube:configuring-sonarqube`
+- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP server, then restart Claude Code
+- Credentials not configured — run `/sonarqube:integrate`
 - Project key is wrong — verify `sonar-project.properties`
 ```
