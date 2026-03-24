@@ -1,6 +1,8 @@
 ---
 name: list-projects
 description: List SonarQube projects accessible to the current user
+argument-hint: [search-query]
+allowed-tools: Bash(sonar:*)
 ---
 
 # SonarQube — List Projects

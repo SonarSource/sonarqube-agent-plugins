@@ -1,6 +1,7 @@
 ---
 name: integrate
 description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with Claude Code (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
+allowed-tools: Bash(which:*), Bash(sonar:*)
 ---
 
 # Integrate SonarQube with Claude Code

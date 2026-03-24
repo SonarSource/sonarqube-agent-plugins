@@ -1,6 +1,8 @@
 ---
 name: project-health
 description: Show a health overview of a SonarQube project — bugs, vulnerabilities, coverage, complexity, and technical debt
+argument-hint: [project-key] [--branch name] [--pr id]
+allowed-tools: Read, Grep
 ---
 
 # SonarQube — Project Health
@@ -21,7 +23,7 @@ Fetch and display key quality and security metrics for a SonarQube project.
 
 - If `$ARGUMENTS` contains a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
-- If still not found, ask: *"Which SonarQube project would you like a health overview for?"*
+- If still not found, omit `projectKey` — when the MCP server is configured per-project it already has the project context.
 
 ### Step 2: Parse optional filters from `$ARGUMENTS`
 
@@ -30,9 +32,11 @@ Fetch and display key quality and security metrics for a SonarQube project.
 | `--branch <name>` | `branch` |
 | `--pr <id>` | `pullRequest` |
 
-### Step 3: Call `mcp__sonarqube__get_component_measures`
+### Step 3: Fetch metrics and quality gate
 
-Fetch all of the following metric keys in a single call:
+Make both calls in parallel:
+
+**`mcp__sonarqube__get_component_measures`** — fetch all metric keys in a single call:
 
 ```json
 {
@@ -59,12 +63,23 @@ Fetch all of the following metric keys in a single call:
 }
 ```
 
+**`mcp__sonarqube__get_project_quality_gate_status`** — fetch the quality gate result:
+
+```json
+{
+  "projectKey": "<project-key>",
+  "pullRequest": "<id>"    // if --pr was given; omit for branch queries
+}
+```
+
 ### Step 4: Format the results
 
 Present the metrics as a structured health card:
 
 ```markdown
 ## Project Health — `my-project` (branch: `main`)
+
+**Quality Gate: ✅ PASSED** <!-- or ❌ FAILED -->
 
 ### Reliability
 | Metric | Value |
@@ -104,6 +119,17 @@ Present the metrics as a structured health card:
 | Metric | Value |
 |--------|-------|
 | Lines of code | 12 450 |
+```
+
+If the quality gate status is unavailable (e.g. no analysis has run yet), omit the line rather than showing an error.
+
+If the quality gate **FAILED**, list the failing conditions beneath the status line, for example:
+
+```markdown
+**Quality Gate: ❌ FAILED**
+Failing conditions:
+- Coverage on new code: 41.2% (required ≥ 80%)
+- New blocker issues: 2 (required = 0)
 ```
 
 **Rating scale** (A–E, where A = best):

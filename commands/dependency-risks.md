@@ -1,6 +1,8 @@
 ---
 name: dependency-risks
 description: Search for software composition analysis (SCA) dependency risks in a SonarQube project
+argument-hint: [project-key] [--branch name] [--pr id]
+allowed-tools: Read, Grep
 ---
 
 # SonarQube — Dependency Risks
@@ -24,7 +26,7 @@ Search for dependency risks (software composition analysis issues) in a SonarQub
 
 - If `$ARGUMENTS` contains a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
-- If still not found, ask: *"Which SonarQube project would you like to check for dependency risks?"*
+- If still not found, omit `projectKey` — when the MCP server is configured per-project it already has the project context.
 
 ### Step 2: Parse optional flags from `$ARGUMENTS`
 

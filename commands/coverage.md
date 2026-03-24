@@ -1,6 +1,8 @@
 ---
 name: coverage
 description: Find files with low test coverage and inspect uncovered lines in a SonarQube project
+argument-hint: [project-key] [--max n] [--file key] [--pr id]
+allowed-tools: Read, Grep
 ---
 
 # SonarQube — Coverage
@@ -22,7 +24,7 @@ Identify files with insufficient test coverage and pinpoint the exact lines that
 
 - If `$ARGUMENTS` contains a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
-- If still not found, ask: *"Which SonarQube project would you like to check coverage for?"*
+- If still not found, omit `projectKey` — when the MCP server is configured per-project it already has the project context.
 
 ### Step 2: Parse optional flags from `$ARGUMENTS`
 
