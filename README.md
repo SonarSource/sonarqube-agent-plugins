@@ -4,7 +4,7 @@ This repository bundles SonarQube integrations for more than one assistant produ
 
 | Surface | Location | Notes |
 |--------|----------|--------|
-| **Claude Code** | `.claude-plugin/`, `commands/`, `skills/`, `hooks/`, `scripts/` | Slash commands, setup skill, SessionStart check; MCP and secrets hooks are registered by **sonarqube-cli** (`sonar integrate claude`), not by a checked-in `.mcp.json` in this tree |
+| **Claude Code** | `.claude-plugin/`, `commands/`, `skills/integrate/`, `hooks/`, `scripts/` | Slash commands, `/sonarqube:integrate` skill, SessionStart check; MCP and secrets hooks are registered by **sonarqube-cli** (`sonar integrate claude`), not by a checked-in `.mcp.json` in this tree |
 | **Gemini** | `gemini-extension.json`, `GEMINI.md` | Gemini extension + MCP user context |
 | **Kiro** | `kiro-power/` | Power definition and `mcp.json` for Kiro |
 
@@ -33,7 +33,7 @@ claude --plugin-dir ./path/to/sonarqube-claude-code-plugin
 ### Prerequisites
 
 - **Node.js** — required to run the `SessionStart` hook (`scripts/setup.js`).
-- **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:configuring-sonarqube`:
+- **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:integrate`:
 
   | Platform              | Command                                                                                                                    |
   |---------------------- |----------------------------------------------------------------------------------------------------------------------------|
@@ -45,7 +45,7 @@ claude --plugin-dir ./path/to/sonarqube-claude-code-plugin
 Once `sonarqube-cli` is installed, run the guided setup skill:
 
 ```
-/sonarqube:configuring-sonarqube
+/sonarqube:integrate
 ```
 
 This will:
@@ -59,7 +59,7 @@ This will:
 ### Set Up
 
 ```
-/sonarqube:configuring-sonarqube
+/sonarqube:integrate
 ```
 
 ### List Projects (CLI)
@@ -114,7 +114,7 @@ This will:
 
 ## Configuration
 
-Run `/sonarqube:configuring-sonarqube` — it handles everything interactively.
+Run `/sonarqube:integrate` — it handles everything interactively.
 
 For reference, the connection scenarios and corresponding `sonar auth login` commands are:
 

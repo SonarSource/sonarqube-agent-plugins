@@ -47,9 +47,9 @@ const integrated = isSonarIntegrated();
 const lines = [
   "SonarQube plugin initialised.",
   "  sonarqube-cli:    " +
-    (sonarOk ? "✓ found" : "✗ not found — run /sonarqube:configuring-sonarqube"),
+    (sonarOk ? "✓ found" : "✗ not found — run /sonarqube:integrate"),
   "  Secrets scanning: " +
-    (integrated ? "✓ configured" : "✗ not set up — run /sonarqube:configuring-sonarqube"),
+    (integrated ? "✓ configured" : "✗ not set up — run /sonarqube:integrate"),
 ];
 
 process.stdout.write(JSON.stringify({ systemMessage: lines.join("\n") }) + "\n");

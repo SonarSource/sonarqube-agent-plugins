@@ -92,7 +92,7 @@ Severity icons:
 After the results, always add:
 
 - If issues were found: *"Run `/sonarqube:fix-issue <rule> <file>:<line>` to fix a specific issue, or ask me to fix them all."*
-- If the MCP server is not configured: guide the user to run `/sonarqube:configuring-sonarqube`.
+- If the MCP server is not configured: guide the user to run `/sonarqube:integrate`.
 - If the user wants to analyze another file: remind them to run `/sonarqube:analyze <file>`.
 
 ## Error Handling
@@ -103,7 +103,7 @@ If `mcp__sonarqube__analyze_code_snippet` is unavailable or returns an error:
 Unable to reach the SonarQube MCP server.
 
 **Possible causes:**
-- MCP server not registered — run `/sonarqube:configuring-sonarqube` so `sonar integrate claude` can wire the SonarQube MCP server, then restart Claude Code
-- Credentials not configured — run `/sonarqube:configuring-sonarqube`
+- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP server, then restart Claude Code
+- Credentials not configured — run `/sonarqube:integrate`
 - Project key is invalid — verify `sonar-project.properties`
 ```
