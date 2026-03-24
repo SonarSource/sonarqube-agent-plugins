@@ -48,7 +48,7 @@ const lines = [
   "SonarQube plugin initialised.",
   "  sonarqube-cli:    " +
     (sonarOk ? "✓ found" : "✗ not found — run /sonarqube:integrate"),
-  "  Secrets scanning: " +
+  "  Secrets-scanning hooks: " +
     (integrated ? "✓ configured" : "✗ not set up — run /sonarqube:integrate"),
 ];
 

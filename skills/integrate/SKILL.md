@@ -77,20 +77,11 @@ verify before continuing.
 
 ---
 
-### Step 4 — Install secrets binary
+### Step 4 — Integrate with Claude Code (`sonar integrate claude`)
 
-Run `sonar install secrets --status` yourself using the Bash tool.
+This step runs **`sonar integrate claude`**, which configures the **SonarQube MCP server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
-**If already installed:** skip to Step 5.
-
-**If not installed:** run `sonar install secrets` yourself using the Bash tool and wait
-for it to complete.
-
----
-
-### Step 5 — Integrate with Claude Code (`sonar integrate claude`)
-
-This step wires **MCP** (for commands like `/sonarqube:project-health`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:dependency-risks`) and **secrets hooks** into the user’s Claude Code config. Do not tell users to hand-edit `.mcp.json` unless they are troubleshooting with Sonar’s documentation.
+It wires **MCP** (for commands like `/sonarqube:project-health`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:dependency-risks`) and **secrets-scanning hooks** into the user’s Claude Code config.
 
 Before running any command, validate the values collected in Step 3:
 
