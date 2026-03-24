@@ -4,7 +4,7 @@ This repository bundles SonarQube integrations for more than one assistant produ
 
 | Surface | Location | Notes |
 |--------|----------|--------|
-| **Claude Code** | `.claude-plugin/`, `commands/`, `skills/integrate/`, `hooks/`, `scripts/` | Slash commands, `/sonarqube:integrate` skill, SessionStart check; MCP and secrets hooks are registered by **sonarqube-cli** (`sonar integrate claude`), not by a checked-in `.mcp.json` in this tree |
+| **Claude Code** | `.claude-plugin/`, `commands/`, `skills/integrate/`, `hooks/`, `scripts/` | Slash commands, `/sonarqube:integrate` skill, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`) |
 | **Gemini** | `gemini-extension.json`, `GEMINI.md` | Gemini extension + MCP user context |
 | **Kiro** | `kiro-power/` | Power definition and `mcp.json` for Kiro |
 
@@ -18,7 +18,7 @@ Integrate SonarQube code quality and security analysis into your **Claude Code**
 - **Issue listing**: Search and filter issues in your SonarQube project (CLI)
 - **Project discovery**: List accessible SonarQube projects to find project keys (CLI)
 - **Project health, coverage, snippet analysis, dependency risks**: Slash commands that call the SonarQube MCP server (available after `sonar integrate claude`)
-- **Secrets scanning**: Pre-tool hooks registered by the CLI to limit secret exposure to the agent
+- **Secrets scanning**: Pre-tool **secrets-scanning hooks** registered by the CLI via `sonar integrate claude` to limit secret exposure to the agent
 - **Session check**: On startup, reports whether sonarqube-cli is present and integration is configured
 
 ## Installation
@@ -49,10 +49,9 @@ Once `sonarqube-cli` is installed, run the guided setup skill:
 ```
 
 This will:
-1. Verify `sonarqube-cli` is available
+1. Verify `sonarqube-cli` is available (and run `sonar self-update` when the CLI is present)
 2. Authenticate with SonarQube Cloud or a self-hosted SonarQube Server via `sonar auth login` (opens browser — token stored in your system keychain, never pasted in chat)
-3. Install the secrets scanning binary
-4. Run `sonar integrate claude` to register the SonarQube MCP server, secrets hooks, and other Claude Code integration on your machine (the plugin bundle in this repo does not ship an `.mcp.json`; the CLI writes the config Claude Code loads)
+3. Run `sonar integrate claude` to register the SonarQube MCP server, secrets-scanning hooks, and other Claude Code integration on your machine (the plugin bundle in this repo does not ship an `.mcp.json`; the SonarQube CLI writes the config Claude Code loads)
 
 ## Usage
 
