@@ -1,6 +1,8 @@
 ---
 name: list-issues
 description: Search and filter SonarQube issues for a project, branch, or pull request
+argument-hint: [project-key] [--severity value] [--types values] [--branch name]
+allowed-tools: Read, Grep, Bash(sonar:*)
 ---
 
 # SonarQube — List Issues
@@ -89,11 +91,12 @@ Found **12 issue(s)**:
 | src/api/routes.py | 67 | 🟡 Medium | python:S3776 | Cognitive complexity too high |
 ```
 
-Severity icons:
-- 🔴 Blocker / Critical
-- 🟠 High
-- 🟡 Medium
-- 🔵 Low / Info
+Severity icons (the label depends on the server version):
+- 🔴 Blocker
+- 🟠 Critical / High
+- 🟡 Major / Medium
+- 🔵 Minor / Low
+- ⚪ Info
 
 **If no issues are found**:
 

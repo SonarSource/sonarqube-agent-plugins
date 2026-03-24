@@ -1,6 +1,8 @@
 ---
 name: fix-issue
 description: Fix a specific SonarQube issue in code by rule key and location
+argument-hint: [rule-key] [file-path:line]
+allowed-tools: Read, Edit
 ---
 
 # SonarQube — Fix Issue

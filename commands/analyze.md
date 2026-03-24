@@ -1,6 +1,8 @@
 ---
 name: analyze
 description: Analyze a file or code snippet for quality and security issues using SonarQube
+argument-hint: [file-path]
+allowed-tools: Read, Glob, Bash(git branch:*)
 ---
 
 # SonarQube — Code Analysis
@@ -18,7 +20,7 @@ Analyze code for quality and security issues using the SonarQube MCP server.
 
 ### Step 1: Resolve what to analyze
 
-`mcp__sonarqube__analyze_code_snippet` analyzes **one file at a time**. Resolve a single file path:
+Both analysis tools work on **one file at a time**. Resolve a single file path:
 
 - If `$ARGUMENTS` contains a path, use it.
 - If `$ARGUMENTS` is empty, look at the current conversation context for a recently mentioned or edited file.
@@ -29,7 +31,7 @@ Do not accept a directory as input. If the user provides one, ask them to specif
 ### Step 2: Read the file and detect context
 
 1. Read its full content with the `Read` tool.
-2. Detect the language from the file extension:
+2. Detect the language from the file extension (needed for the standard tool):
 
 | Extension | Language key |
 |-----------|-------------|
@@ -45,17 +47,33 @@ Do not accept a directory as input. If the user provides one, ask them to specif
 | `.kt` | `kotlin` |
 | `.c` `.cpp` `.cc` `.h` | `cpp` |
 
-3. Detect the SonarQube project key (use the first that exists):
-   - `sonar.projectKey` in `sonar-project.properties` at the repo root
-   - The `SONARQUBE_ORG` environment variable as a fallback prefix
+3. Detect the SonarQube project key:
+   - If `$ARGUMENTS` contains a project key, use it.
+   - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
+   - If still not found, omit `projectKey` — when the MCP server is configured per-project it already has the project context.
 
-### Step 3: Call `mcp__sonarqube__analyze_code_snippet`
+4. Determine the file scope: `"TEST"` if the file path contains `test`, `spec`, or `__tests__`; otherwise `"MAIN"`.
 
-Call the tool with:
+### Step 3: Call the appropriate analysis tool
+
+Two tools may be available depending on whether the connected organization is eligible for Agentic Analysis:
+
+**Try `mcp__sonarqube__run_advanced_code_analysis` first** (available when the organization is eligible for Agentic Analysis).
+
+Before calling it, detect the current branch name using `git branch --show-current`. If git is unavailable, use `main` as a fallback. Then call with:
+
+- `projectKey` — project key if found, otherwise omit
+- `branchName` — detected branch name
+- `filePath` — project-relative file path (e.g. `src/auth/login.py`)
+- `fileContent` — full file content
+- `fileScope` — `["TEST"]` or `["MAIN"]`
+
+**If that tool is unavailable, fall back to `mcp__sonarqube__analyze_code_snippet`** (available for all organizations):
+
 - `projectKey` — project key if found, otherwise omit
 - `codeSnippet` — full file content
 - `language` — detected language key
-- `scope` — `"TEST"` if the file path contains `test`, `spec`, or `__tests__`; otherwise `"MAIN"`
+- `scope` — `"TEST"` or `"MAIN"`
 
 ### Step 4: Format the results
 
@@ -73,11 +91,12 @@ Found **3 issue(s)**:
 | 67 | 🟡 Minor | python:S1135 | Complete the task associated to this "TODO" comment. |
 ```
 
-Severity icons:
-- 🔴 Blocker / Critical
-- 🟠 Major
-- 🟡 Minor
-- 🔵 Info
+Severity icons (the label depends on the server version):
+- 🔴 Blocker
+- 🟠 Critical / High
+- 🟡 Major / Medium
+- 🔵 Minor / Low
+- ⚪ Info
 
 **If no issues are found**:
 
@@ -97,7 +116,7 @@ After the results, always add:
 
 ## Error Handling
 
-If `mcp__sonarqube__analyze_code_snippet` is unavailable or returns an error:
+If both `mcp__sonarqube__run_advanced_code_analysis` and `mcp__sonarqube__analyze_code_snippet` are unavailable or return an error:
 
 ```markdown
 Unable to reach the SonarQube MCP server.

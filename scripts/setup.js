@@ -26,7 +26,7 @@ function hasSonarCli() {
   return false;
 }
 
-function isSonarIntegrated() {
+function readClaudeCodeHooksInstalled() {
   const statePath = path.join(
     os.homedir(),
     ".sonar",
@@ -35,21 +35,31 @@ function isSonarIntegrated() {
   );
   try {
     const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
-    return !!(state?.agents?.["claude-code"]?.configured);
+    const installed = state?.agents?.["claude-code"]?.hooks?.installed;
+    return Array.isArray(installed) ? installed : [];
   } catch {
-    return false;
+    return [];
   }
 }
 
+function hasNamedHook(installed, hookName) {
+  return installed.some((entry) => entry && entry.name === hookName);
+}
+
 const sonarOk = hasSonarCli();
-const integrated = isSonarIntegrated();
+const hooksInstalled = readClaudeCodeHooksInstalled();
+const agenticAnalysisOk = hasNamedHook(hooksInstalled, "sonar-sqaa");
+const secretsOk = hasNamedHook(hooksInstalled, "sonar-secrets");
+const integrateHint = "✗ not set up — run /sonarqube:integrate";
 
 const lines = [
   "SonarQube plugin initialised.",
   "  sonarqube-cli:    " +
     (sonarOk ? "✓ found" : "✗ not found — run /sonarqube:integrate"),
-  "  Secrets-scanning hooks: " +
-    (integrated ? "✓ configured" : "✗ not set up — run /sonarqube:integrate"),
+  "  Agentic Analysis hook (sonar-sqaa): " +
+    (agenticAnalysisOk ? "✓ configured" : integrateHint),
+  "  Secrets hook (sonar-secrets): " +
+    (secretsOk ? "✓ configured" : integrateHint),
 ];
 
 process.stdout.write(JSON.stringify({ systemMessage: lines.join("\n") }) + "\n");
