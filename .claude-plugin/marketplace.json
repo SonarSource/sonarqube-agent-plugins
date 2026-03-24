@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "sonarqube",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "description": "SonarQube plugin for Claude Code: slash commands and /sonarqube:integrate skill. sonarqube-cli (sonar integrate claude) registers the SonarQube MCP server and secrets hooks on your machine.",
       "source": "./"
     }
