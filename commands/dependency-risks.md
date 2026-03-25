@@ -1,7 +1,7 @@
 ---
 name: dependency-risks
-description: Search for software composition analysis (SCA) dependency risks in a SonarQube project
-argument-hint: [project-key] [--branch name] [--pr id]
+description: Search for software composition analysis (SCA) dependency risks in a SonarQube project (project key optional when MCP integration already defines the default project)
+argument-hint: [project-key?] [--branch name] [--pr id]
 allowed-tools: Read, Grep
 ---
 
@@ -9,7 +9,7 @@ allowed-tools: Read, Grep
 
 Search for dependency risks (software composition analysis issues) in a SonarQube project, paired with the releases that appear in the analysed project, application, or portfolio.
 
-> **Availability:** Requires SonarQube Advanced Security — available on SonarQube Cloud Enterprise edition, or SonarQube Server 2025.4 Enterprise or higher.
+> **Availability:** Requires SonarQube Advanced Security — available on SonarQube Cloud Enterprise plan, or SonarQube Server 2025.4 Enterprise edition or higher.
 
 ## Usage
 
@@ -22,28 +22,34 @@ Search for dependency risks (software composition analysis issues) in a SonarQub
 
 ## Instructions
 
-### Step 1: Resolve the project key
+### Step 1: Resolve the project key (only when needed)
+
+MCP tools sometimes **do not require** `projectKey` after **`sonar integrate claude`** has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
 - If `$ARGUMENTS` contains a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
-- If still not found, omit `projectKey` — when the MCP server is configured per-project it already has the project context.
+- If still not found, **omit `projectKey`** in MCP calls and rely on the integration default.
 
 ### Step 2: Parse optional flags from `$ARGUMENTS`
 
-| Flag | Maps to parameter |
-|------|-------------------|
-| `--branch <name>` | `branchKey` |
-| `--pr <id>` | `pullRequestKey` |
+| Flag              | Maps to parameter |
+| ----------------- | ----------------- |
+| `--branch <name>` | `branchKey`       |
+| `--pr <id>`       | `pullRequestKey`  |
 
 ### Step 3: Call `mcp__sonarqube__search_dependency_risks`
 
+Include **`projectKey` only if** you resolved one in Step 1 **and** the tool requires it; otherwise omit it.
+
 ```json
 {
-  "projectKey": "<project-key>",
+  "projectKey": "<only-if-required>",
   "branchKey": "<name>",       // if --branch was given
   "pullRequestKey": "<id>"     // if --pr was given
 }
 ```
+
+Omit `projectKey` from the payload when the integration default applies. Omit unused optional fields.
 
 ### Step 4: Format the results
 
@@ -55,21 +61,21 @@ Search for dependency risks (software composition analysis issues) in a SonarQub
 Found **5 dependency risk(s)**:
 
 ### Critical
-| Dependency | Version | Risk | CVE |
-|------------|---------|------|-----|
-| log4j-core | 2.14.1 | Remote code execution | CVE-2021-44228 |
+| Dependency | Version | Risk                  | CVE            |
+| ---------- | ------- | --------------------- | -------------- |
+| log4j-core | 2.14.1  | Remote code execution | CVE-2021-44228 |
 
 ### High
-| Dependency | Version | Risk | CVE |
-|------------|---------|------|-----|
-| jackson-databind | 2.12.3 | Deserialization vulnerability | CVE-2021-46877 |
-| commons-text | 1.9 | Remote code execution | CVE-2022-42889 |
+| Dependency       | Version | Risk                          | CVE            |
+| ---------------- | ------- | ----------------------------- | -------------- |
+| jackson-databind | 2.12.3  | Deserialization vulnerability | CVE-2021-46877 |
+| commons-text     | 1.9     | Remote code execution         | CVE-2022-42889 |
 
 ### Medium
-| Dependency | Version | Risk | CVE |
-|------------|---------|------|-----|
-| spring-web | 5.3.18 | DoS vulnerability | CVE-2022-22965 |
-| netty-handler | 4.1.68 | SSL/TLS issue | CVE-2021-43797 |
+| Dependency    | Version | Risk              | CVE            |
+| ------------- | ------- | ----------------- | -------------- |
+| spring-web    | 5.3.18  | DoS vulnerability | CVE-2022-22965 |
+| netty-handler | 4.1.68  | SSL/TLS issue     | CVE-2021-43797 |
 ```
 
 Omit columns that are not present in the response. Omit severity sections that have no risks.
@@ -85,8 +91,8 @@ Omit columns that are not present in the response. Omit severity sections that h
 ### Step 5: Next steps
 
 - To fix a vulnerable dependency: *"Ask me to update `<dependency>` to a safe version."*
-- To see overall project health: *"Run `/sonarqube:project-health <project-key>`."*
-- To check code-level security issues: *"Run `/sonarqube:list-issues <project-key> --severity HIGH`."*
+- To check the quality gate: *"Run `/sonarqube:quality-gate` (add a project key only if you are not using the integration default)."*
+- To check code-level security issues: *"Run `/sonarqube:list-issues <project-key>` (or use `sonar.projectKey` in the repo) with filters as needed — `sonar list issues` always requires `-p`."*
 
 ## Error Handling
 
@@ -97,7 +103,7 @@ Unable to fetch dependency risks.
 
 **Possible causes:**
 - This feature requires SonarQube Advanced Security — available on SonarQube Cloud Enterprise edition, or SonarQube Server 2025.4 Enterprise or higher
-- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP server, then restart Claude Code
+- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP Server, then restart Claude Code
 - Credentials not configured — run `/sonarqube:integrate`
-- Project key is wrong — verify `sonar-project.properties`
+- Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run `/sonarqube:integrate` for this project
 ```

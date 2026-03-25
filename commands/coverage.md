@@ -1,7 +1,7 @@
 ---
 name: coverage
-description: Find files with low test coverage and inspect uncovered lines in a SonarQube project
-argument-hint: [project-key] [--max n] [--file key] [--pr id]
+description: Find files with low test coverage and inspect uncovered lines in a SonarQube project (project key optional when MCP integration already defines the default project)
+argument-hint: [project-key?] [--max n] [--file key] [--pr id]
 allowed-tools: Read, Grep
 ---
 
@@ -20,34 +20,38 @@ Identify files with insufficient test coverage and pinpoint the exact lines that
 
 ## Instructions
 
-### Step 1: Resolve the project key
+### Step 1: Resolve the project key (only when needed)
+
+MCP tools sometimes **do not require** `projectKey` after **`sonar integrate claude`** has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
 - If `$ARGUMENTS` contains a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
-- If still not found, omit `projectKey` — when the MCP server is configured per-project it already has the project context.
+- If still not found, **omit `projectKey`** in MCP calls and rely on the integration default.
 
 ### Step 2: Parse optional flags from `$ARGUMENTS`
 
-| Flag | Meaning |
-|------|---------|
-| `--max <n>` | Only return files with coverage ≤ n% (maps to `maxCoverage`) |
-| `--pr <id>` | Analyse a pull request instead of the main branch |
+| Flag           | Meaning                                                                     |
+| -------------- | --------------------------------------------------------------------------- |
+| `--max <n>`    | Only return files with coverage ≤ n% (maps to `maxCoverage`)                |
+| `--pr <id>`    | Analyse a pull request instead of the main branch                           |
 | `--file <key>` | Skip the file list and go straight to line-by-line detail for this file key |
 
 ### Step 3: Run the appropriate flow
 
 #### Flow A — File list (default, no `--file`)
 
-Call `mcp__sonarqube__search_files_by_coverage`:
+Call `mcp__sonarqube__search_files_by_coverage`. Include **`projectKey` only if** you resolved one in Step 1 **and** the tool requires it; otherwise omit it.
 
 ```json
 {
-  "projectKey": "<project-key>",
+  "projectKey": "<only-if-required>",
   "maxCoverage": <n>,       // if --max was given
   "pullRequest": "<id>",    // if --pr was given
   "pageSize": 20
 }
 ```
+
+Omit `projectKey` from the payload entirely when the default project from integration applies. Omit unused optional fields.
 
 Present results as a table sorted by coverage ascending:
 
@@ -56,17 +60,17 @@ Present results as a table sorted by coverage ascending:
 
 Files with lowest coverage (worst first):
 
-| File | Coverage |
-|------|----------|
-| src/auth/login.py | 12.5% |
-| src/utils/crypto.py | 23.0% |
-| src/api/routes.py | 41.8% |
+| File                | Coverage |
+| ------------------- | -------- |
+| src/auth/login.py   | 12.5%    |
+| src/utils/crypto.py | 23.0%    |
+| src/api/routes.py   | 41.8%    |
 ```
 
 If no files are returned (all files exceed the threshold), say: *"All files meet the coverage threshold."*
 
 Then offer to drill in:
-*"Ask me to inspect any of these files for uncovered lines, or run `/sonarqube:coverage <project> --file <file-key>` directly."*
+*"Ask me to inspect any of these files for uncovered lines, or run `/sonarqube:coverage --file <file-key>` (add a project key only if needed)."`*
 
 #### Flow B — Line detail (`--file <key>` given, or user asks to inspect a file)
 
@@ -80,7 +84,7 @@ Call `mcp__sonarqube__get_file_coverage_details`:
 ```
 
 The file key format is `<projectKey>:<path>`, e.g. `my-project:src/auth/login.py`.
-If the user provides just a path, prepend the resolved project key.
+If the user provides just a path, prepend the resolved project key when you have one; if the integration supplies the default project, the detail tool may accept the path or key format your MCP schema documents — follow the tool schema.
 
 Present uncovered and partially covered lines:
 
@@ -94,9 +98,9 @@ Lines with no test coverage: 14, 15, 23, 45–52, 67
 
 ### Partially covered branches
 | Line | Covered branches | Total branches |
-|------|-----------------|----------------|
-| 30 | 1 | 2 |
-| 61 | 0 | 2 |
+| ---- | ---------------- | -------------- |
+| 30   | 1                | 2              |
+| 61   | 0                | 2              |
 ```
 
 If the file is fully covered, say: *"All lines in this file are covered."*
@@ -105,17 +109,17 @@ If the file is fully covered, say: *"All lines in this file are covered."*
 
 - To write tests for uncovered lines: *"Ask me to add tests for the uncovered lines above."*
 - To check for quality issues in the same file: *"Run `/sonarqube:analyze <file>`."*
-- To see overall project health: *"Run `/sonarqube:project-health <project-key>`."*
+- To check the quality gate: *"Run `/sonarqube:quality-gate` (add a project key only if you are not using the integration default)."*
 
 ## Error Handling
 
 If the MCP server is unavailable or the project key is not found:
 
 ```markdown
-Unable to reach the SonarQube MCP server, or project key not found.
+Unable to reach the SonarQube MCP Server, or project key not found.
 
 **Possible causes:**
-- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP server, then restart Claude Code
+- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP Server, then restart Claude Code
 - Credentials not configured — run `/sonarqube:integrate`
-- Project key is wrong — verify `sonar-project.properties`
+- Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run `/sonarqube:integrate` for this project
 ```
