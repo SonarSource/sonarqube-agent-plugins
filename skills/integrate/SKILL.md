@@ -6,7 +6,7 @@ allowed-tools: Bash(which:*), Bash(sonar:*)
 
 # Integrate SonarQube with Claude Code
 
-Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate claude`**. That command configures the **SonarQube MCP server** and **secrets-scanning hooks** in Claude Code. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the SonarQube CLI writes the config Claude loads.
+Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate claude`**. That command configures the **SonarQube MCP Server** and **secrets-scanning hooks** in Claude Code. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the SonarQube CLI writes the config Claude loads.
 
 ## Instructions
 
@@ -23,10 +23,10 @@ Run `which sonar` yourself using the Bash tool.
 **If not found:** show the user the platform-appropriate install command and ask them to run it
 (this cannot be automated — it requires an interactive shell session).
 
-| Platform       | Install command                                                                                                            |
-|----------------|----------------------------------------------------------------------------------------------------------------------------|
-| macOS / Linux  | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
-| Windows (PS)   | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
+| Platform      | Install command                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| macOS / Linux | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
+| Windows (PS)  | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
 
 Wait for the user to confirm, then re-run `which sonar` yourself to verify before continuing.
 
@@ -54,19 +54,19 @@ First determine the connection type. Ask:
 
 Collect:
 
-| Scenario                        | Information needed                                                |
-|---------------------------------|-------------------------------------------------------------------|
-| SonarQube Cloud — EU (default)  | organization key (e.g. `my-org`)                                  |
-| SonarQube Cloud — US            | organization key + confirm US region (`https://sonarqube.us`)     |
-| SonarQube Server                | server URL (e.g. `https://sonarqube.yourcompany.com`)            |
+| Scenario                       | Information needed                                            |
+| ------------------------------ | ------------------------------------------------------------- |
+| SonarQube Cloud — EU (default) | organization key (e.g. `my-org`)                              |
+| SonarQube Cloud — US           | organization key + confirm US region (`https://sonarqube.us`) |
+| SonarQube Server               | server URL (e.g. `https://sonarqube.yourcompany.com`)         |
 
 Build the login command and show it to the user:
 
-| Scenario             | Command                                                   |
-|----------------------|-----------------------------------------------------------|
-| SonarQube Cloud — EU | `sonar auth login -o <org-key>`                           |
-| SonarQube Cloud — US | `sonar auth login -o <org-key> -s https://sonarqube.us`   |
-| SonarQube Server     | `sonar auth login -s <server-url>`                        |
+| Scenario             | Command                                                 |
+| -------------------- | ------------------------------------------------------- |
+| SonarQube Cloud — EU | `sonar auth login -o <org-key>`                         |
+| SonarQube Cloud — US | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+| SonarQube Server     | `sonar auth login -s <server-url>`                      |
 
 Tell the user:
 
@@ -80,9 +80,9 @@ verify before continuing.
 
 ### Step 4 — Integrate with Claude Code (`sonar integrate claude`)
 
-This step runs **`sonar integrate claude`**, which configures the **SonarQube MCP server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
+This step runs **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
-It wires **MCP** (for commands like `/sonarqube:project-health`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:dependency-risks`) and **secrets-scanning hooks** into the user’s Claude Code config.
+It wires **MCP** (for commands like `/sonarqube:quality-gate`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:duplication`, `/sonarqube:dependency-risks`) and **secrets-scanning hooks** into the user’s Claude Code config.
 
 Before running any command, validate the values collected in Step 3:
 
@@ -97,14 +97,14 @@ Ask the user:
 Then run the appropriate command yourself using the Bash tool, using the server/org
 from Step 2 or Step 3 and adding `--non-interactive`:
 
-| Scenario                      | Command                                                                          |
-|-------------------------------|----------------------------------------------------------------------------------|
-| SonarQube Cloud — EU, project | `sonar integrate claude -o <org-key> --non-interactive`                          |
-| SonarQube Cloud — EU, global  | `sonar integrate claude -o <org-key> --global --non-interactive`                 |
-| SonarQube Cloud — US, project | `sonar integrate claude -o <org-key> -s https://sonarqube.us --non-interactive`  |
+| Scenario                      | Command                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| SonarQube Cloud — EU, project | `sonar integrate claude -o <org-key> --non-interactive`                                  |
+| SonarQube Cloud — EU, global  | `sonar integrate claude -o <org-key> --global --non-interactive`                         |
+| SonarQube Cloud — US, project | `sonar integrate claude -o <org-key> -s https://sonarqube.us --non-interactive`          |
 | SonarQube Cloud — US, global  | `sonar integrate claude -o <org-key> -s https://sonarqube.us --global --non-interactive` |
-| SonarQube Server, project     | `sonar integrate claude -s <server-url> --non-interactive`                       |
-| SonarQube Server, global      | `sonar integrate claude -s <server-url> --global --non-interactive`              |
+| SonarQube Server, project     | `sonar integrate claude -s <server-url> --non-interactive`                               |
+| SonarQube Server, global      | `sonar integrate claude -s <server-url> --global --non-interactive`                      |
 
 ---
 

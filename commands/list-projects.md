@@ -45,11 +45,11 @@ Only include `--query` if a search term was provided.
 
 Found **8 project(s)**:
 
-| Project key | Name |
-|-------------|------|
-| my-org_backend | Backend Service |
-| my-org_frontend | Frontend App |
-| my-org_shared-lib | Shared Library |
+| Project key       | Name            |
+| ----------------- | --------------- |
+| my-org_backend    | Backend Service |
+| my-org_frontend   | Frontend App    |
+| my-org_shared-lib | Shared Library  |
 ```
 
 **If no projects are found**:
@@ -64,8 +64,8 @@ No projects found. If you expected results, check your authentication with `sona
 
 ### Step 5: Next steps
 
-- To list issues in a project: *"Run `/sonarqube:list-issues <project-key>`."*
-- To view project health: *"Run `/sonarqube:project-health <project-key>`."*
+- To list issues: *"Run `/sonarqube:list-issues <project-key>` or ensure `sonar.projectKey` is in `sonar-project.properties` — the CLI always requires `-p`."*
+- To check the quality gate: *"Run `/sonarqube:quality-gate` — add a project key only if you are not using the MCP integration default."*
 
 ## Error Handling
 

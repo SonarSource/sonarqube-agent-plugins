@@ -31,7 +31,7 @@ If neither a rule key nor a file path can be determined, ask: *"Which rule and f
 ### Step 2: Look up the rule (if a key was given)
 
 Call `mcp__sonarqube__show_rule` with the rule key to retrieve the full rule description,
-rationale, and remediation guidance before touching any code.
+rationale, and remediation guidance before touching any code. **Do not add extra parameters** (such as `projectKey`) unless the tool schema requires them — after integration, rule lookup usually needs only the rule key.
 
 If the MCP server is unavailable, rely on built-in knowledge of SonarQube rules.
 
@@ -56,4 +56,4 @@ After editing, briefly explain:
 ### Step 6: Suggest next steps
 
 - *"Run `/sonarqube:analyze <file>` to confirm no new issues were introduced."*
-- *"Run `/sonarqube:list-issues` to see remaining issues in the project."*
+- *"Run `/sonarqube:list-issues` with the project key (or `sonar.projectKey` in `sonar-project.properties`) — the CLI always uses `-p`."*
