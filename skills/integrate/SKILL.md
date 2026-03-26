@@ -84,11 +84,6 @@ This step runs **`sonar integrate claude`**, which configures the **SonarQube MC
 
 It wires **MCP** (for commands like `/sonarqube:quality-gate`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:duplication`, `/sonarqube:dependency-risks`) and **secrets-scanning hooks** into the user’s Claude Code config.
 
-Before running any command, validate the values collected in Step 3:
-
-- **Organization key** must match `^[a-zA-Z0-9_\-]+$` — reject and ask again if it contains anything else (maximum 3 attempts, then abort with instructions to check their SonarQube organization settings).
-- **Server URL** must start with `https://` or `http://` and contain no shell metacharacters (spaces, quotes, semicolons, backticks, `$`, `&`, `|`, `>`). Reject and ask again if it does not (maximum 3 attempts, then abort with instructions to contact their SonarQube administrator).
-
 Ask the user:
 
 > "Should this integration apply to the **current project only** (default) or
@@ -97,14 +92,10 @@ Ask the user:
 Then run the appropriate command yourself using the Bash tool, using the server/org
 from Step 2 or Step 3 and adding `--non-interactive`:
 
-| Scenario                      | Command                                                                                  |
-| ----------------------------- | ---------------------------------------------------------------------------------------- |
-| SonarQube Cloud — EU, project | `sonar integrate claude -o <org-key> --non-interactive`                                  |
-| SonarQube Cloud — EU, global  | `sonar integrate claude -o <org-key> --global --non-interactive`                         |
-| SonarQube Cloud — US, project | `sonar integrate claude -o <org-key> -s https://sonarqube.us --non-interactive`          |
-| SonarQube Cloud — US, global  | `sonar integrate claude -o <org-key> -s https://sonarqube.us --global --non-interactive` |
-| SonarQube Server, project     | `sonar integrate claude -s <server-url> --non-interactive`                               |
-| SonarQube Server, global      | `sonar integrate claude -s <server-url> --global --non-interactive`                      |
+| Scenario                      | Command                                              |
+| ----------------------------- | -----------------------------------------------------|
+| Project-only                  | `sonar integrate claude --non-interactive`           |
+| Global                        | `sonar integrate claude --global --non-interactive`  |
 
 ---
 
