@@ -37,8 +37,9 @@ In Claude Code, register this repository as a plugin marketplace, install the **
 ```shell
 /plugin marketplace add SonarSource/sonarqube-agent-plugins
 /plugin install sonarqube@sonar
-/reload-plugins
 ```
+
+Then start a new Claude Code session (or otherwise reload the session) so the plugin loads.
 
 The catalog name `sonar` comes from `.claude-plugin/marketplace.json`; the plugin id `sonarqube` comes from `.claude-plugin/plugin.json`. Alternatively, run `/plugin`, open the **Discover** tab, and install **sonarqube** from the Sonar marketplace interactively (pick user, project, or local [scope](https://code.claude.com/en/settings#configuration-scopes) as needed).
 
