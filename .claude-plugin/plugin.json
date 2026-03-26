@@ -1,6 +1,6 @@
 {
   "name": "sonarqube",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SonarQube plugin for Claude Code: slash commands and /sonarqube:integrate skill. sonarqube-cli (sonar integrate claude) registers the SonarQube MCP Server and analysis hooks on your machine.",
   "author": {
     "name": "Sonar",
