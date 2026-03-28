@@ -1,0 +1,5 @@
+{
+    "sonarCloudOrganization": "sonarsource",
+    "projectKey": "SonarSource_sonarqube-claude-code-plugin",
+    "region": "EU"
+}
