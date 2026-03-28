@@ -1,12 +1,12 @@
 ---
 name: integrate
-description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with Claude Code (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
+description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with OpenAI Codex (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
 allowed-tools: Bash(which:*), Bash(sonar:*)
 ---
 
-# Integrate SonarQube with Claude Code
+# Integrate SonarQube with OpenAI Codex
 
-Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate claude`**. That command configures the **SonarQube MCP Server** and **secrets-scanning hooks** in Claude Code. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the SonarQube CLI writes the config Claude loads.
+Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate codex`**. That command configures the **SonarQube MCP Server** and **secrets-scanning hooks** in OpenAI Codex. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the SonarQube CLI writes the config Codex loads.
 
 ## Instructions
 
@@ -78,12 +78,11 @@ verify before continuing.
 
 ---
 
-### Step 4 — Integrate with Claude Code (`sonar integrate claude`)
+### Step 4 — Integrate with OpenAI Codex (`sonar integrate codex`)
 
-This step runs **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
+This step runs **`sonar integrate codex`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
-It wires **MCP** (for commands like `/sonarqube:quality-gate`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:duplication`, `/sonarqube:dependency-risks`) and **secrets-scanning hooks** into the user’s Claude Code config.
-
+It wires **MCP** (for commands like `/sonarqube:quality-gate`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:duplication`, `/sonarqube:dependency-risks`) and **secrets-scanning hooks** into the user’s Codex config.
 Ask the user:
 
 > "Should this integration apply to the **current project only** (default) or
@@ -93,10 +92,11 @@ Then run the appropriate command yourself using the Bash tool, using the server/
 from Step 2 or Step 3 and adding `--non-interactive`:
 
 | Scenario                      | Command                                              |
-| ----------------------------- | -----------------------------------------------------|
-| Project-only                  | `sonar integrate claude --non-interactive`           |
-| Global                        | `sonar integrate claude --global --non-interactive`  |
-If the CLI reports that **`integrate claude`** is unknown, tell the user to install or upgrade to a current **sonarqube-cli** (e.g. run **`sonar self-update`**) and retry.
+| ----------------------------- | ---------------------------------------------------- |
+| Project-only                  | `sonar integrate codex --non-interactive`            |
+| Global                        | `sonar integrate codex --global --non-interactive`   |
+
+If the CLI reports that **`integrate codex`** is unknown, tell the user to install or upgrade to a current **sonarqube-cli** (e.g. run **`sonar self-update`**) and retry.
 
 ---
 
@@ -108,8 +108,8 @@ After all steps complete, print a summary:
 ✅ SonarQube integration is ready.
 
   sonarqube-cli:     updated via sonar self-update (when Step 1 ran successfully)
-  MCP + hooks:       registered via sonar integrate claude (restart Claude Code if tools do not appear)
-  Secrets scanning:  hooks installed via sonar integrate claude
+  MCP + hooks:       registered via sonar integrate codex (restart Codex if tools do not appear; ensure codex_hooks / lifecycle hooks are enabled if your Codex version requires it)
+  Secrets scanning:  hooks installed via sonar integrate codex
   Authentication:    token stored in system keychain
 
 You can verify at any time with:  sonar auth status

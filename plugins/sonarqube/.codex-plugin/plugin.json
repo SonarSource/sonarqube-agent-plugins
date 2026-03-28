@@ -1,0 +1,43 @@
+{
+  "name": "sonarqube",
+  "version": "1.0.1",
+  "description": "SonarQube plugin for Codex: guided setup and SonarQube workflows. sonarqube-cli (sonar integrate codex) registers the SonarQube MCP Server and Codex hooks on your machine.",
+  "author": {
+    "name": "Sonar",
+    "email": "info@sonarsource.com",
+    "url": "https://www.sonarsource.com/"
+  },
+  "homepage": "https://www.sonarsource.com",
+  "repository": "https://github.com/SonarSource/sonarqube-agent-plugins",
+  "license": "SSAL-1.0",
+  "keywords": [
+    "sonarqube",
+    "code-quality",
+    "static-analysis",
+    "security",
+    "secrets"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "SonarQube",
+    "shortDescription": "SonarQube code quality and security in Codex",
+    "longDescription": "Guided /sonarqube:integrate skill (sonarqube-cli install, auth, sonar integrate codex) and bundled MCP template in .mcp.json. After install, run sonar integrate codex to merge SonarQube MCP and hooks into your local Codex config (same integration scope as sonar integrate claude for Claude Code). Requires Docker for the MCP server image unless your CLI configures a different transport.",
+    "developerName": "Sonar",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://www.sonarsource.com",
+    "privacyPolicyURL": "https://www.sonarsource.com/company/legal/privacy/",
+    "termsOfServiceURL": "https://www.sonarsource.com/company/legal/terms-of-service/",
+    "defaultPrompt": [
+      "Set up SonarQube in Codex for this project",
+      "Check the SonarQube quality gate for this project",
+      "Help me inspect and fix SonarQube issues"
+    ],
+    "brandColor": "#CB3032",
+    "screenshots": []
+  }
+}

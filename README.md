@@ -4,14 +4,60 @@ This repository bundles SonarQube-related plugins and configuration for AI agent
 
 | Surface         | Location                                                                  | Notes                                                                                                                                                           |
 | --------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Codex**       | `plugins/sonarqube/` (`.codex-plugin/`, `skills/integrate/`, optional `.mcp.json`), `.agents/plugins/marketplace.json` | One integrate skill + [Codex plugin layout](https://developers.openai.com/codex/plugins/build); **`sonar integrate codex`** applies SonarQube MCP and hooks (same scope as `integrate claude`) |
 | **Claude Code** | `.claude-plugin/`, `commands/`, `skills/integrate/`, `hooks/`, `scripts/` | Slash commands, `/sonarqube:integrate` skill, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`) |
 | **Gemini**      | `gemini-extension.json`, `GEMINI.md`                                      | Gemini extension + MCP user context                                                                                                                             |
 | **Kiro**        | `kiro-power/`                                                             | Power definition and `mcp.json` for Kiro                                                                                                                        |
 
+- **Codex** — install and wiring: [Codex plugin](#codex-plugin).
 - **Claude Code** — full setup, commands, and configuration: [Claude Code plugin](#claude-code-plugin).
 - **Gemini** and **Kiro** — see the paths in the table above;
 
 ---
+
+## Codex plugin
+
+Integrate SonarQube into **OpenAI Codex** using the [Codex plugin layout](https://developers.openai.com/codex/plugins/build): manifest under `plugins/sonarqube/.codex-plugin/`, a **single** guided skill at `plugins/sonarqube/skills/integrate/SKILL.md`, optional bundled **`plugins/sonarqube/.mcp.json`** (referenced from the manifest as `mcpServers`), and a repo marketplace at `.agents/plugins/marketplace.json`.
+
+On-disk MCP and hook wiring for your machine is applied by **sonarqube-cli** when you run **`sonar integrate codex`** (parity with **`sonar integrate claude`** for Claude Code). The bundled `.mcp.json` is the catalog template Codex expects; the CLI merges the live SonarQube MCP definition into your Codex config.
+
+**Maintaining skills:** the Claude integrate flow lives at repo root `skills/integrate/SKILL.md`; the Codex integrate flow is `plugins/sonarqube/skills/integrate/SKILL.md`. When you change the shared steps (CLI install, auth, project vs global), update **both** files so behavior stays aligned.
+
+### Files
+
+- `plugins/sonarqube/.codex-plugin/plugin.json` — Codex plugin manifest (`skills`, optional `mcpServers`)
+- `plugins/sonarqube/skills/integrate/SKILL.md` — `/sonarqube:integrate` guided setup (sonarqube-cli + `sonar integrate codex`)
+- `plugins/sonarqube/.mcp.json` — optional bundled SonarQube MCP template (Docker-based `mcp/sonarqube` image)
+- `.agents/plugins/marketplace.json` — local marketplace entry (`source.path`: `./plugins/sonarqube` from repository root)
+
+### Install the plugin in Codex
+
+1. Open Codex (e.g. Codex CLI) with this repository as context when using the repo marketplace.
+2. Run `/plugins` and add the local marketplace file `.agents/plugins/marketplace.json`.
+3. Install plugin **sonarqube** from marketplace **sonar**.
+4. Restart Codex so the catalog refreshes.
+
+### Finish setup with `/sonarqube:integrate` and `sonar integrate codex`
+
+Use the guided skill (same flow as Claude’s integrate skill, adapted for Codex):
+
+```
+/sonarqube:integrate
+```
+
+It walks through **sonarqube-cli** (including `sonar self-update`), **`sonar auth login`**, and **`sonar integrate codex`** with **`--non-interactive`**, for example:
+
+```bash
+sonar integrate codex --non-interactive
+sonar integrate codex --global --non-interactive
+```
+
+Prerequisites:
+
+- **sonarqube-cli** (`sonar`) — current build with **`integrate codex`** (upgrade with `sonar self-update` if the command is missing)
+- **Docker** — for the SonarQube MCP server image used by the bundled MCP template and typical CLI wiring
+- **Authenticated** `sonar auth` (token in system keychain)
+- Restart **Codex** after integration if tools or hooks do not appear immediately
 
 ## Claude Code plugin
 

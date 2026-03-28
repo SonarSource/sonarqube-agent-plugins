@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **Codex plugin** (`plugins/sonarqube/`): single `skills/integrate/SKILL.md` aligned with the Claude integrate skill (sonarqube-cli, auth, `sonar integrate codex` with `--non-interactive` / `--global`); removed duplicate `skills/sonarqube/` skill
+- Added bundled `plugins/sonarqube/.mcp.json` and `mcpServers` entry in `.codex-plugin/plugin.json` per [Codex Build plugins](https://developers.openai.com/codex/plugins/build)
+- README Codex section: install flow, prerequisites, dual-file maintenance note for integrate skills
+
 ## [1.0.0]
 
 ### Added
