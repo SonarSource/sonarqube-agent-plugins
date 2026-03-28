@@ -6,7 +6,7 @@ allowed-tools: Bash(which:*), Bash(sonar:*)
 
 # Integrate SonarQube with Claude Code
 
-Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate claude`**. That command configures the **SonarQube MCP Server** and **secrets-scanning hooks** in Claude Code. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the SonarQube CLI writes the config Claude loads.
+Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate claude`**. That command configures the **SonarQube MCP Server** and **secrets-scanning hooks** in Claude Code. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. The CLI merges the live SonarQube MCP definition and hooks into your local Claude Code configuration.
 
 ## Instructions
 
@@ -96,6 +96,7 @@ from Step 2 or Step 3 and adding `--non-interactive`:
 | ----------------------------- | -----------------------------------------------------|
 | Project-only                  | `sonar integrate claude --non-interactive`           |
 | Global                        | `sonar integrate claude --global --non-interactive`  |
+
 If the CLI reports that **`integrate claude`** is unknown, tell the user to install or upgrade to a current **sonarqube-cli** (e.g. run **`sonar self-update`**) and retry.
 
 ---

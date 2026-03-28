@@ -6,7 +6,7 @@ allowed-tools: Bash(which:*), Bash(sonar:*)
 
 # Integrate SonarQube with OpenAI Codex
 
-Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate codex`**. That command configures the **SonarQube MCP Server** and **secrets-scanning hooks** in OpenAI Codex. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the SonarQube CLI writes the config Codex loads.
+Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate codex`**. That command configures the **SonarQube MCP Server** and **secrets-scanning hooks** in OpenAI Codex. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. The bundled `.mcp.json` is a catalog template; `sonar integrate codex` merges the live SonarQube MCP definition into your local Codex config.
 
 ## Instructions
 
