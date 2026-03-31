@@ -10,6 +10,8 @@ Guide the user through installing **sonarqube-cli** (if needed), **updating it t
 
 ## Instructions
 
+Interaction rule: for every finite decision, always present predefined selector options (single-choice or multi-choice as appropriate) instead of asking for free-form text. If the user gives an invalid answer, re-show the same selector.
+
 ### Step 1 — Check for sonarqube-cli and update it
 
 Run `which sonar` yourself using the Bash tool.
@@ -47,10 +49,13 @@ then skip directly to Step 4.
 
 This step requires user interaction — do **not** run it yourself.
 
-First determine the connection type. Ask:
+First determine the connection type using a single-choice selector with these options:
 
-> "Are you connecting to **SonarQube Cloud** (sonarcloud.io / sonarqube.us) or a
-> **self-hosted SonarQube Server**?"
+1. SonarQube Cloud - EU (default)
+2. SonarQube Cloud - US
+3. Self-hosted SonarQube Server
+
+Do not ask an open-ended text question for this decision.
 
 Collect:
 
@@ -84,10 +89,12 @@ This step runs **`sonar integrate claude`**, which configures the **SonarQube MC
 
 It wires **MCP** (for commands like `/sonarqube:quality-gate`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:duplication`, `/sonarqube:dependency-risks`) and **secrets-scanning hooks** into the user’s Claude Code config.
 
-Ask the user:
+Ask the user using a single-choice selector with these options:
 
-> "Should this integration apply to the **current project only** (default) or
-> **globally** to all projects?"
+1. Current project only (default)
+2. Global (all projects)
+
+Do not ask an open-ended text question for this decision.
 
 Then run the appropriate command yourself using the Bash tool, using the server/org
 from Step 2 or Step 3 and adding `--non-interactive`:
