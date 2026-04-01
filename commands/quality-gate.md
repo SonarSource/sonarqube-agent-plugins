@@ -1,7 +1,7 @@
 ---
 name: quality-gate
 description: Show SonarQube quality gate status for a project — pass/fail and each condition (metric key, threshold, actual value). Project key optional when MCP integration already defines the default project.
-argument-hint: [project-key?] [--branch name] [--pr id]
+argument-hint: "[project-key?] [--branch name] [--pr id]"
 allowed-tools: Read, Grep
 ---
 

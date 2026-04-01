@@ -1,7 +1,7 @@
 ---
 name: coverage
 description: Find files with low test coverage and inspect uncovered lines in a SonarQube project (project key optional when MCP integration already defines the default project)
-argument-hint: [project-key?] [--max n] [--file key] [--pr id]
+argument-hint: "[project-key?] [--max n] [--file key] [--pr id]"
 allowed-tools: Read, Grep
 ---
 
