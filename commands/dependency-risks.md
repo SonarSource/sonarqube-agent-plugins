@@ -1,7 +1,7 @@
 ---
 name: dependency-risks
 description: Search for software composition analysis (SCA) dependency risks in a SonarQube project (project key optional when MCP integration already defines the default project)
-argument-hint: [project-key?] [--branch name] [--pr id]
+argument-hint: "[project-key?] [--branch name] [--pr id]"
 allowed-tools: Read, Grep
 ---
 

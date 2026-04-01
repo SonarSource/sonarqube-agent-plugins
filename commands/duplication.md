@@ -1,7 +1,7 @@
 ---
 name: duplication
 description: Find files with code duplications in a SonarQube project and inspect duplication blocks for a file (project key optional when MCP integration already defines the default project)
-argument-hint: [project-key?] [--pr id] [--page-size n] [--page n] [--file key]
+argument-hint: "[project-key?] [--pr id] [--page-size n] [--page n] [--file key]"
 allowed-tools: Read, Grep
 ---
 

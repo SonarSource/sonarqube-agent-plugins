@@ -1,7 +1,7 @@
 ---
 name: list-issues
 description: Search and filter SonarQube issues for a project, branch, or pull request via sonarqube-cli (`-p` is always required on the CLI; resolve the key from slash args or sonar-project.properties)
-argument-hint: [project-key?] [--severity value] [--types values] [--branch name]
+argument-hint: "[project-key?] [--severity value] [--types values] [--branch name]"
 allowed-tools: Read, Grep, Bash(sonar:*)
 ---
 
