@@ -1,0 +1,20 @@
+{
+  "name": "sonar",
+  "interface": {
+    "displayName": "Sonar"
+  },
+  "plugins": [
+    {
+      "name": "sonarqube",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sonarqube"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
