@@ -14,23 +14,23 @@ Search for dependency risks (software composition analysis issues) in a SonarQub
 ## Usage
 
 ```
-/sonarqube:dependency-risks                    # risks in the current project
-/sonarqube:dependency-risks my-project        # risks in a specific project
-/sonarqube:dependency-risks my-project --branch feature/auth
-/sonarqube:dependency-risks my-project --pr 42
+dependency-risks                    # risks in the current project
+dependency-risks my-project         # risks in a specific project
+dependency-risks my-project --branch feature/auth
+dependency-risks my-project --pr 42
 ```
 
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
 
-MCP tools sometimes **do not require** `projectKey` after **`sonar integrate claude`** has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
+MCP tools sometimes **do not require** `projectKey` after the SonarQube integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
-- If `$ARGUMENTS` contains a project key, use it.
+- If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
 - If still not found, **omit `projectKey`** in MCP calls and rely on the integration default.
 
-### Step 2: Parse optional flags from `$ARGUMENTS`
+### Step 2: Parse optional flags from the user-provided arguments
 
 | Flag              | Maps to parameter |
 | ----------------- | ----------------- |
@@ -91,8 +91,8 @@ Omit columns that are not present in the response. Omit severity sections that h
 ### Step 5: Next steps
 
 - To fix a vulnerable dependency: *"Ask me to update `<dependency>` to a safe version."*
-- To check the quality gate: *"Run `/sonarqube:quality-gate` (add a project key only if you are not using the integration default)."*
-- To check code-level security issues: *"Run `/sonarqube:list-issues <project-key>` (or use `sonar.projectKey` in the repo) with filters as needed — `sonar list issues` always requires `-p`."*
+- To check the quality gate: *"Invoke the SonarQube quality-gate skill (add a project key only if you are not using the integration default)."*
+- To check code-level security issues: *"Invoke the SonarQube list-issues skill with the project key (or use `sonar.projectKey` in the repo) with filters as needed — `sonar list issues` always requires `-p`."*
 
 ## Error Handling
 
@@ -103,7 +103,7 @@ Unable to fetch dependency risks.
 
 **Possible causes:**
 - This feature requires SonarQube Advanced Security — available on SonarQube Cloud Enterprise edition, or SonarQube Server 2025.4 Enterprise or higher
-- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP Server, then restart Claude Code
-- Credentials not configured — run `/sonarqube:integrate`
-- Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run `/sonarqube:integrate` for this project
+- MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
+- Credentials not configured — invoke the SonarQube integrate skill
+- Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
 ```

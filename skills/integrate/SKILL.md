@@ -1,12 +1,12 @@
 ---
 name: integrate
-description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with Claude Code (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
-allowed-tools: Bash(which:*), Bash(sonar:*)
+description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
+allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(docker:*)
 ---
 
-# Integrate SonarQube with Claude Code
+# Integrate SonarQube
 
-Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and running **`sonar integrate claude`**. That command configures the **SonarQube MCP Server** and **secrets-scanning hooks** in Claude Code. When available, SonarQube Agentic Analysis hooks are also installed. Assume SonarQube itself is already set up; this skill only wires the assistant. This plugin repo does not ship `.mcp.json`; the SonarQube CLI writes the config Claude loads.
+Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and completing agent-specific integration. Assume SonarQube itself is already set up; this skill only wires the assistant.
 
 ## Instructions
 
@@ -14,11 +14,11 @@ Interaction rule: for every finite decision, always present predefined selector 
 
 ### Step 1 — Check for sonarqube-cli and update it
 
-Run `which sonar` yourself using the Bash tool.
+Check if `sonar` is available on the PATH by running `which sonar` (macOS/Linux) or `Get-Command sonar` (Windows) yourself.
 
 **If found:**
 
-1. Run **`sonar self-update`** yourself using the Bash tool and wait for it to finish.
+1. Run **`sonar self-update`** yourself and wait for it to finish.
    - **If it succeeds:** briefly tell the user the CLI is up to date (or was upgraded), then go to Step 2.
    - **If it fails:** show the relevant output, suggest they run `sonar self-update` manually (e.g. offline or network issues), then **still continue** to Step 2 if `sonar` remains usable — do not block the rest of the flow unless the binary is missing or broken.
 
@@ -30,13 +30,13 @@ Run `which sonar` yourself using the Bash tool.
 | macOS / Linux | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
 | Windows (PS)  | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
 
-Wait for the user to confirm, then re-run `which sonar` yourself to verify before continuing.
+Wait for the user to confirm, then re-run the PATH check (`which sonar` or `Get-Command sonar`) yourself to verify before continuing.
 
 ---
 
 ### Step 2 — Check authentication status
 
-Run `sonar auth status` yourself using the Bash tool.
+Run `sonar auth status` yourself using a shell command.
 
 **If already authenticated:** note the connected server and organisation from the output,
 then skip directly to Step 4.
@@ -85,9 +85,11 @@ verify before continuing.
 
 ### Step 4 — Integrate with Claude Code (`sonar integrate claude`)
 
+> Skip this step if you are not Claude Code. Go to Step 5 instead.
+
 This step runs **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
-It wires **MCP** (for commands like `/sonarqube:quality-gate`, `/sonarqube:analyze`, `/sonarqube:coverage`, `/sonarqube:duplication`, `/sonarqube:dependency-risks`) and **secrets-scanning hooks** into the user’s Claude Code config.
+It wires **MCP** (for skills like quality-gate, analyze, coverage, duplication, dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config. When available, SonarQube Agentic Analysis hooks are also installed.
 
 Ask the user using a single-choice selector with these options:
 
@@ -96,13 +98,26 @@ Ask the user using a single-choice selector with these options:
 
 Do not ask an open-ended text question for this decision.
 
-Then run the appropriate command yourself using the Bash tool, using the server/org
+Then run the appropriate command yourself using a shell command, using the server/org
 from Step 2 or Step 3 and adding `--non-interactive`:
 
-| Scenario                      | Command                                              |
-| ----------------------------- | -----------------------------------------------------|
-| Project-only                  | `sonar integrate claude --non-interactive`           |
-| Global                        | `sonar integrate claude --global --non-interactive`  |
+| Scenario     | Command                                             |
+| ------------ | --------------------------------------------------- |
+| Project-only | `sonar integrate claude --non-interactive`          |
+| Global       | `sonar integrate claude --global --non-interactive` |
+
+---
+
+### Step 5 — Verify Docker and environment variables
+
+> Skip this step if you are Claude Code. Step 4 already handled integration.
+
+These agents (Cursor, Codex, Copilot CLI) use a shared `.mcp.json` at the plugin root that starts the SonarQube MCP Server via Docker. Verify the prerequisites:
+
+1. **Docker:** run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
+2. **Environment variables:** check that `SONARQUBE_TOKEN`, `SONARQUBE_ORG`, and `SONARQUBE_URL` are set in the host environment. If any are missing, tell the user which ones to set and how (`export` in shell profile on macOS/Linux, or system/user environment variables on Windows). `SONARQUBE_URL` can be omitted when using SonarQube Cloud EU (the default).
+
+If both checks pass, confirm that integration is ready — the MCP server will start automatically when the agent reads `.mcp.json`.
 
 ---
 
@@ -113,13 +128,12 @@ After all steps complete, print a summary:
 ```
 ✅ SonarQube integration is ready.
 
-  sonarqube-cli:     updated via sonar self-update (when Step 1 ran successfully)
-  MCP + hooks:       registered via sonar integrate claude (restart Claude Code if tools do not appear)
-  Secrets scanning:  hooks installed via sonar integrate claude
+  sonarqube-cli:     updated via sonar self-update
   Authentication:    token stored in system keychain
+  MCP Server:        configured (restart the agent session if tools do not appear)
 
 You can verify at any time with:  sonar auth status
-To refresh CLI + wiring later:     run /sonarqube:integrate again (self-update + integrate)
+To refresh CLI + wiring later:    invoke the SonarQube integrate skill again
 ```
 
 If **`sonar self-update`** failed in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest `sonar self-update` in a terminal.

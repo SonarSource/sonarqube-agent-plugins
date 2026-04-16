@@ -7,20 +7,20 @@ allowed-tools: Bash(sonar:*)
 
 # SonarQube — List Projects
 
-List SonarQube projects accessible to the authenticated user. Useful for discovering project keys before running other commands.
+List SonarQube projects accessible to the authenticated user. Useful for discovering project keys before running other skills.
 
 ## Usage
 
 ```
-/sonarqube:list-projects                      # list all accessible projects
-/sonarqube:list-projects my-team              # search by name or key
+list-projects                      # list all accessible projects
+list-projects my-team              # search by name or key
 ```
 
 ## Instructions
 
-### Step 1: Parse optional flags from `$ARGUMENTS`
+### Step 1: Parse optional search term from the user-provided arguments
 
-- If `$ARGUMENTS` contains a search term (not a flag), pass it as `--query`.
+- If the user provided a search term (not a flag), pass it as `--query`.
 
 ### Step 2: Validate arguments
 
@@ -28,7 +28,7 @@ If a `--query` search term was provided, validate it matches `^[a-zA-Z0-9_\-\. ]
 
 ### Step 3: Run `sonar list projects`
 
-Build and run the command using the Bash tool:
+Build and run the command using a shell command:
 
 ```bash
 sonar list projects [--query <search-term>]
@@ -60,12 +60,12 @@ Found **8 project(s)**:
 No projects found. If you expected results, check your authentication with `sonar auth status`.
 ```
 
-**If the result is paginated** (500 projects returned), note: *"Showing first 500 projects. Use a search term to narrow results — e.g. `/sonarqube:list-projects <query>`."*
+**If the result is paginated** (500 projects returned), note: *"Showing first 500 projects. Use a search term to narrow results."*
 
 ### Step 5: Next steps
 
-- To list issues: *"Run `/sonarqube:list-issues <project-key>` or ensure `sonar.projectKey` is in `sonar-project.properties` — the CLI always requires `-p`."*
-- To check the quality gate: *"Run `/sonarqube:quality-gate` — add a project key only if you are not using the MCP integration default."*
+- To list issues: *"Invoke the SonarQube list-issues skill with the project key, or ensure `sonar.projectKey` is in `sonar-project.properties` — the CLI always requires `-p`."*
+- To check the quality gate: *"Invoke the SonarQube quality-gate skill — add a project key only if you are not using the MCP integration default."*
 
 ## Error Handling
 
@@ -75,5 +75,5 @@ If the command fails:
 Unable to list projects.
 
 **Possible causes:**
-- `sonarqube-cli` not installed or not authenticated — run `/sonarqube:integrate`
+- `sonarqube-cli` not installed or not authenticated — invoke the SonarQube integrate skill
 ```

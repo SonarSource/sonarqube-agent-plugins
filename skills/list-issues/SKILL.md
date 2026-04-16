@@ -1,6 +1,6 @@
 ---
 name: list-issues
-description: Search and filter SonarQube issues for a project, branch, or pull request via sonarqube-cli (`-p` is always required on the CLI; resolve the key from slash args or sonar-project.properties)
+description: Search and filter SonarQube issues for a project, branch, or pull request via sonarqube-cli (`-p` is always required on the CLI; resolve the key from user arguments or sonar-project.properties)
 argument-hint: "[project-key?] [--severity value] [--types values] [--branch name]"
 allowed-tools: Read, Grep, Bash(sonar:*)
 ---
@@ -9,22 +9,22 @@ allowed-tools: Read, Grep, Bash(sonar:*)
 
 Search for issues in a SonarQube project using the `sonarqube-cli`.
 
-Unlike SonarQube MCP tools (which may use a default project from integration), **`sonar list issues` always requires `-p <project-key>`**. Resolve the key from slash arguments or `sonar-project.properties` before running the CLI.
+Unlike SonarQube MCP tools (which may use a default project from integration), **`sonar list issues` always requires `-p <project-key>`**. Resolve the key from the user-provided arguments or `sonar-project.properties` before running the CLI.
 
 ## Usage
 
 ```
-/sonarqube:list-issues                                          # issues in the current project
-/sonarqube:list-issues my-project                               # issues in a specific project key
-/sonarqube:list-issues my-project --severity CRITICAL           # filter by severity
-/sonarqube:list-issues my-project --types BUG,VULNERABILITY     # filter by type
-/sonarqube:list-issues my-project --statuses OPEN,CONFIRMED     # filter by status
-/sonarqube:list-issues my-project --rules python:S2077          # filter by rule key
-/sonarqube:list-issues my-project --tags security               # filter by tag
-/sonarqube:list-issues my-project --component src/auth/login.py # issues in a specific file
-/sonarqube:list-issues my-project --resolved                    # only resolved issues
-/sonarqube:list-issues my-project --branch main                 # on a specific branch
-/sonarqube:list-issues my-project --pr 42                       # on a pull request
+list-issues                                          # issues in the current project
+list-issues my-project                               # issues in a specific project key
+list-issues my-project --severity CRITICAL           # filter by severity
+list-issues my-project --types BUG,VULNERABILITY     # filter by type
+list-issues my-project --statuses OPEN,CONFIRMED     # filter by status
+list-issues my-project --rules python:S2077          # filter by rule key
+list-issues my-project --tags security               # filter by tag
+list-issues my-project --component src/auth/login.py # issues in a specific file
+list-issues my-project --resolved                    # only resolved issues
+list-issues my-project --branch main                 # on a specific branch
+list-issues my-project --pr 42                       # on a pull request
 ```
 
 ## Instructions
@@ -33,11 +33,11 @@ Unlike SonarQube MCP tools (which may use a default project from integration), *
 
 This flow uses **`sonar list issues`** (CLI), not MCP. The CLI **always** needs **`-p <project-key>`** — do not invoke it without a resolved key.
 
-- If `$ARGUMENTS` contains a project key, use it.
+- If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
-- If still not found, **do not run** `sonar list issues`. Tell the user: *"Run `/sonarqube:list-projects` to find your project key, then re-run with that key,"* or add `sonar.projectKey` to `sonar-project.properties`. (MCP integration defaults do **not** apply to this CLI command.)
+- If still not found, **do not run** `sonar list issues`. Tell the user: *"Invoke the SonarQube list-projects skill to find your project key, then re-run with that key,"* or add `sonar.projectKey` to `sonar-project.properties`. (MCP integration defaults do **not** apply to this CLI command.)
 
-### Step 2: Parse optional flags from `$ARGUMENTS`
+### Step 2: Parse optional flags from the user-provided arguments
 
 | Flag                  | Maps to CLI option                                           |
 | --------------------- | ------------------------------------------------------------ |
@@ -71,7 +71,7 @@ Before building the command, validate each user-supplied value against the follo
 
 ### Step 4: Run `sonar list issues`
 
-Build and run the command using the Bash tool. **Always** pass **`-p`** with the key resolved in Step 1.
+Build and run the command using a shell command. **Always** pass **`-p`** with the key resolved in Step 1.
 
 ```bash
 sonar list issues -p <project-key> --format toon [--severity <value>] [--types <values>] [--statuses <values>] [--rules <values>] [--tags <values>] [--component-keys <key>] [--resolved] [--branch <name>] [--pull-request <id>]
@@ -113,7 +113,7 @@ Severity icons (the label depends on the server version):
 ### Step 6: Next steps
 
 - To fix a specific issue: *"Ask me to fix `<rule>` at `<file>:<line>`."*
-- To check the quality gate: *"Run `/sonarqube:quality-gate`."*
+- To check the quality gate: *"Invoke the SonarQube quality-gate skill."*
 
 ## Error Handling
 
@@ -123,6 +123,6 @@ If the command fails:
 Unable to list issues.
 
 **Possible causes:**
-- `sonarqube-cli` not installed or not authenticated — run `/sonarqube:integrate`
-- Project key is wrong or missing — `-p` is mandatory for `sonar list issues`; run `/sonarqube:list-projects` or set `sonar.projectKey` in `sonar-project.properties`
+- `sonarqube-cli` not installed or not authenticated — invoke the SonarQube integrate skill
+- Project key is wrong or missing — `-p` is mandatory for `sonar list issues`; invoke the SonarQube list-projects skill or set `sonar.projectKey` in `sonar-project.properties`
 ```

@@ -2,20 +2,20 @@
 
 This repository bundles SonarQube-related plugins and configuration for AI agents:
 
-| Surface         | Location                                                                  | Notes                                                                                                                                                           |
-| --------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Claude Code** | `.claude-plugin/`, `commands/`, `skills/integrate/`, `hooks/`, `scripts/` | Slash commands, `/sonarqube:integrate` skill, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`) |
-| **Gemini**      | `gemini-extension.json`, `GEMINI.md`                                      | Gemini extension + MCP user context                                                                                                                             |
-| **Kiro**        | `kiro-power/`                                                             | Power definition and `mcp.json` for Kiro                                                                                                                        |
+| Surface         | Location                                                    | Notes                                                                                                                                                           |
+| --------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Claude Code** | `.claude-plugin/`, `skills/`, `hooks/`, `scripts/`          | Skills, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`) |
+| **Gemini**      | `gemini-extension.json`, `GEMINI.md`                        | Gemini extension + MCP user context                                                                                                                             |
+| **Kiro**        | `kiro-power/`                                               | Power definition and `mcp.json` for Kiro                                                                                                                        |
 
-- **Claude Code** — full setup, commands, and configuration: [Claude Code plugin](#claude-code-plugin).
+- **Claude Code** — full setup, skills, and configuration: [Claude Code plugin](#claude-code-plugin).
 - **Gemini** and **Kiro** — see the paths in the table above;
 
 ---
 
 ## Claude Code plugin
 
-Integrate SonarQube code quality and security analysis into **Claude Code**: namespaced slash commands, a guided `/sonarqube:integrate` skill, and a startup check for the CLI and wiring.
+Integrate SonarQube code quality and security analysis into **Claude Code**: skills (in `skills/`), and a startup check for the CLI and wiring.
 
 **MCP server registration and secrets-scanning hooks** are installed on your machine by **sonarqube-cli** when you run `sonar integrate claude` during setup (the plugin bundle does not ship an `.mcp.json`; the CLI writes the config Claude Code loads).
 
@@ -24,7 +24,7 @@ Integrate SonarQube code quality and security analysis into **Claude Code**: nam
 - **Issue fixing**: Fix specific code quality issues by rule key and location (CLI)
 - **Issue listing**: Search and filter issues in your SonarQube project (CLI)
 - **Project discovery**: List accessible SonarQube projects to find project keys (CLI)
-- **Quality gate, coverage, duplication, snippet analysis, dependency risks**: Slash commands that call the SonarQube MCP Server (available after `sonar integrate claude`)
+- **Quality gate, coverage, duplication, snippet analysis, dependency risks**: Skills that call the SonarQube MCP Server (available after `sonar integrate claude`)
 - **Secrets scanning**: Pre-tool **secrets-scanning hooks** registered by the CLI via `sonar integrate claude` to limit secret exposure to the agent
 - **Session check**: On startup, reports whether sonarqube-cli is present and integration is configured
 

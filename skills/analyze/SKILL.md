@@ -11,9 +11,9 @@ Analyze code for quality and security issues using the SonarQube MCP Server.
 
 ## Usage
 
-```bash
-/sonarqube:analyze                        # analyze the file currently in context
-/sonarqube:analyze src/auth/login.py      # analyze a specific file
+```
+analyze                        # analyze the file currently in context
+analyze src/auth/login.py      # analyze a specific file
 ```
 
 ## Instructions
@@ -22,15 +22,15 @@ Analyze code for quality and security issues using the SonarQube MCP Server.
 
 Both analysis tools work on **one file at a time**. Resolve a single file path:
 
-- If `$ARGUMENTS` contains a path, use it.
-- If `$ARGUMENTS` is empty, look at the current conversation context for a recently mentioned or edited file.
+- If the user provided a file path, use it.
+- If no path was provided, look at the current conversation context for a recently mentioned or edited file.
 - If nothing is clear, ask: *"Which file would you like me to analyze?"*
 
 Do not accept a directory as input. If the user provides one, ask them to specify a single file.
 
 ### Step 2: Read the file and detect context
 
-1. Read its full content with the `Read` tool (needed for the fallback tool and language detection).
+1. Read the file's full content (needed for the fallback tool and language detection).
 2. Detect the language from the file extension (needed for the standard tool):
 
 | Extension              | Language key |
@@ -51,7 +51,7 @@ Do not accept a directory as input. If the user provides one, ask them to specif
 
 ### Step 3: Call the appropriate analysis tool
 
-After **`sonar integrate claude`**, the SonarQube MCP Server often has a **default project** for this workspace, so **`projectKey` is sometimes unnecessary** — pass it only when the tool schema requires it or the user targets another project.
+After running the SonarQube integrate skill, the SonarQube MCP Server often has a **default project** for this workspace, so **`projectKey` is sometimes unnecessary** — pass it only when the tool schema requires it or the user targets another project.
 
 Two tools may be available depending on whether the connected organization is eligible for Agentic Analysis:
 
@@ -61,7 +61,7 @@ Before calling it, detect the current branch name using `git branch --show-curre
 
 Then call with:
 
-- `projectKey` — **omit unless the tool requires it** (initial MCP configuration usually supplies the default project); if required, use the value from `$ARGUMENTS` if provided, otherwise `sonar.projectKey` in `sonar-project.properties` at the repo root
+- `projectKey` — **omit unless the tool requires it** (initial MCP configuration usually supplies the default project); if required, use the value from the user's arguments if provided, otherwise `sonar.projectKey` in `sonar-project.properties` at the repo root
 - `branchName` — detected branch name
 - `filePath` — project-relative file path (e.g. `src/auth/login.py`)
 - `fileContent` — full file content; **only pass if the tool requires it** (when the MCP server has a mount, it reads the file directly and this parameter will not be required)
@@ -110,9 +110,9 @@ Severity icons (the label depends on the server version):
 
 After the results, always add:
 
-- If issues were found: *"Run `/sonarqube:fix-issue <rule> <file>:<line>` to fix a specific issue, or ask me to fix them all."*
-- If the MCP server is not configured: guide the user to run `/sonarqube:integrate`.
-- If the user wants to analyze another file: remind them to run `/sonarqube:analyze <file>`.
+- If issues were found: *"Invoke the SonarQube fix-issue skill with `<rule> <file>:<line>` to fix a specific issue, or ask me to fix them all."*
+- If the MCP server is not configured: guide the user to invoke the SonarQube integrate skill.
+- If the user wants to analyze another file: remind them to invoke the SonarQube analyze skill with the file path.
 
 ## Error Handling
 
@@ -122,7 +122,7 @@ If all `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_co
 Unable to reach the SonarQube MCP Server.
 
 **Possible causes:**
-- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP Server, then restart Claude Code
-- Credentials not configured — run `/sonarqube:integrate`
-- Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run `/sonarqube:integrate` so the MCP default project is set
+- MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
+- Credentials not configured — invoke the SonarQube integrate skill
+- Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the SonarQube integrate skill so the MCP default project is set
 ```
