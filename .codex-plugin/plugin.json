@@ -1,0 +1,19 @@
+{
+  "name": "SonarQube",
+  "version": "1.0.2",
+  "description": "SonarQube plugin for Codex: shared SonarQube skills with MCP server configuration.",
+  "author": {
+    "name": "Sonar",
+    "url": "https://www.sonarsource.com/"
+  },
+  "keywords": [
+    "sonarqube",
+    "code-quality",
+    "static-analysis",
+    "security",
+    "secrets"
+  ],
+  "license": "SSAL-1.0",
+  "repository": "https://github.com/SonarSource/sonarqube-agent-plugins",
+  "homepage": "https://www.sonarsource.com"
+}

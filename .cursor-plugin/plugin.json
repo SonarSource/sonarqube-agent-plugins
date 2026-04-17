@@ -1,0 +1,20 @@
+{
+  "name": "sonarqube",
+  "version": "1.0.2",
+  "description": "SonarQube plugin for Cursor: slash commands and /sonarqube:integrate skill. sonarqube-cli (sonar integrate claude) registers the SonarQube MCP Server and analysis hooks on your machine.",
+  "author": {
+    "name": "Sonar",
+    "url": "https://www.sonarsource.com/"
+  },
+  "keywords": [
+    "sonarqube",
+    "code-quality",
+    "static-analysis",
+    "security",
+    "secrets"
+  ],
+  "license": "SSAL-1.0",
+  "repository": "https://github.com/SonarSource/sonarqube-agent-plugins",
+  "homepage": "https://www.sonarsource.com",
+  "mcpServers": "./mcp.json"
+}

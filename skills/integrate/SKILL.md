@@ -83,11 +83,17 @@ verify before continuing.
 
 ---
 
-### Step 4 — Integrate with Claude Code (`sonar integrate claude`)
+### Step 4 — Agent-specific integration
 
-> Skip this step if you are not Claude Code. Go to Step 5 instead.
+Pick exactly one branch below based on which agent you are. Do not run the other branches.
 
-This step runs **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
+- Claude Code → **4.a**
+- Codex → **4.b**
+- Cursor or Copilot CLI → **4.c**
+
+#### 4.a — Claude Code (`sonar integrate claude`)
+
+Run **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
 It wires **MCP** (for skills like quality-gate, analyze, coverage, duplication, dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config. When available, SonarQube Agentic Analysis hooks are also installed.
 
@@ -106,16 +112,30 @@ from Step 2 or Step 3 and adding `--non-interactive`:
 | Project-only | `sonar integrate claude --non-interactive`          |
 | Global       | `sonar integrate claude --global --non-interactive` |
 
----
+#### 4.b — Codex (manual MCP server install)
 
-### Step 5 — Verify Docker and environment variables
+Ask the user to install the **SonarQube MCP Server** themselves by following the upstream instructions:
 
-> Skip this step if you are Claude Code. Step 4 already handled integration.
+> https://docs.sonarsource.com/sonarqube-mcp-server/quickstart-guide/codex-cli
 
-These agents (Cursor, Codex, Copilot CLI) use a shared `.mcp.json` at the plugin root that starts the SonarQube MCP Server via Docker. Verify the prerequisites:
+Tell the user to follow that quickstart guide to configure the MCP server in their Codex environment (using the server/org and, if applicable, server URL collected in Step 2 or Step 3). Do **not** attempt to run, install, or configure the MCP server yourself.
+
+Wait for the user to confirm they have completed the installation before moving on to the summary.
+
+#### 4.c — Cursor and Copilot CLI (Docker + environment variables)
+
+These agents use a shared `.mcp.json` at the plugin root that starts the SonarQube MCP Server via Docker. Verify the prerequisites:
 
 1. **Docker:** run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
-2. **Environment variables:** check that `SONARQUBE_TOKEN`, `SONARQUBE_ORG`, and `SONARQUBE_URL` are set in the host environment. If any are missing, tell the user which ones to set and how (`export` in shell profile on macOS/Linux, or system/user environment variables on Windows). `SONARQUBE_URL` can be omitted when using SonarQube Cloud EU (the default).
+2. **Environment variables:** check that **all three** of `SONARQUBE_TOKEN`, `SONARQUBE_ORG`, and `SONARQUBE_URL` are set in the host environment. All three are required, none may be omitted. If any are missing, tell the user which ones to set and how (`export` in shell profile on macOS/Linux, or system/user environment variables on Windows).
+
+   Use the value from Step 3 for `SONARQUBE_URL`:
+
+   | Connection type                | `SONARQUBE_URL` value          |
+   | ------------------------------ | ------------------------------ |
+   | SonarQube Cloud — EU (default) | `https://sonarcloud.io`        |
+   | SonarQube Cloud — US           | `https://sonarqube.us`         |
+   | Self-hosted SonarQube Server   | the server URL from Step 3     |
 
 If both checks pass, confirm that integration is ready — the MCP server will start automatically when the agent reads `.mcp.json`.
 
