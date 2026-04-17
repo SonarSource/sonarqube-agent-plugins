@@ -1,7 +1,7 @@
 {
-  "name": "SonarQube",
+  "name": "sonarqube",
   "version": "1.0.2",
-  "description": "SonarQube plugin for Codex: shared SonarQube skills with MCP server configuration.",
+  "description": "SonarQube plugin for Codex: easily manage quality and security of your projects.",
   "author": {
     "name": "Sonar",
     "url": "https://www.sonarsource.com/"
