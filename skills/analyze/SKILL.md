@@ -16,6 +16,19 @@ analyze                        # analyze the file currently in context
 analyze src/auth/login.py      # analyze a specific file
 ```
 
+## Prerequisites
+
+This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_code_snippet`, or `mcp__sonarqube__analyze_file_list` to be available in your session.
+
+**Before proceeding**, verify at least one of these tools is accessible. If none are, stop immediately — do not attempt to call any CLI commands or invent alternatives — and tell the user:
+
+> Unable to reach the SonarQube MCP Server.
+>
+> **Possible causes:**
+> - MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the SonarQube integrate skill
+> - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the SonarQube integrate skill so the MCP default project is set
+
 ## Instructions
 
 ### Step 1: Resolve what to analyze
@@ -113,16 +126,3 @@ After the results, always add:
 - If issues were found: *"Invoke the SonarQube fix-issue skill with `<rule> <file>:<line>` to fix a specific issue, or ask me to fix them all."*
 - If the MCP server is not configured: guide the user to invoke the SonarQube integrate skill.
 - If the user wants to analyze another file: remind them to invoke the SonarQube analyze skill with the file path.
-
-## Error Handling
-
-If all `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_code_snippet` and `mcp__sonarqube__analyze_file_list` are unavailable or return an error:
-
-```markdown
-Unable to reach the SonarQube MCP Server.
-
-**Possible causes:**
-- MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
-- Credentials not configured — invoke the SonarQube integrate skill
-- Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the SonarQube integrate skill so the MCP default project is set
-```

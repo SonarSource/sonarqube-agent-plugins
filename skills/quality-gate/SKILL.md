@@ -18,6 +18,19 @@ quality-gate my-project --branch release/2.0
 quality-gate my-project --pr 42
 ```
 
+## Prerequisites
+
+This skill requires the SonarQube MCP Server to be configured and the tool `mcp__sonarqube__get_project_quality_gate_status` to be available in your session.
+
+**Before proceeding**, verify the tool is accessible. If it is not, stop immediately — do not attempt to call any CLI commands or invent alternatives — and tell the user:
+
+> Unable to reach the SonarQube MCP Server, or project key not found.
+>
+> **Possible causes:**
+> - MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the SonarQube integrate skill
+> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
+
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
@@ -153,16 +166,3 @@ To investigate **beyond** the gate (e.g. overall coverage, line coverage, bug co
 
 - **list-issues** — drill into issues when conditions reference violations or hotspots.
 - **coverage** — file- and line-level coverage when `new_coverage` or similar fails.
-
-## Error Handling
-
-If the MCP server is unavailable or the project key is not found:
-
-```markdown
-Unable to reach the SonarQube MCP Server, or project key not found.
-
-**Possible causes:**
-- MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
-- Credentials not configured — invoke the SonarQube integrate skill
-- Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
-```

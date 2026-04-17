@@ -16,6 +16,17 @@ list-projects                      # list all accessible projects
 list-projects my-team              # search by name or key
 ```
 
+## Prerequisites
+
+This skill uses the `sonarqube-cli` command. The CLI must be installed and authenticated before proceeding.
+
+**Before proceeding**, verify that `sonar` is available on your PATH and authenticated. If it is not, stop immediately — do not attempt to call any alternative commands or invent alternatives — and tell the user:
+
+> Unable to list projects.
+>
+> **Possible causes:**
+> - `sonarqube-cli` not installed or not authenticated — invoke the SonarQube integrate skill
+
 ## Instructions
 
 ### Step 1: Parse optional search term from the user-provided arguments
@@ -66,14 +77,3 @@ No projects found. If you expected results, check your authentication with `sona
 
 - To list issues: *"Invoke the SonarQube list-issues skill with the project key, or ensure `sonar.projectKey` is in `sonar-project.properties` — the CLI always requires `-p`."*
 - To check the quality gate: *"Invoke the SonarQube quality-gate skill — add a project key only if you are not using the MCP integration default."*
-
-## Error Handling
-
-If the command fails:
-
-```markdown
-Unable to list projects.
-
-**Possible causes:**
-- `sonarqube-cli` not installed or not authenticated — invoke the SonarQube integrate skill
-```

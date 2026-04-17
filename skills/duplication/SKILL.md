@@ -19,6 +19,19 @@ duplication my-project --page-size 100 --page 2   # single page of results (manu
 duplication my-project --file src/auth/login.py   # duplication detail for one file
 ```
 
+## Prerequisites
+
+This skill requires the SonarQube MCP Server to be configured and the tools `mcp__sonarqube__search_duplicated_files` and `mcp__sonarqube__get_duplications` to be available in your session.
+
+**Before proceeding**, verify the tools are accessible. If they are not, stop immediately — do not attempt to call any CLI commands or invent alternatives — and tell the user:
+
+> Unable to reach the SonarQube MCP Server, or project key not found.
+>
+> **Possible causes:**
+> - MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the SonarQube integrate skill
+> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
+
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
@@ -121,18 +134,3 @@ If the file has no duplications in the response, say: *"No duplications were rep
 - To refactor: *"Ask me to extract a shared helper or consolidate the duplicated regions."*
 - To scan the same file for issues: *"Invoke the SonarQube analyze skill with `<file>`."*
 - To check the quality gate (e.g. `new_duplicated_lines_density`): *"Invoke the SonarQube quality-gate skill (add a project key only if you are not using the integration default)."*
-
-## Error Handling
-
-If the MCP server is unavailable or the project key is not found:
-
-```markdown
-Unable to reach the SonarQube MCP Server, or project key not found.
-
-**Possible causes:**
-- MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
-- Credentials not configured — invoke the SonarQube integrate skill
-- Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
-```
-
-If `get_duplications` fails with permission errors, mention **Browse** on the project and that the user may need a role with code view access.

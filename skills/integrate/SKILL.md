@@ -114,13 +114,33 @@ from Step 2 or Step 3 and adding `--non-interactive`:
 
 #### 4.b — Codex (manual MCP server install)
 
-Ask the user to install the **SonarQube MCP Server** themselves by following the upstream instructions:
+Codex CLI reads MCP config from `~/.codex/config.toml`. Do **not** edit it yourself — give the user a ready-to-paste snippet.
 
-> https://docs.sonarsource.com/sonarqube-mcp-server/quickstart-guide/codex-cli
+Pick the template below based on connection type, then **substitute every value you already know** (org key and server URL from Step 2/3) before presenting it. The only placeholder left for the user is `<YourSonarQubeUserToken>`.
 
-Tell the user to follow that quickstart guide to configure the MCP server in their Codex environment (using the server/org and, if applicable, server URL collected in Step 2 or Step 3). Do **not** attempt to run, install, or configure the MCP server yourself.
+**SonarQube Cloud** (use `https://sonarcloud.io` for EU, `https://sonarqube.us` for US):
 
-Wait for the user to confirm they have completed the installation before moving on to the summary.
+```toml
+[mcp_servers.sonarqube]
+command = "docker"
+args = ["run", "--rm", "-i", "--init", "--pull=always", "-e", "SONARQUBE_TOKEN", "-e", "SONARQUBE_ORG", "-e", "SONARQUBE_URL", "mcp/sonarqube"]
+env = { "SONARQUBE_TOKEN" = "<YourSonarQubeUserToken>", "SONARQUBE_ORG" = "<org-key>", "SONARQUBE_URL" = "<cloud-url>" }
+```
+
+**Self-hosted SonarQube Server:**
+
+```toml
+[mcp_servers.sonarqube]
+command = "docker"
+args = ["run", "--rm", "-i", "--init", "--pull=always", "-e", "SONARQUBE_TOKEN", "-e", "SONARQUBE_URL", "mcp/sonarqube"]
+env = { "SONARQUBE_TOKEN" = "<YourSonarQubeUserToken>", "SONARQUBE_URL" = "<server-url>" }
+```
+
+Tell the user to paste their **user token** in place of `<YourSonarQubeUserToken>`, save the file, and **restart Codex CLI** so it picks up the new config.
+
+For HTTPS/HTTP transport or other options, point the user to the upstream docs as a fallback: https://docs.sonarsource.com/sonarqube-mcp-server/quickstart-guide/codex-cli
+
+Wait for the user to confirm before moving to the summary.
 
 #### 4.c — Cursor and Copilot CLI (Docker + environment variables)
 

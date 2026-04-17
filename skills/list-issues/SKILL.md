@@ -27,6 +27,18 @@ list-issues my-project --branch main                 # on a specific branch
 list-issues my-project --pr 42                       # on a pull request
 ```
 
+## Prerequisites
+
+This skill uses the `sonarqube-cli` command. The CLI must be installed and authenticated before proceeding.
+
+**Before proceeding**, verify that `sonar` is available on your PATH and authenticated. If it is not, stop immediately — do not attempt to call any alternative commands or invent alternatives — and tell the user:
+
+> Unable to list issues.
+>
+> **Possible causes:**
+> - `sonarqube-cli` not installed or not authenticated — invoke the SonarQube integrate skill
+> - Project key is wrong or missing — `-p` is mandatory for `sonar list issues`; invoke the SonarQube list-projects skill or set `sonar.projectKey` in `sonar-project.properties`
+
 ## Instructions
 
 ### Step 1: Resolve the project key
@@ -114,15 +126,3 @@ Severity icons (the label depends on the server version):
 
 - To fix a specific issue: *"Ask me to fix `<rule>` at `<file>:<line>`."*
 - To check the quality gate: *"Invoke the SonarQube quality-gate skill."*
-
-## Error Handling
-
-If the command fails:
-
-```markdown
-Unable to list issues.
-
-**Possible causes:**
-- `sonarqube-cli` not installed or not authenticated — invoke the SonarQube integrate skill
-- Project key is wrong or missing — `-p` is mandatory for `sonar list issues`; invoke the SonarQube list-projects skill or set `sonar.projectKey` in `sonar-project.properties`
-```
