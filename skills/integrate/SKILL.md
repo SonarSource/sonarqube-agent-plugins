@@ -144,7 +144,7 @@ Wait for the user to confirm before moving to the summary.
 
 #### 4.c — Cursor and Copilot CLI (Docker + environment variables)
 
-These agents use a shared `.mcp.json` at the plugin root that starts the SonarQube MCP Server via Docker. Verify the prerequisites:
+These agents use an `mcp.json` at the plugin root that starts the SonarQube MCP Server via Docker. Verify the prerequisites:
 
 1. **Docker:** run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
 2. **Environment variables:** check that **all three** of `SONARQUBE_TOKEN`, `SONARQUBE_ORG`, and `SONARQUBE_URL` are set in the host environment. All three are required, none may be omitted. If any are missing, tell the user which ones to set and how (`export` in shell profile on macOS/Linux, or system/user environment variables on Windows).
