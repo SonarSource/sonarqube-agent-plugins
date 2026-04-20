@@ -4,7 +4,7 @@ This repository bundles SonarQube-related plugins and configuration for AI agent
 
 | Surface         | Location                                                    | Notes                                                                                                                                                           |
 | --------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Claude Code** | `.claude-plugin/`, `skills/`, `hooks/`, `scripts/`          | Skills, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`) |
+| **Claude Code** | `.claude-plugin/`, `skills/`, `claude-hooks/`, `scripts/`          | Skills, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`) |
 | **Gemini**      | `gemini-extension.json`, `GEMINI.md`                        | Gemini extension + MCP user context                                                                                                                             |
 | **Kiro**        | `kiro-power/`                                               | Power definition and `mcp.json` for Kiro                                                                                                                        |
 

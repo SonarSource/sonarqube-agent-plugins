@@ -149,7 +149,10 @@ Wait for the user to confirm before moving to the summary.
 These agents use an `mcp.json` at the plugin root that starts the SonarQube MCP Server via Docker. Verify the prerequisites:
 
 1. **Docker:** run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
-2. **Environment variables:** check that **all three** of `SONARQUBE_TOKEN`, `SONARQUBE_ORG`, and `SONARQUBE_URL` are set in the host environment. All three are required, none may be omitted. If any are missing, tell the user which ones to set and how (`export` in shell profile on macOS/Linux, or system/user environment variables on Windows).
+2. **Environment variables:** check which variables are required based on the connection type from Step 3:
+   - **SonarQube Cloud:** all three of `SONARQUBE_TOKEN`, `SONARQUBE_ORG`, and `SONARQUBE_URL` must be set.
+   - **Self-hosted SonarQube Server:** only `SONARQUBE_TOKEN` and `SONARQUBE_URL` are required; `SONARQUBE_ORG` is not needed and should not be checked.
+   If any required variable is missing, tell the user which ones to set and how (`export` in shell profile on macOS/Linux, or system/user environment variables on Windows).
 
    Use the value from Step 3 for `SONARQUBE_URL`:
 
