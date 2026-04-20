@@ -114,6 +114,8 @@ from Step 2 or Step 3 and adding `--non-interactive`:
 
 #### 4.b — Codex (manual MCP server install)
 
+First, verify Docker is available: run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
+
 Codex CLI reads MCP config from `~/.codex/config.toml`. Do **not** edit it yourself — give the user a ready-to-paste snippet.
 
 Pick the template below based on connection type, then **substitute every value you already know** (org key and server URL from Step 2/3) before presenting it. The only placeholder left for the user is `<YourSonarQubeUserToken>`.
