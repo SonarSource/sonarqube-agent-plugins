@@ -115,7 +115,7 @@ Call `mcp__sonarqube__get_duplications`:
 
 The file key format is `<projectKey>:<path>`, e.g. `my-project:src/auth/login.py`. If the user provides just a path, prepend the resolved project key when you have one; otherwise follow the MCP tool schema for the default project. Omit `pullRequest` when `--pr` was not given.
 
-> **Permission:** This call requires **Browse** permission on the file’s project. If the tool reports forbidden or missing access, say so clearly.
+> **Permission:** This call requires **Browse** permission on the file’s project. If the tool returns a permission or authorization error, tell the user they need the **Browse** role on the project and that they may need a role with code-view access.
 
 Present duplication **blocks** from the response: for each block, show ranges, sibling copies, or other fields returned by the API so the user can see where code is duplicated.
 

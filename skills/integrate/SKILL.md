@@ -178,6 +178,12 @@ You can verify at any time with:  sonar auth status
 To refresh CLI + wiring later:    invoke the SonarQube integrate skill again
 ```
 
+If path **4.a** (Claude Code) was taken, add this line to the summary:
+
+```
+  Secrets scanning:  hooks registered via sonar integrate claude
+```
+
 If **`sonar self-update`** failed in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest `sonar self-update` in a terminal.
 
 If any other step failed, note it clearly and suggest the corrective action.
