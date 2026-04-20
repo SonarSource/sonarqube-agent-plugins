@@ -162,7 +162,7 @@ These agents use an `mcp.json` at the plugin root that starts the SonarQube MCP 
    | SonarQube Cloud — US           | `https://sonarqube.us`         |
    | Self-hosted SonarQube Server   | the server URL from Step 3     |
 
-If both checks pass, confirm that integration is ready — the MCP server will start automatically when the agent reads `.mcp.json`.
+If both checks pass, confirm that integration is ready — the MCP server will start automatically when the agent reads `mcp.json`.
 
 ---
 

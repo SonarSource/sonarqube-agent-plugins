@@ -2,14 +2,17 @@
 
 This repository bundles SonarQube-related plugins and configuration for AI agents:
 
-| Surface         | Location                                                    | Notes                                                                                                                                                           |
-| --------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Claude Code** | `.claude-plugin/`, `skills/`, `claude-hooks/`, `scripts/`          | Skills, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`) |
-| **Gemini**      | `gemini-extension.json`, `GEMINI.md`                        | Gemini extension + MCP user context                                                                                                                             |
-| **Kiro**        | `kiro-power/`                                               | Power definition and `mcp.json` for Kiro                                                                                                                        |
+| Surface             | Location                                                    | Notes                                                                                                                                                           |
+| ------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Claude Code**     | `.claude-plugin/`, `skills/`, `claude-hooks/`, `scripts/`   | Skills, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`)                                       |
+| **Cursor**          | `.cursor-plugin/plugin.json`, `mcp.json`                    | Cursor plugin manifest; MCP server wired via `mcp.json`                                                                                                         |
+| **Codex**           | `.codex-plugin/plugin.json`                                 | Codex plugin manifest                                                                                                                                            |
+| **Copilot CLI**     | `.github/plugin/plugin.json`, `mcp.json`                    | GitHub Copilot CLI / AgentHQ plugin manifest; MCP server wired via `mcp.json`                                                                                   |
+| **Gemini**          | `gemini-extension.json`, `GEMINI.md`                        | Gemini extension + MCP user context                                                                                                                             |
+| **Kiro**            | `kiro-power/`                                               | Power definition and `mcp.json` for Kiro                                                                                                                        |
 
 - **Claude Code** — full setup, skills, and configuration: [Claude Code plugin](#claude-code-plugin).
-- **Gemini** and **Kiro** — see the paths in the table above;
+- **Cursor**, **Codex**, **Copilot CLI**, **Gemini**, and **Kiro** — see the paths in the table above.
 
 ---
 
