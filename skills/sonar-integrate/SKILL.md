@@ -1,5 +1,5 @@
 ---
-name: integrate
+name: sonar-integrate
 description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
 allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(docker:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
 ---
@@ -94,7 +94,7 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 
 Run **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
-It wires **MCP** (for skills like quality-gate, analyze, coverage, duplication, dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config. When available, SonarQube Agentic Analysis hooks are also installed.
+It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config. When available, SonarQube Agentic Analysis hooks are also installed.
 
 Ask the user using a single-choice selector with these options:
 
@@ -177,7 +177,7 @@ After all steps complete, print a summary:
   MCP Server:        configured (restart the agent session if tools do not appear)
 
 You can verify at any time with:  sonar auth status
-To refresh CLI + wiring later:    invoke the SonarQube integrate skill again
+To refresh CLI + wiring later:    invoke the sonar-integrate skill again
 ```
 
 If path **4.a** (Claude Code) was taken, add this line to the summary:

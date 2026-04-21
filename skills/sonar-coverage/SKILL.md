@@ -1,5 +1,5 @@
 ---
-name: coverage
+name: sonar-coverage
 description: Find files with low test coverage and inspect uncovered lines in a SonarQube project (project key optional when MCP integration already defines the default project)
 argument-hint: "[project-key?] [--max n] [--file key] [--pr id]"
 allowed-tools: Read, Grep
@@ -12,10 +12,10 @@ Identify files with insufficient test coverage and pinpoint the exact lines that
 ## Usage
 
 ```
-coverage                              # worst-covered files in the current project
-coverage my-project                   # worst-covered files in a specific project
-coverage my-project --max 50          # only files with coverage <= 50%
-coverage my-project --file src/auth/login.py  # line-by-line detail for one file
+sonar-coverage                              # worst-covered files in the current project
+sonar-coverage my-project                   # worst-covered files in a specific project
+sonar-coverage my-project --max 50          # only files with coverage <= 50%
+sonar-coverage my-project --file src/auth/login.py  # line-by-line detail for one file
 ```
 
 ## Prerequisites
@@ -27,15 +27,15 @@ This skill requires the SonarQube MCP Server to be configured and the tools `mcp
 > Unable to reach the SonarQube MCP Server, or project key not found.
 >
 > **Possible causes:**
-> - MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
-> - Credentials not configured — invoke the SonarQube integrate skill
-> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
+> - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the sonar-integrate skill
+> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
 
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
 
-MCP tools sometimes **do not require** `projectKey` after the SonarQube integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
+MCP tools sometimes **do not require** `projectKey` after the sonar-integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
 - If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
@@ -83,7 +83,7 @@ Files with lowest coverage (worst first):
 If no files are returned (all files exceed the threshold), say: *"All files meet the coverage threshold."*
 
 Then offer to drill in:
-*"Ask me to inspect any of these files for uncovered lines, or invoke the SonarQube coverage skill with `--file <file-key>` (add a project key only if needed)."*
+*"Ask me to inspect any of these files for uncovered lines, or invoke the sonar-coverage skill with `--file <file-key>` (add a project key only if needed)."*
 
 #### Flow B — Line detail (`--file <key>` given, or user asks to inspect a file)
 
@@ -121,5 +121,5 @@ If the file is fully covered, say: *"All lines in this file are covered."*
 ### Step 4: Next steps
 
 - To write tests for uncovered lines: *"Ask me to add tests for the uncovered lines above."*
-- To check for quality issues in the same file: *"Invoke the SonarQube analyze skill with `<file>`."*
-- To check the quality gate: *"Invoke the SonarQube quality-gate skill (add a project key only if you are not using the integration default)."*
+- To check for quality issues in the same file: *"Invoke the sonar-analyze skill with `<file>`."*
+- To check the quality gate: *"Invoke the sonar-quality-gate skill (add a project key only if you are not using the integration default)."*

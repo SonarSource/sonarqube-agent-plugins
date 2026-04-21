@@ -1,5 +1,5 @@
 ---
-name: analyze
+name: sonar-analyze
 description: Analyze a file or code snippet for quality and security issues using SonarQube
 argument-hint: [file-path]
 allowed-tools: Read, Glob, Bash(git branch:*)
@@ -12,8 +12,8 @@ Analyze code for quality and security issues using the SonarQube MCP Server.
 ## Usage
 
 ```
-analyze                        # analyze the file currently in context
-analyze src/auth/login.py      # analyze a specific file
+sonar-analyze                        # analyze the file currently in context
+sonar-analyze src/auth/login.py      # analyze a specific file
 ```
 
 ## Prerequisites
@@ -25,9 +25,9 @@ This skill requires the SonarQube MCP Server to be configured and at least one o
 > Unable to reach the SonarQube MCP Server.
 >
 > **Possible causes:**
-> - MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
-> - Credentials not configured — invoke the SonarQube integrate skill
-> - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the SonarQube integrate skill so the MCP default project is set
+> - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the sonar-integrate skill
+> - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the sonar-integrate skill so the MCP default project is set
 
 ## Instructions
 
@@ -64,7 +64,7 @@ Do not accept a directory as input. If the user provides one, ask them to specif
 
 ### Step 3: Call the appropriate analysis tool
 
-After running the SonarQube integrate skill, the SonarQube MCP Server often has a **default project** for this workspace, so **`projectKey` is sometimes unnecessary** — pass it only when the tool schema requires it or the user targets another project.
+After running the sonar-integrate skill, the SonarQube MCP Server often has a **default project** for this workspace, so **`projectKey` is sometimes unnecessary** — pass it only when the tool schema requires it or the user targets another project.
 
 Two tools may be available depending on whether the connected organization is eligible for Agentic Analysis:
 
@@ -123,6 +123,6 @@ Severity icons (the label depends on the server version):
 
 After the results, always add:
 
-- If issues were found: *"Invoke the SonarQube fix-issue skill with `<rule> <file>:<line>` to fix a specific issue, or ask me to fix them all."*
-- If the MCP server is not configured: guide the user to invoke the SonarQube integrate skill.
-- If the user wants to analyze another file: remind them to invoke the SonarQube analyze skill with the file path.
+- If issues were found: *"Invoke the sonar-fix-issue skill with `<rule> <file>:<line>` to fix a specific issue, or ask me to fix them all."*
+- If the MCP server is not configured: guide the user to invoke the sonar-integrate skill.
+- If the user wants to analyze another file: remind them to invoke the sonar-analyze skill with the file path.

@@ -50,12 +50,12 @@ const sonarOk = hasSonarCli();
 const hooksInstalled = readClaudeCodeHooksInstalled();
 const agenticAnalysisOk = hasNamedHook(hooksInstalled, "sonar-sqaa");
 const secretsOk = hasNamedHook(hooksInstalled, "sonar-secrets");
-const integrateHint = "✗ not set up — run /sonarqube:integrate";
+const integrateHint = "✗ not set up — run /sonarqube:sonar-integrate";
 
 const lines = [
   "SonarQube plugin initialised.",
   "  sonarqube-cli:    " +
-    (sonarOk ? "✓ found" : "✗ not found — run /sonarqube:integrate"),
+    (sonarOk ? "✓ found" : "✗ not found — run /sonarqube:sonar-integrate"),
   "  Agentic Analysis hook (sonar-sqaa): " +
     (agenticAnalysisOk ? "✓ configured" : integrateHint),
   "  Secrets hook (sonar-secrets): " +
