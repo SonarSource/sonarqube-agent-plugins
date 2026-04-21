@@ -1,7 +1,7 @@
 {
   "name": "sonarqube",
-  "version": "1.0.2",
-  "description": "SonarQube plugin for Copilot CLI & AgentHQ: easily manage quality and security of your projects.",
+  "version": "1.1",
+  "description": "Automatically enforce SonarQube code quality and security in the agent coding loop — 7,000+ rules, secrets scanning, agentic analysis, and quality gates across 40+ languages.",
   "author": {
     "name": "Sonar",
     "url": "https://www.sonarsource.com/"
