@@ -20,7 +20,7 @@ sonar-analyze src/auth/login.py      # analyze a specific file
 
 This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_code_snippet`, or `mcp__sonarqube__analyze_file_list` to be available in your session.
 
-**Before proceeding**, verify at least one of these tools is accessible. If none are, stop immediately — do not attempt to call any CLI commands or invent alternatives — and tell the user:
+**Before proceeding**, verify at least one of these tools is accessible. If none are, do not attempt to call any CLI commands or invent alternatives, and show the user:
 
 > Unable to reach the SonarQube MCP Server.
 >
@@ -28,6 +28,8 @@ This skill requires the SonarQube MCP Server to be configured and at least one o
 > - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the sonar-integrate skill for this project
+
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 
@@ -124,5 +126,4 @@ Severity icons (the label depends on the server version):
 After the results, always add:
 
 - If issues were found: *"Invoke the sonar-fix-issue skill with `<rule> <file>:<line>` to fix a specific issue, or ask me to fix them all."*
-- If the MCP server is not configured: guide the user to invoke the sonar-integrate skill.
 - If the user wants to analyze another file: remind them to invoke the sonar-analyze skill with the file path.
