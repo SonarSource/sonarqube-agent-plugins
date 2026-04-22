@@ -1,5 +1,5 @@
 ---
-name: quality-gate
+name: sonar-quality-gate
 description: Show SonarQube quality gate status for a project — pass/fail and each condition (metric key, threshold, actual value). Project key optional when MCP integration already defines the default project.
 argument-hint: "[project-key?] [--branch name] [--pr id]"
 allowed-tools: Read, Grep
@@ -12,23 +12,38 @@ Report **only** the quality gate evaluation for a SonarQube project: overall sta
 ## Usage
 
 ```
-/sonarqube:quality-gate                       # quality gate for the current project
-/sonarqube:quality-gate my-project            # quality gate for a specific project key
-/sonarqube:quality-gate my-project --branch release/2.0
-/sonarqube:quality-gate my-project --pr 42
+sonar-quality-gate                       # quality gate for the current project
+sonar-quality-gate my-project            # quality gate for a specific project key
+sonar-quality-gate my-project --branch release/2.0
+sonar-quality-gate my-project --pr 42
 ```
+
+## Prerequisites
+
+This skill requires the SonarQube MCP Server to be configured and the tool `mcp__sonarqube__get_project_quality_gate_status` to be available in your session.
+
+**Before proceeding**, verify the tool is accessible. If it is not, do not attempt to call any CLI commands or invent alternatives, and show the user:
+
+> Unable to reach the SonarQube MCP Server, or project key not found.
+>
+> **Possible causes:**
+> - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the sonar-integrate skill
+> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
+
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
 
-MCP tools often **do not require** `projectKey` after **`sonar integrate claude`** has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
+MCP tools often **do not require** `projectKey` after the sonar-integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
-- If `$ARGUMENTS` contains a project key, use it.
+- If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
 - If still not found, **omit `projectKey`** in MCP calls and rely on the integration default.
 
-### Step 2: Parse optional filters from `$ARGUMENTS`
+### Step 2: Parse optional filters from the user-provided arguments
 
 | Flag              | Maps to parameter |
 | ----------------- | ----------------- |
@@ -141,7 +156,7 @@ Sort so failing conditions (`ERROR` or non-OK, per server rules) appear **before
 
 3. **Ratings** — For keys like `reliability_rating` / `security_rating`, SonarQube often encodes ratings as numeric grades in the API (for example 1 = A, 5 = E). Mention that interpretation when it helps the user.
 
-4. **No extra measures** — Do not call `get_component_measures` inside this command unless the user explicitly asks for deeper metrics in the same turn. When they need more detail, tell them the next step (see Step 5).
+4. **No extra measures** — Do not call `get_component_measures` inside this skill unless the user explicitly asks for deeper metrics in the same turn. When they need more detail, tell them the next step (see Step 5).
 
 If the quality gate payload is missing or analysis has not run, say so clearly instead of inventing values.
 
@@ -149,20 +164,7 @@ If the quality gate payload is missing or analysis has not run, say so clearly i
 
 To investigate **beyond** the gate (e.g. overall coverage, line coverage, bug counts, detailed ratings), call **`mcp__sonarqube__get_component_measures`** with the same branch/PR context if applicable, and pass `metricKeys` for the measures you need. Add **`projectKey` only when** the tool requires it and you have a resolved key; otherwise rely on the integration default (you can start from the `metricKey` values that failed or from the [SonarQube metric keys](https://docs.sonarsource.com/) documentation).
 
-### Step 6: Related slash commands
+### Step 6: Related skills
 
-- **`/sonarqube:list-issues`** — drill into issues when conditions reference violations or hotspots.
-- **`/sonarqube:coverage`** — file- and line-level coverage when `new_coverage` or similar fails.
-
-## Error Handling
-
-If the MCP server is unavailable or the project key is not found:
-
-```markdown
-Unable to reach the SonarQube MCP Server, or project key not found.
-
-**Possible causes:**
-- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP Server, then restart Claude Code
-- Credentials not configured — run `/sonarqube:integrate`
-- Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run `/sonarqube:integrate` for this project
-```
+- **sonar-list-issues** — drill into issues when conditions reference violations or hotspots.
+- **sonar-coverage** — file- and line-level coverage when `new_coverage` or similar fails.

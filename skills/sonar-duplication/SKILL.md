@@ -1,5 +1,5 @@
 ---
-name: duplication
+name: sonar-duplication
 description: Find files with code duplications in a SonarQube project and inspect duplication blocks for a file (project key optional when MCP integration already defines the default project)
 argument-hint: "[project-key?] [--pr id] [--page-size n] [--page n] [--file key]"
 allowed-tools: Read, Grep
@@ -12,24 +12,39 @@ List files that contain duplicated code in a SonarQube project, then drill into 
 ## Usage
 
 ```
-/sonarqube:duplication                              # all duplicated files in the current project (auto-paginated)
-/sonarqube:duplication my-project                   # duplicated files in a specific project
-/sonarqube:duplication my-project --pr 42           # same, on a pull request
-/sonarqube:duplication my-project --page-size 100 --page 2   # single page of results (manual pagination)
-/sonarqube:duplication my-project --file src/auth/login.py   # duplication detail for one file
+sonar-duplication                              # all duplicated files in the current project (auto-paginated)
+sonar-duplication my-project                   # duplicated files in a specific project
+sonar-duplication my-project --pr 42           # same, on a pull request
+sonar-duplication my-project --page-size 100 --page 2   # single page of results (manual pagination)
+sonar-duplication my-project --file src/auth/login.py   # duplication detail for one file
 ```
+
+## Prerequisites
+
+This skill requires the SonarQube MCP Server to be configured and the tools `mcp__sonarqube__search_duplicated_files` and `mcp__sonarqube__get_duplications` to be available in your session.
+
+**Before proceeding**, verify the tools are accessible. If they are not, do not attempt to call any CLI commands or invent alternatives, and show the user:
+
+> Unable to reach the SonarQube MCP Server, or project key not found.
+>
+> **Possible causes:**
+> - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the sonar-integrate skill
+> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
+
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
 
-MCP tools sometimes **do not require** `projectKey` after **`sonar integrate claude`** has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
+MCP tools sometimes **do not require** `projectKey` after the sonar-integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
-- If `$ARGUMENTS` contains a project key, use it.
+- If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
 - If still not found, **omit `projectKey`** in MCP calls and rely on the integration default.
 
-### Step 2: Parse optional flags from `$ARGUMENTS`
+### Step 2: Parse optional flags from the user-provided arguments
 
 | Flag              | Meaning                                                                                                      |
 | ----------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -87,7 +102,7 @@ If the list is empty: *"No duplicated files were returned for this project/branc
 
 Then offer to drill in:
 
-*"Ask me to open duplications for any file, or run `/sonarqube:duplication --file <file-key>` (add a project key only if needed)."`*
+*"Ask me to open duplications for any file, or invoke the sonar-duplication skill with `--file <file-key>` (add a project key only if needed)."*
 
 #### Flow B — Duplication detail (`--file <key>` given, or user asks to inspect a file)
 
@@ -102,7 +117,7 @@ Call `mcp__sonarqube__get_duplications`:
 
 The file key format is `<projectKey>:<path>`, e.g. `my-project:src/auth/login.py`. If the user provides just a path, prepend the resolved project key when you have one; otherwise follow the MCP tool schema for the default project. Omit `pullRequest` when `--pr` was not given.
 
-> **Permission:** This call requires **Browse** permission on the file’s project. If the tool reports forbidden or missing access, say so clearly.
+> **Permission:** This call requires **Browse** permission on the file’s project. If the tool returns a permission or authorization error, tell the user they need the **Browse** role on the project and that they may need a role with code-view access.
 
 Present duplication **blocks** from the response: for each block, show ranges, sibling copies, or other fields returned by the API so the user can see where code is duplicated.
 
@@ -119,20 +134,5 @@ If the file has no duplications in the response, say: *"No duplications were rep
 ### Step 4: Next steps
 
 - To refactor: *"Ask me to extract a shared helper or consolidate the duplicated regions."*
-- To scan the same file for issues: *"Run `/sonarqube:analyze <file>`."*
-- To check the quality gate (e.g. `new_duplicated_lines_density`): *"Run `/sonarqube:quality-gate` (add a project key only if you are not using the integration default)."*
-
-## Error Handling
-
-If the MCP server is unavailable or the project key is not found:
-
-```markdown
-Unable to reach the SonarQube MCP Server, or project key not found.
-
-**Possible causes:**
-- MCP server not registered — run `/sonarqube:integrate` so `sonar integrate claude` can wire the SonarQube MCP Server, then restart Claude Code
-- Credentials not configured — run `/sonarqube:integrate`
-- Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run `/sonarqube:integrate` for this project
-```
-
-If `get_duplications` fails with permission errors, mention **Browse** on the project and that the user may need a role with code view access.
+- To scan the same file for issues: *"Invoke the sonar-analyze skill with `<file>`."*
+- To check the quality gate (e.g. `new_duplicated_lines_density`): *"Invoke the sonar-quality-gate skill (add a project key only if you are not using the integration default)."*
