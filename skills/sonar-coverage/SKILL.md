@@ -22,7 +22,7 @@ sonar-coverage my-project --file src/auth/login.py  # line-by-line detail for on
 
 This skill requires the SonarQube MCP Server to be configured and the tools `mcp__sonarqube__search_files_by_coverage` and `mcp__sonarqube__get_file_coverage_details` to be available in your session.
 
-**Before proceeding**, verify the tools are accessible. If they are not, stop immediately — do not attempt to call any CLI commands or invent alternatives — and tell the user:
+**Before proceeding**, verify the tools are accessible. If they are not, do not attempt to call any CLI commands or invent alternatives, and show the user:
 
 > Unable to reach the SonarQube MCP Server, or project key not found.
 >
@@ -30,6 +30,8 @@ This skill requires the SonarQube MCP Server to be configured and the tools `mcp
 > - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
+
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 
