@@ -55,19 +55,19 @@ claude plugin install sonarqube@sonar
 #### Prerequisites
 
 - **Node.js** — required to run the `SessionStart` hook (`scripts/setup.js`).
-- **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:integrate`. Agent will also guide you through the installation process:
+- **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:sonar-integrate`. Agent will also guide you through the installation process:
 
   | Platform             | Command                                                                                                                  |
   | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
   | macOS / Linux        | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
   | Windows (PowerShell) | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
 
-#### Finish setup with `/sonarqube:integrate`
+#### Finish setup with `/sonarqube:sonar-integrate`
 
 Once `sonarqube-cli` is installed, run the guided setup skill:
 
 ```
-/sonarqube:integrate
+/sonarqube:sonar-integrate
 ```
 
 This will:
@@ -81,70 +81,70 @@ This will:
 #### Set Up
 
 ```
-/sonarqube:integrate
+/sonarqube:sonar-integrate
 ```
 
 #### List Projects (CLI)
 
 ```
-/sonarqube:list-projects             # all accessible projects
-/sonarqube:list-projects my-team     # search by name or key
+/sonarqube:sonar-list-projects             # all accessible projects
+/sonarqube:sonar-list-projects my-team     # search by name or key
 ```
 
 #### List Issues (CLI)
 
 ```
-/sonarqube:list-issues                              # issues in the current project
-/sonarqube:list-issues my-project --severity CRITICAL
+/sonarqube:sonar-list-issues                              # issues in the current project
+/sonarqube:sonar-list-issues my-project --severity CRITICAL
 ```
 
 #### Fix an Issue
 
 ```
-/sonarqube:fix-issue java:S1481 src/main/java/MyClass.java
-/sonarqube:fix-issue python:S2077 src/auth/login.py:34
+/sonarqube:sonar-fix-issue java:S1481 src/main/java/MyClass.java
+/sonarqube:sonar-fix-issue python:S2077 src/auth/login.py:34
 ```
 
 #### Quality gate (MCP)
 
 ```
-/sonarqube:quality-gate
-/sonarqube:quality-gate my-project --branch main
+/sonarqube:sonar-quality-gate
+/sonarqube:sonar-quality-gate my-project --branch main
 ```
 
 #### Analyze a File (MCP)
 
 ```
-/sonarqube:analyze
-/sonarqube:analyze src/auth/login.py
+/sonarqube:sonar-analyze
+/sonarqube:sonar-analyze src/auth/login.py
 ```
 
 #### Coverage (MCP)
 
 ```
-/sonarqube:coverage
-/sonarqube:coverage my-project --max 50
-/sonarqube:coverage my-project --file src/auth/login.py
+/sonarqube:sonar-coverage
+/sonarqube:sonar-coverage my-project --max 50
+/sonarqube:sonar-coverage my-project --file src/auth/login.py
 ```
 
 #### Duplication (MCP)
 
 ```
-/sonarqube:duplication
-/sonarqube:duplication my-project --pr 42
-/sonarqube:duplication my-project --file src/auth/login.py
+/sonarqube:sonar-duplication
+/sonarqube:sonar-duplication my-project --pr 42
+/sonarqube:sonar-duplication my-project --file src/auth/login.py
 ```
 
 #### Dependency Risks (MCP, Advanced Security)
 
 ```
-/sonarqube:dependency-risks
-/sonarqube:dependency-risks my-project --pr 42
+/sonarqube:sonar-dependency-risks
+/sonarqube:sonar-dependency-risks my-project --pr 42
 ```
 
 ### Configuration
 
-Run `/sonarqube:integrate` — it handles everything interactively.
+Run `/sonarqube:sonar-integrate` — it handles everything interactively.
 
 For reference, the connection scenarios and corresponding `sonar auth login` commands are:
 

@@ -1,5 +1,5 @@
 ---
-name: list-projects
+name: sonar-list-projects
 description: List SonarQube projects accessible to the current user
 argument-hint: [search-query]
 allowed-tools: Bash(sonar:*)
@@ -12,8 +12,8 @@ List SonarQube projects accessible to the authenticated user. Useful for discove
 ## Usage
 
 ```
-list-projects                      # list all accessible projects
-list-projects my-team              # search by name or key
+sonar-list-projects                      # list all accessible projects
+sonar-list-projects my-team              # search by name or key
 ```
 
 ## Prerequisites
@@ -25,7 +25,7 @@ This skill uses the `sonarqube-cli` command. The CLI must be installed and authe
 > Unable to list projects.
 >
 > **Possible causes:**
-> - `sonarqube-cli` not installed or not authenticated — invoke the SonarQube integrate skill
+> - `sonarqube-cli` not installed or not authenticated — invoke the sonar-integrate skill
 
 ## Instructions
 
@@ -75,5 +75,5 @@ No projects found. If you expected results, check your authentication with `sona
 
 ### Step 5: Next steps
 
-- To list issues: *"Invoke the SonarQube list-issues skill with the project key, or ensure `sonar.projectKey` is in `sonar-project.properties` — the CLI always requires `-p`."*
-- To check the quality gate: *"Invoke the SonarQube quality-gate skill — add a project key only if you are not using the MCP integration default."*
+- To list issues: *"Invoke the sonar-list-issues skill with the project key, or ensure `sonar.projectKey` is in `sonar-project.properties` — the CLI always requires `-p`."*
+- To check the quality gate: *"Invoke the sonar-quality-gate skill — add a project key only if you are not using the MCP integration default."*

@@ -1,5 +1,5 @@
 ---
-name: dependency-risks
+name: sonar-dependency-risks
 description: Search for software composition analysis (SCA) dependency risks in a SonarQube project (project key optional when MCP integration already defines the default project)
 argument-hint: "[project-key?] [--branch name] [--pr id]"
 allowed-tools: Read, Grep
@@ -12,10 +12,10 @@ Search for dependency risks (software composition analysis issues) in a SonarQub
 ## Usage
 
 ```
-dependency-risks                    # risks in the current project
-dependency-risks my-project         # risks in a specific project
-dependency-risks my-project --branch feature/auth
-dependency-risks my-project --pr 42
+sonar-dependency-risks                    # risks in the current project
+sonar-dependency-risks my-project         # risks in a specific project
+sonar-dependency-risks my-project --branch feature/auth
+sonar-dependency-risks my-project --pr 42
 ```
 
 ## Prerequisites
@@ -28,15 +28,15 @@ This skill requires SonarQube Advanced Security (available on SonarQube Cloud En
 >
 > **Possible causes:**
 > - This feature requires SonarQube Advanced Security — available on SonarQube Cloud Enterprise edition, or SonarQube Server 2025.4 Enterprise or higher
-> - MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
-> - Credentials not configured — invoke the SonarQube integrate skill
-> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
+> - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the sonar-integrate skill
+> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
 
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
 
-MCP tools sometimes **do not require** `projectKey` after the SonarQube integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
+MCP tools sometimes **do not require** `projectKey` after the sonar-integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
 - If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
@@ -103,5 +103,5 @@ Omit columns that are not present in the response. Omit severity sections that h
 ### Step 5: Next steps
 
 - To fix a vulnerable dependency: *"Ask me to update `<dependency>` to a safe version."*
-- To check the quality gate: *"Invoke the SonarQube quality-gate skill (add a project key only if you are not using the integration default)."*
-- To check code-level security issues: *"Invoke the SonarQube list-issues skill with the project key (or use `sonar.projectKey` in the repo) with filters as needed — `sonar list issues` always requires `-p`."*
+- To check the quality gate: *"Invoke the sonar-quality-gate skill (add a project key only if you are not using the integration default)."*
+- To check code-level security issues: *"Invoke the sonar-list-issues skill with the project key (or use `sonar.projectKey` in the repo) with filters as needed — `sonar list issues` always requires `-p`."*

@@ -1,5 +1,5 @@
 ---
-name: duplication
+name: sonar-duplication
 description: Find files with code duplications in a SonarQube project and inspect duplication blocks for a file (project key optional when MCP integration already defines the default project)
 argument-hint: "[project-key?] [--pr id] [--page-size n] [--page n] [--file key]"
 allowed-tools: Read, Grep
@@ -12,11 +12,11 @@ List files that contain duplicated code in a SonarQube project, then drill into 
 ## Usage
 
 ```
-duplication                              # all duplicated files in the current project (auto-paginated)
-duplication my-project                   # duplicated files in a specific project
-duplication my-project --pr 42           # same, on a pull request
-duplication my-project --page-size 100 --page 2   # single page of results (manual pagination)
-duplication my-project --file src/auth/login.py   # duplication detail for one file
+sonar-duplication                              # all duplicated files in the current project (auto-paginated)
+sonar-duplication my-project                   # duplicated files in a specific project
+sonar-duplication my-project --pr 42           # same, on a pull request
+sonar-duplication my-project --page-size 100 --page 2   # single page of results (manual pagination)
+sonar-duplication my-project --file src/auth/login.py   # duplication detail for one file
 ```
 
 ## Prerequisites
@@ -28,15 +28,15 @@ This skill requires the SonarQube MCP Server to be configured and the tools `mcp
 > Unable to reach the SonarQube MCP Server, or project key not found.
 >
 > **Possible causes:**
-> - MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
-> - Credentials not configured — invoke the SonarQube integrate skill
-> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
+> - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the sonar-integrate skill
+> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
 
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
 
-MCP tools sometimes **do not require** `projectKey` after the SonarQube integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
+MCP tools sometimes **do not require** `projectKey` after the sonar-integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
 - If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
@@ -100,7 +100,7 @@ If the list is empty: *"No duplicated files were returned for this project/branc
 
 Then offer to drill in:
 
-*"Ask me to open duplications for any file, or invoke the SonarQube duplication skill with `--file <file-key>` (add a project key only if needed)."*
+*"Ask me to open duplications for any file, or invoke the sonar-duplication skill with `--file <file-key>` (add a project key only if needed)."*
 
 #### Flow B — Duplication detail (`--file <key>` given, or user asks to inspect a file)
 
@@ -132,5 +132,5 @@ If the file has no duplications in the response, say: *"No duplications were rep
 ### Step 4: Next steps
 
 - To refactor: *"Ask me to extract a shared helper or consolidate the duplicated regions."*
-- To scan the same file for issues: *"Invoke the SonarQube analyze skill with `<file>`."*
-- To check the quality gate (e.g. `new_duplicated_lines_density`): *"Invoke the SonarQube quality-gate skill (add a project key only if you are not using the integration default)."*
+- To scan the same file for issues: *"Invoke the sonar-analyze skill with `<file>`."*
+- To check the quality gate (e.g. `new_duplicated_lines_density`): *"Invoke the sonar-quality-gate skill (add a project key only if you are not using the integration default)."*

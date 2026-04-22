@@ -1,5 +1,5 @@
 ---
-name: quality-gate
+name: sonar-quality-gate
 description: Show SonarQube quality gate status for a project — pass/fail and each condition (metric key, threshold, actual value). Project key optional when MCP integration already defines the default project.
 argument-hint: "[project-key?] [--branch name] [--pr id]"
 allowed-tools: Read, Grep
@@ -12,10 +12,10 @@ Report **only** the quality gate evaluation for a SonarQube project: overall sta
 ## Usage
 
 ```
-quality-gate                       # quality gate for the current project
-quality-gate my-project            # quality gate for a specific project key
-quality-gate my-project --branch release/2.0
-quality-gate my-project --pr 42
+sonar-quality-gate                       # quality gate for the current project
+sonar-quality-gate my-project            # quality gate for a specific project key
+sonar-quality-gate my-project --branch release/2.0
+sonar-quality-gate my-project --pr 42
 ```
 
 ## Prerequisites
@@ -27,15 +27,15 @@ This skill requires the SonarQube MCP Server to be configured and the tool `mcp_
 > Unable to reach the SonarQube MCP Server, or project key not found.
 >
 > **Possible causes:**
-> - MCP server not registered — invoke the SonarQube integrate skill to configure the SonarQube MCP Server, then restart the agent session
-> - Credentials not configured — invoke the SonarQube integrate skill
-> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the SonarQube integrate skill for this project
+> - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Credentials not configured — invoke the sonar-integrate skill
+> - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
 
 ## Instructions
 
 ### Step 1: Resolve the project key (only when needed)
 
-MCP tools often **do not require** `projectKey` after the SonarQube integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
+MCP tools often **do not require** `projectKey` after the sonar-integrate skill has stored the default project for this workspace. Resolve a key only when you must pass it (tool schema requires it, or the user targets another project):
 
 - If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root.
@@ -164,5 +164,5 @@ To investigate **beyond** the gate (e.g. overall coverage, line coverage, bug co
 
 ### Step 6: Related skills
 
-- **list-issues** — drill into issues when conditions reference violations or hotspots.
-- **coverage** — file- and line-level coverage when `new_coverage` or similar fails.
+- **sonar-list-issues** — drill into issues when conditions reference violations or hotspots.
+- **sonar-coverage** — file- and line-level coverage when `new_coverage` or similar fails.

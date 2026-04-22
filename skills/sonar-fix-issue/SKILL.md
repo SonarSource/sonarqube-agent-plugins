@@ -1,5 +1,5 @@
 ---
-name: fix-issue
+name: sonar-fix-issue
 description: Fix a specific SonarQube issue in code by rule key and location
 argument-hint: "[rule-key] [file-path:line]"
 allowed-tools: Read, Edit
@@ -12,9 +12,9 @@ Fix a code quality or security issue identified by SonarQube.
 ## Usage
 
 ```
-fix-issue java:S1481 src/main/java/MyClass.java:42
-fix-issue python:S2077 src/auth/login.py
-fix-issue Remove unused variable in MyClass.java
+sonar-fix-issue java:S1481 src/main/java/MyClass.java:42
+sonar-fix-issue python:S2077 src/auth/login.py
+sonar-fix-issue Remove unused variable in MyClass.java
 ```
 
 ## Instructions
@@ -55,5 +55,5 @@ After editing, briefly explain:
 
 ### Step 6: Suggest next steps
 
-- *"Invoke the SonarQube analyze skill with `<file>` to confirm no new issues were introduced."*
-- *"Invoke the SonarQube list-issues skill with the project key (or `sonar.projectKey` in `sonar-project.properties`) — the CLI always uses `-p`."*
+- *"Invoke the sonar-analyze skill with `<file>` to confirm no new issues were introduced."*
+- *"Invoke the sonar-list-issues skill with the project key (or `sonar.projectKey` in `sonar-project.properties`) — the CLI always uses `-p`."*
