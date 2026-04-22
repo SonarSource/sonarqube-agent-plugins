@@ -1,7 +1,7 @@
 ---
 name: sonar-integrate
 description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
-allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(docker:*), Bash(curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh | bash), Bash(irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 | iex)
+allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(docker:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
 ---
 
 # Integrate SonarQube
