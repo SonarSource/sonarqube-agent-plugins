@@ -22,7 +22,7 @@ sonar-quality-gate my-project --pr 42
 
 This skill requires the SonarQube MCP Server to be configured and the tool `mcp__sonarqube__get_project_quality_gate_status` to be available in your session.
 
-**Before proceeding**, verify the tool is accessible. If it is not, stop immediately — do not attempt to call any CLI commands or invent alternatives — and tell the user:
+**Before proceeding**, verify the tool is accessible. If it is not, do not attempt to call any CLI commands or invent alternatives, and show the user:
 
 > Unable to reach the SonarQube MCP Server, or project key not found.
 >
@@ -30,6 +30,8 @@ This skill requires the SonarQube MCP Server to be configured and the tool `mcp_
 > - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
+
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 

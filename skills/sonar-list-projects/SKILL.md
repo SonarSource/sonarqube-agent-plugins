@@ -20,12 +20,14 @@ sonar-list-projects my-project              # search by name or key
 
 This skill uses the `sonarqube-cli` command. The CLI must be installed and authenticated before proceeding.
 
-**Before proceeding**, verify that `sonar` is available on your PATH and authenticated. If it is not, stop immediately — do not attempt to call any alternative commands or invent alternatives — and tell the user:
+**Before proceeding**, verify that `sonar` is available on your PATH and authenticated. If it is not, do not attempt to call any alternative commands or invent alternatives, and show the user:
 
 > Unable to list projects.
 >
 > **Possible causes:**
 > - `sonarqube-cli` not installed or not authenticated — invoke the sonar-integrate skill
+
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then re-check and continue; if they decline, stop.
 
 ## Instructions
 
