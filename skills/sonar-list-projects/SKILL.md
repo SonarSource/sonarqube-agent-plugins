@@ -13,7 +13,7 @@ List SonarQube projects accessible to the authenticated user. Useful for discove
 
 ```
 sonar-list-projects                      # list all accessible projects
-sonar-list-projects my-team              # search by name or key
+sonar-list-projects my-project              # search by name or key
 ```
 
 ## Prerequisites

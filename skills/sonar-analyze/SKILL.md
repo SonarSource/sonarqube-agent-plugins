@@ -27,7 +27,7 @@ This skill requires the SonarQube MCP Server to be configured and at least one o
 > **Possible causes:**
 > - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
 > - Credentials not configured — invoke the sonar-integrate skill
-> - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the sonar-integrate skill so the MCP default project is set
+> - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the sonar-integrate skill for this project
 
 ## Instructions
 

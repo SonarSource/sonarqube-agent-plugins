@@ -121,5 +121,5 @@ If the file is fully covered, say: *"All lines in this file are covered."*
 ### Step 4: Next steps
 
 - To write tests for uncovered lines: *"Ask me to add tests for the uncovered lines above."*
-- To check for quality issues in the same file: *"Invoke the sonar-analyze skill with `<file>`."*
+- To check for quality issues in the same file: *"Invoke the sonar-list-issues skill with `--component <file>`."*
 - To check the quality gate: *"Invoke the sonar-quality-gate skill (add a project key only if you are not using the integration default)."*

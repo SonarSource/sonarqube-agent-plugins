@@ -1,7 +1,7 @@
 ---
 name: sonar-integrate
 description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
-allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(docker:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
+allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(docker:*), Bash(curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh | bash), Bash(irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 | iex)
 ---
 
 # Integrate SonarQube
@@ -22,14 +22,16 @@ Check if `sonar` is available on the PATH by running `which sonar` (macOS/Linux)
    - **If it succeeds:** briefly tell the user the CLI is up to date (or was upgraded), then go to Step 2.
    - **If it fails:** show the relevant output, suggest they run `sonar self-update` manually (e.g. offline or network issues), then **still continue** to Step 2 if `sonar` remains usable — do not block the rest of the flow unless the binary is missing or broken.
 
-**If not found:** run the platform-appropriate install command yourself using a shell command.
+**If not found:** pick the platform-appropriate install command from the table below, show it to the user, and ask for explicit confirmation **before running it**. Do **not** execute the command until the user confirms.
 
 | Platform      | Install command                                                                                                          |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | macOS / Linux | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
 | Windows (PS)  | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
 
-After the install command finishes, re-run the PATH check (`which sonar` or `Get-Command sonar`) yourself to verify before continuing.
+**If the user confirms:** run the command yourself using a shell command. After it finishes, re-run the PATH check (`which sonar` or `Get-Command sonar`) yourself to verify before continuing.
+
+**If the user declines:** stop the skill and ask the user to install `sonarqube-cli` manually and then re-invoke the sonar-integrate skill.
 
 ---
 

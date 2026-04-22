@@ -88,7 +88,7 @@ This will:
 
 ```
 /sonarqube:sonar-list-projects             # all accessible projects
-/sonarqube:sonar-list-projects my-team     # search by name or key
+/sonarqube:sonar-list-projects my-project     # search by name or key
 ```
 
 #### List Issues (CLI)
