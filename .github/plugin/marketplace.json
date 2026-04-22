@@ -1,0 +1,18 @@
+{
+  "name": "sonar",
+  "owner": {
+    "name": "Sonar"
+  },
+  "metadata": {
+    "description": "AI Agent Plugins by Sonar",
+    "homepage": "https://sonarsource.com"
+  },
+  "plugins": [
+    {
+      "name": "sonarqube",
+      "version": "1.1",
+      "description": "Automatically enforce SonarQube code quality and security in the agent coding loop — 7,000+ rules, secrets scanning, agentic analysis, and quality gates across 40+ languages.",
+      "source": "./"
+    }
+  ]
+}
