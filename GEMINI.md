@@ -1,15 +1,19 @@
-# SonarQube MCP Server - User Context
+# SonarQube Gemini CLI Extension - Agent Context
 
-## What This MCP Server Provides
+## What This Extension Provides
 
-This MCP server gives you access to SonarQube's code quality and security analysis tools directly in your AI conversations. You can analyze code, check project quality, manage issues, and get detailed insights without leaving your chat.
+This Gemini CLI extension gives the agent SonarQube's code quality and security capabilities through a set of skills backed by the SonarQube MCP server and `sonarqube-cli`. With it, you can analyze code, check project quality, manage issues, and get detailed insights without leaving the chat.
 
-## Setup
+## Integration and Recovery
 
-The user should provide the following environment variables:
-- `SONARQUBE_TOKEN`: A SonarQube USER token
-- `SONARQUBE_URL`: The URL of the SonarQube server (for SonarQube Server)
-- `SONARQUBE_ORG`: The organization key (for SonarQube Cloud)
+The `sonar-integrate` skill is a preliminary initialization and recovery skill for the extension itself. It:
+
+- installs `sonarqube-cli` if missing and updates it to the latest version,
+- authenticates the CLI,
+- verifies Docker is installed and running (the MCP server runs in a container),
+- checks that the required environment variables (`SONARQUBE_TOKEN`, `SONARQUBE_URL`, and `SONARQUBE_ORG` for SonarQube Cloud) are set.
+
+Invoke it when another skill surfaces a failure that points to one of the conditions above (missing CLI, failed auth, Docker not running, missing env vars).
 
 ## How Users Typically Interact
 
@@ -18,7 +22,7 @@ The user should provide the following environment variables:
 - "Show me my SonarQube projects"
 - "List all projects in my organization"
 
-**What to do:** Use `search_my_sonarqube_projects` to get the list. The results will show project keys that are needed for other operations.
+**What to do:** Invoke the `sonar-list-projects` skill end-to-end. It runs the `sonarqube-cli` to return project keys needed for other operations.
 
 ### Analyzing Code Quality
 **Example user requests:**
@@ -26,7 +30,7 @@ The user should provide the following environment variables:
 - "Check if my project passes quality gates"
 - "How is the code quality for project X?"
 
-**What to do:** Use `get_project_quality_gate_status` with the project key. If user doesn't know the project key, first use `search_my_sonarqube_projects`.
+**What to do:** Invoke the `sonar-quality-gate` skill end-to-end. If the user doesn't know the project key, first invoke the `sonar-list-projects` skill.
 
 ### Code Issues and Violations
 **Example user requests:**
@@ -35,7 +39,7 @@ The user should provide the following environment variables:
 - "List all bugs in my codebase"
 - "Find all blocker issues in my codebase"
 
-**What to do:** Use `search_sonar_issues_in_projects`. You can filter by project, software quality (MAINTAINABILITY, RELIABILITY, SECURITY), severity, issue status, branch, pull request, or search for a specific issue by key.
+**What to do:** Invoke the `sonar-list-issues` skill end-to-end. It supports filtering by severity, type, status, rule, tag, component, branch, and pull request, and always passes `-p <project-key>` to the CLI.
 
 ### Code Snippet Analysis
 **Example user requests:**
@@ -43,22 +47,35 @@ The user should provide the following environment variables:
 - "Check this code for quality problems"  
 - "Generate a method that does X and analyze it for issues"
 
-**What to do:** Use `analyze_code_snippet` - always pass complete file content:
-1. **Full analysis**: Pass `fileContent` only to get all issues
-2. **Filtered analysis** (recommended for generated code): Pass `fileContent` + `codeSnippet` - tool analyzes full file but reports issues only in the snippet (auto-detects location)
+**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Agentic Analysis) and falls back to `mcp__sonarqube__analyze_code_snippet` / `mcp__sonarqube__analyze_file_list`, handling file reading, language detection, and scope selection.
 
-**Supported Languages:**
-- Java
-- Kotlin
-- Python (including IPython notebooks)
-- Ruby
-- Go
-- JavaScript, TypeScript, JSP
-- PHP
-- XML
-- HTML, CSS
-- Infrastructure as Code: CloudFormation, Kubernetes, Terraform, Azure Resource Manager, Ansible, Docker
-- Secrets detection (works across all file types)
+### Coverage
+**Example user requests:**
+- "Which files have the worst test coverage?"
+- "Show uncovered lines in `src/auth/login.py`"
+
+**What to do:** Invoke the `sonar-coverage` skill end-to-end for both the file list (lowest coverage first) and line-level detail.
+
+### Duplications
+**Example user requests:**
+- "Which files have duplicated code?"
+- "Show duplication blocks in `src/auth/login.py`"
+
+**What to do:** Invoke the `sonar-duplication` skill end-to-end for the duplicated-files list and per-file duplication blocks.
+
+### Dependency Risks (SCA)
+**Example user requests:**
+- "Are there any vulnerable dependencies?"
+- "Show dependency risks for this project"
+
+**What to do:** Invoke the `sonar-dependency-risks` skill end-to-end (requires SonarQube Advanced Security).
+
+### Fixing a Specific Issue
+**Example user requests:**
+- "Fix `python:S2077` in `src/auth/login.py:12`"
+- "Remove the unused variable flagged by Sonar"
+
+**What to do:** Invoke the `sonar-fix-issue` skill end-to-end. It looks up the rule, reads the file, and applies a minimal fix.
 
 ### Understanding Rules and Metrics
 **Example user requests:**
@@ -67,7 +84,7 @@ The user should provide the following environment variables:
 - "What metrics are available?"
 - "Show me code complexity metrics"
 
-**What to do:** Use `show_rule` for rule explanations, `search_metrics` for available metrics, and `get_component_measures` for specific metric values.
+**What to do:** No dedicated skill exists for this — call the MCP tools directly: `mcp__sonarqube__show_rule` for rule explanations, `mcp__sonarqube__search_metrics` for available metrics, and `mcp__sonarqube__get_component_measures` for specific metric values.
 
 ## Important Parameter Guidelines
 
@@ -79,15 +96,8 @@ Always resolve the project key using the following lookup order — **never gues
 2. **`.sonarlint/connectedMode.json`**: Look for this file in the workspace root (or any parent directory). It contains the project key in the `projectKey` field.
 3. **Project-level configuration file**: Search for a `sonar.projectKey` property in files such as `sonar-project.properties`, `pom.xml`, `build.gradle`, `build.gradle.kts`, or `package.json` in the root project folder.
 4. **CI/CD pipeline definitions**: Search for `sonar.projectKey` in pipeline files such as `.github/workflows/*.yml`, `Jenkinsfile`, `.gitlab-ci.yml`, `azure-pipelines.yml`, `.circleci/config.yml`, etc.
-5. **User-provided project name**: When a user mentions a project by name or partial key, use `search_my_sonarqube_projects` to find the exact project key.
-6. **No key found**: If none of the above methods yield a project key, use `search_my_sonarqube_projects` to list available projects.
-
-### Code Language Detection
-- When analyzing code snippets, try to detect the programming language from the code syntax
-- Only the languages listed in the "Code Snippet Analysis" section are supported for local analysis
-- If the code is in an unsupported language, inform the user about the limitation
-- If unclear, ask the user or make an educated guess based on syntax
-- Note: Secrets detection works on all file types regardless of language
+5. **User-provided project name**: When a user mentions a project by name or partial key, invoke the `sonar-list-projects` skill to find the exact project key.
+6. **No key found**: If none of the above methods yield a project key, invoke the `sonar-list-projects` skill to list available projects.
 
 ### Branch and Pull Request Context
 - Many operations support branch-specific analysis
@@ -95,21 +105,21 @@ Always resolve the project key using the following lookup order — **never gues
 - Pull request analysis is available for PR-specific insights
 
 ### Code Issues and Violations
-- After fixing issues, do not attempt to verify them using `search_sonar_issues_in_projects`, as the server will not yet reflect the updates
+- After fixing issues, do not attempt to verify them using `mcp__sonarqube__search_sonar_issues_in_projects`, as the server will not yet reflect the updates
 
 ## Common Troubleshooting
 
 ### Authentication Issues
 - SonarQube requires USER tokens (not project tokens)
 - When the error `SonarQube answered with Not authorized` occurs, verify the token type
+- For setup or re-authentication, invoke the `sonar-integrate` skill
 
 ### Project Not Found
-- Use `search_my_sonarqube_projects` to confirm available projects
+- Invoke the `sonar-list-projects` skill to confirm available projects
 - Check if user has access to the specific project
 - Verify project key spelling and format
 
 ### Code Analysis Issues
-- Ensure programming language is correctly specified
 - Remind users that snippet analysis doesn't replace full project scans
 - Provide full file content for better analysis results
 - Mention that code snippet analysis tool has limited capabilities compared to full SonarQube scans
