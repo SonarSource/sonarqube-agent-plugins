@@ -147,7 +147,7 @@ Wait for the user to confirm before moving to the summary.
 
 #### 4.c — Cursor, Copilot CLI, and Gemini CLI (Docker + environment variables)
 
-These agents use an `mcp.json` at the plugin root that starts the SonarQube MCP Server via Docker. Verify the prerequisites:
+Cursor and Copilot CLI use an `mcp.json` at the plugin root, while Gemini CLI uses `gemini-extension.json` — all three start the SonarQube MCP Server via Docker. Verify the prerequisites:
 
 1. **Docker:** run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
 2. **Environment variables:** check which variables are required based on the connection type from Step 3:
