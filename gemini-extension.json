@@ -18,7 +18,12 @@
         "-e",
         "SONARQUBE_URL",
         "mcp/sonarqube"
-      ]
+      ],
+      "env": {
+        "SONARQUBE_URL": "${SONARQUBE_URL}",
+        "SONARQUBE_TOKEN": "${SONARQUBE_TOKEN}",
+        "SONARQUBE_ORG": "${SONARQUBE_ORG}"
+      }
     }
   }
 }
