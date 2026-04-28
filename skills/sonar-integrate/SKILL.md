@@ -90,7 +90,7 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 
 - Claude Code → **4.a**
 - Codex → **4.b**
-- Cursor or Copilot CLI → **4.c**
+- Cursor, Copilot CLI, or Gemini CLI → **4.c**
 
 #### 4.a — Claude Code (`sonar integrate claude`)
 
@@ -145,9 +145,9 @@ For HTTPS/HTTP transport or other options, point the user to the upstream docs a
 
 Wait for the user to confirm before moving to the summary.
 
-#### 4.c — Cursor and Copilot CLI (Docker + environment variables)
+#### 4.c — Cursor, Copilot CLI, and Gemini CLI (Docker + environment variables)
 
-These agents use an `mcp.json` at the plugin root that starts the SonarQube MCP Server via Docker. Verify the prerequisites:
+Cursor and Copilot CLI use an `mcp.json` at the plugin root, while Gemini CLI uses `gemini-extension.json` — all three start the SonarQube MCP Server via Docker. Verify the prerequisites:
 
 1. **Docker:** run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
 2. **Environment variables:** check which variables are required based on the connection type from Step 3:
@@ -163,7 +163,7 @@ These agents use an `mcp.json` at the plugin root that starts the SonarQube MCP 
    | SonarQube Cloud — US           | `https://sonarqube.us`         |
    | Self-hosted SonarQube Server   | the server URL from Step 3     |
 
-If both checks pass, confirm that integration is ready — the MCP server will start automatically when the agent reads `mcp.json`.
+If both checks pass, confirm that integration is ready — the MCP server will start automatically when the agent reads its config (`mcp.json` for Cursor and Copilot CLI, `gemini-extension.json` for Gemini CLI).
 
 ---
 
