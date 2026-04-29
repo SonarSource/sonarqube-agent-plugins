@@ -31,11 +31,9 @@ SonarQube supports 30+ programming languages and provides actionable insights to
 
 ### sonarqube
 
-**Connection:** Docker container (stdio transport)
+**Connection:** `sonar run mcp` (stdio transport)
 
-**Container Image:** `mcp/sonarqube` from Docker Hub
-
-**Authorization:** User token authentication with environment variables
+**Authorization:** Authentication via `sonar auth login` (stored in system keychain)
 
 The server supports both SonarQube Cloud and on-premises SonarQube Server instances.
 
@@ -164,11 +162,7 @@ Use `change_sonar_issue_status` appropriately:
 
 ```bash
 # For code analysis workflow
-docker run --init --pull=always -i --rm \
-  -e SONARQUBE_TOOLSETS="analysis,issues,quality-gates" \
-  -e SONARQUBE_TOKEN="<token>" \
-  -e SONARQUBE_ORG="<org>" \
-  mcp/sonarqube
+sonar run mcp --toolsets analysis,issues,quality-gates
 ```
 
 Available toolsets: `analysis`, `issues`, `quality-gates`, `rules`, `sources`, `measures`, `languages`, `portfolios`, `system`, `webhooks`, `dependency-risks`. Note: `projects` is always enabled.
@@ -176,11 +170,7 @@ Available toolsets: `analysis`, `issues`, `quality-gates`, `rules`, `sources`, `
 **Read-Only Mode** - Disable write operations for safer exploration:
 
 ```bash
-docker run --init --pull=always -i --rm \
-  -e SONARQUBE_READ_ONLY="true" \
-  -e SONARQUBE_TOKEN="<token>" \
-  -e SONARQUBE_ORG="<org>" \
-  mcp/sonarqube
+sonar run mcp --read-only
 ```
 
 ## Common Workflows
@@ -300,86 +290,31 @@ const risks = get_file_coverage_details({
 
 ## Configuration
 
-**Authentication Required**:
+**Prerequisites:**
 
-- **For SonarQube Cloud**: User token + organization key
-- **For SonarQube Server**: User token + server URL
+- Install [sonarqube-cli](https://cli.sonarqube.com/) if not already installed
+- Run `sonar auth login` once to authenticate (opens a browser; credentials stored in your system keychain):
 
-**Setup Steps:**
-
-### For SonarQube Cloud:
-
-1. Navigate to [SonarQube Cloud](https://sonarcloud.io) (https://sonarqube.us for US region)
-2. Go to Account → Security → Generate Tokens
-3. Generate a user token
-4. Note your organization key from [Organizations](https://sonarcloud.io/account/organizations)
-5. Configure in your MCP client
-
-### For SonarQube Server:
-
-1. Log in to your SonarQube Server instance
-2. Navigate to User → My Account → Security
-3. Generate a USER token (not project or global token)
-4. Note your server URL (e.g., `https://sonarqube.company.com`)
-5. Configure in your MCP client
+  | Connection type                | Command                                                 |
+  | ------------------------------ | ------------------------------------------------------- |
+  | SonarQube Cloud — EU (default) | `sonar auth login -o <org-key>`                         |
+  | SonarQube Cloud — US           | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+  | SonarQube Server               | `sonar auth login -s <server-url>`                      |
 
 **MCP Configuration:**
 
-For SonarQube Cloud:
-
 ```json
 {
   "mcpServers": {
     "sonarqube": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--init",
-        "--pull=always",
-        "-i",
-        "--rm",
-        "-e",
-        "SONARQUBE_TOKEN",
-        "-e",
-        "SONARQUBE_ORG",
-        "mcp/sonarqube"
-      ],
-      "env": {
-        "SONARQUBE_TOKEN": "<your-token>",
-        "SONARQUBE_ORG": "<your-org>"
-      }
+      "command": "sonar",
+      "args": ["run", "mcp"]
     }
   }
 }
 ```
 
-For SonarQube Server:
-
-```json
-{
-  "mcpServers": {
-    "sonarqube": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--init",
-        "--pull=always",
-        "-i",
-        "--rm",
-        "-e",
-        "SONARQUBE_TOKEN",
-        "-e",
-        "SONARQUBE_URL",
-        "mcp/sonarqube"
-      ],
-      "env": {
-        "SONARQUBE_TOKEN": "<your-token>",
-        "SONARQUBE_URL": "<your-server-url>"
-      }
-    }
-  }
-}
-```
+`sonar run mcp` handles container runtime detection (Docker, Podman, or Nerdctl) and authentication automatically.
 
 ## Troubleshooting
 
