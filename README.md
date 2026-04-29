@@ -12,7 +12,7 @@ This repository bundles SonarQube-related plugins and configuration for AI agent
 | **Kiro**            | `kiro-power/`                                               | Power definition and `mcp.json` for Kiro                                                                                                                        |
 
 - **Claude Code** — full setup, skills, and configuration: [Claude Code plugin](#claude-code-plugin).
-- **Cursor**, **Codex**, **Copilot CLI**, **Gemini**, and **Kiro** — see the paths in the table above.
+- **Cursor**, **Codex**, **Copilot CLI**, **Gemini**, and **Kiro** — use `sonar run mcp` for the MCP server. **Prerequisites**: install [sonarqube-cli](https://cli.sonarqube.com/) and run `sonar auth login` once; `sonar run mcp` then handles container runtime detection and auth automatically.
 
 ---
 

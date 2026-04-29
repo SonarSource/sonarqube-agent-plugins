@@ -9,11 +9,11 @@ This Gemini CLI extension gives the agent SonarQube's code quality and security 
 The `sonar-integrate` skill is a preliminary initialization and recovery skill for the extension itself. It:
 
 - installs `sonarqube-cli` if missing and updates it to the latest version,
-- authenticates the CLI,
-- verifies Docker is installed and running (the MCP server runs in a container),
-- checks that the required environment variables (`SONARQUBE_TOKEN`, `SONARQUBE_URL`, and `SONARQUBE_ORG` for SonarQube Cloud) are set.
+- authenticates the CLI via `sonar auth login` (token stored in system keychain).
 
-Invoke it when another skill surfaces a failure that points to one of the conditions above (missing CLI, failed auth, Docker not running, missing env vars).
+`sonar run mcp` handles container runtime detection (Docker, Podman, Nerdctl) and auth automatically — no environment variables are needed.
+
+Invoke it when another skill surfaces a failure that points to one of the conditions above (missing CLI, failed auth).
 
 ## How Users Typically Interact
 

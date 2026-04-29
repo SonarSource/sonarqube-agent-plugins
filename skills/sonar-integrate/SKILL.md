@@ -1,7 +1,7 @@
 ---
 name: sonar-integrate
 description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
-allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(docker:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
+allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
 ---
 
 # Integrate SonarQube
@@ -89,8 +89,7 @@ verify before continuing.
 Pick exactly one branch below based on which agent you are. Do not run the other branches.
 
 - Claude Code → **4.a**
-- Codex → **4.b**
-- Cursor, Copilot CLI, or Gemini CLI → **4.c**
+- Cursor, Copilot CLI, Gemini CLI, or Codex → **4.b**
 
 #### 4.a — Claude Code (`sonar integrate claude`)
 
@@ -113,57 +112,11 @@ from Step 2 or Step 3 and adding `--non-interactive`:
 | Project-only | `sonar integrate claude --non-interactive`          |
 | Global       | `sonar integrate claude --global --non-interactive` |
 
-#### 4.b — Codex (manual MCP server install)
+#### 4.b — Cursor, Copilot CLI, Gemini CLI, and Codex
 
-First, verify Docker is available: run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
+These agents start the SonarQube MCP Server via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
 
-Codex CLI reads MCP config from `~/.codex/config.toml`. Do **not** edit it yourself — give the user a ready-to-paste snippet.
-
-Pick the template below based on connection type, then **substitute every value you already know** (org key and server URL from Step 2/3) before presenting it. The only placeholder left for the user is `<YourSonarQubeUserToken>`.
-
-**SonarQube Cloud** (use `https://sonarcloud.io` for EU, `https://sonarqube.us` for US):
-
-```toml
-[mcp_servers.sonarqube]
-command = "docker"
-args = ["run", "--rm", "-i", "--init", "--pull=always", "-e", "SONARQUBE_TOKEN", "-e", "SONARQUBE_ORG", "-e", "SONARQUBE_URL", "mcp/sonarqube"]
-env = { "SONARQUBE_TOKEN" = "<YourSonarQubeUserToken>", "SONARQUBE_ORG" = "<org-key>", "SONARQUBE_URL" = "<cloud-url>" }
-```
-
-**Self-hosted SonarQube Server:**
-
-```toml
-[mcp_servers.sonarqube]
-command = "docker"
-args = ["run", "--rm", "-i", "--init", "--pull=always", "-e", "SONARQUBE_TOKEN", "-e", "SONARQUBE_URL", "mcp/sonarqube"]
-env = { "SONARQUBE_TOKEN" = "<YourSonarQubeUserToken>", "SONARQUBE_URL" = "<server-url>" }
-```
-
-Tell the user to paste their **user token** in place of `<YourSonarQubeUserToken>`, save the file, and **restart Codex CLI** so it picks up the new config.
-
-For HTTPS/HTTP transport or other options, point the user to the upstream docs as a fallback: https://docs.sonarsource.com/sonarqube-mcp-server/quickstart-guide/codex-cli
-
-Wait for the user to confirm before moving to the summary.
-
-#### 4.c — Cursor, Copilot CLI, and Gemini CLI (Docker + environment variables)
-
-Cursor and Copilot CLI use an `mcp.json` at the plugin root, while Gemini CLI uses `gemini-extension.json` — all three start the SonarQube MCP Server via Docker. Verify the prerequisites:
-
-1. **Docker:** run `docker info` yourself. If it fails, tell the user Docker must be installed and running, then stop.
-2. **Environment variables:** check which variables are required based on the connection type from Step 3:
-   - **SonarQube Cloud:** all three of `SONARQUBE_TOKEN`, `SONARQUBE_ORG`, and `SONARQUBE_URL` must be set.
-   - **Self-hosted SonarQube Server:** only `SONARQUBE_TOKEN` and `SONARQUBE_URL` are required; `SONARQUBE_ORG` is not needed and should not be checked.
-   If any required variable is missing, tell the user which ones to set and how (`export` in shell profile on macOS/Linux, or system/user environment variables on Windows).
-
-   Use the value from Step 3 for `SONARQUBE_URL`:
-
-   | Connection type                | `SONARQUBE_URL` value          |
-   | ------------------------------ | ------------------------------ |
-   | SonarQube Cloud — EU (default) | `https://sonarcloud.io`        |
-   | SonarQube Cloud — US           | `https://sonarqube.us`         |
-   | Self-hosted SonarQube Server   | the server URL from Step 3     |
-
-If both checks pass, confirm that integration is ready — the MCP server will start automatically when the agent reads its config (`mcp.json` for Cursor and Copilot CLI, `gemini-extension.json` for Gemini CLI).
+Confirm that integration is ready — the MCP server will start automatically when the agent reads its config (`mcp.json` for Cursor, Copilot CLI, and Codex; `gemini-extension.json` for Gemini CLI).
 
 ---
 
