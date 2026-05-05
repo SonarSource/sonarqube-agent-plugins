@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "sonarqube",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "description": "Automatically enforce SonarQube code quality and security in the agent coding loop — 7,000+ rules, secrets scanning, agentic analysis, and quality gates across 40+ languages.",
       "source": "./"
     }
