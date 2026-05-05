@@ -1,186 +1,189 @@
 # SonarQube agent integrations
 
-This repository bundles SonarQube-related plugins and configuration for AI agents:
+**Made by [Sonar](https://www.sonarsource.com/)**
 
-| Surface             | Location                                                    | Notes                                                                                                                                                           |
-| ------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Claude Code**     | `.claude-plugin/`, `skills/`, `claude-hooks/`, `scripts/`   | Skills, SessionStart check; MCP and secrets-scanning hooks are registered by **sonarqube-cli** (`sonar integrate claude`)                                       |
-| **Cursor**          | `.cursor-plugin/plugin.json`, `mcp.json`                    | Cursor plugin manifest; MCP server wired via `mcp.json`                                                                                                         |
-| **Codex**           | `.codex-plugin/plugin.json`                                 | Codex plugin manifest                                                                                                                                            |
-| **Copilot CLI**     | `.github/plugin/plugin.json`, `mcp.json`                    | GitHub Copilot CLI / AgentHQ plugin manifest; MCP server wired via `mcp.json`                                                                                   |
-| **Gemini**          | `gemini-extension.json`, `GEMINI.md`                        | Gemini extension + MCP user context                                                                                                                             |
-| **Kiro**            | `kiro-power/`                                               | Power definition and `mcp.json` for Kiro                                                                                                                        |
+Automatically enforce SonarQube code quality and security in the agent coding loop — 7,000+ rules, secrets scanning, agentic analysis, and quality gates across 40+ languages.
 
-- **Claude Code** — full setup, skills, and configuration: [Claude Code plugin](#claude-code-plugin).
-- **Cursor**, **Codex**, **Copilot CLI**, **Gemini**, and **Kiro** — use `sonar run mcp` for the MCP server. **Prerequisites**: install [sonarqube-cli](https://cli.sonarqube.com/) and run `sonar auth login` once; `sonar run mcp` then handles container runtime detection and auth automatically.
+SonarQube combines deterministic checks with AI-assisted workflows so quality rules apply consistently to code from both developers and agents. Where your stack supports it, analysis and secrets scanning can run inside the agent loop instead of only in CI.
+
+## What do the plugins include
+
+The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage & duplications, fetch dependency risks, etc. Claude Code & Copilot integrations (through SonarQube CLI) install agent hooks. This is coming soon for other agents too.
+
+How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Agentic Analysis enabled, verification happens automatically after each edit with no manual invocation required.
+
+## Prerequisites
+
+- A SonarQube account (**SonarQube Cloud**, **Server**, or **Community Build**). Some features (for example Agentic Analysis) depend on your SonarQube Cloud organization settings.
+- **[SonarQube CLI](https://cli.sonarqube.com/)** (`sonar`) on your machine.
+- A **container runtime** (Docker, Podman, or Nerdctl) for the MCP server image.
+
+Authenticate once with **`sonar auth login`** (browser flow; credentials stay in your OS keychain). The MCP server uses that login.
+
+Check auth anytime:
+
+```bash
+sonar auth status
+```
 
 ---
 
-## Claude Code plugin
+## How plugins connect to SonarQube
 
-Integrate SonarQube code quality and security analysis into **Claude Code**: skills (in `skills/`), and a startup check for the CLI and wiring.
+### Claude Code and GitHub Copilot CLI
 
-**MCP server registration and secrets-scanning hooks** are installed on your machine by **sonarqube-cli** when you run `sonar integrate claude` during setup (the plugin bundle does not ship an `.mcp.json`; the CLI writes the config Claude Code loads).
+**SonarQube CLI** can wire everything for you:
 
-### Features
-
-- **Issue fixing**: Fix specific code quality issues by rule key and location (CLI)
-- **Issue listing**: Search and filter issues in your SonarQube project (CLI)
-- **Project discovery**: List accessible SonarQube projects to find project keys (CLI)
-- **Quality gate, coverage, duplication, snippet analysis, dependency risks**: Skills that call the SonarQube MCP Server (available after `sonar integrate claude`)
-- **Secrets scanning**: Pre-tool **secrets-scanning hooks** registered by the CLI via `sonar integrate claude` to limit secret exposure to the agent
-- **Session check**: On startup, reports whether sonarqube-cli is present and integration is configured
-
-### Installation
-
-#### Add the marketplace and install the plugin
-
-In Claude Code, register this repository as a plugin marketplace, install the **sonarqube** plugin, then reload:
-
-```shell
-/plugin marketplace add SonarSource/sonarqube-agent-plugins
-/plugin install sonarqube@sonar
+```bash
+sonar integrate claude    # Claude Code: MCP, hooks, secrets scanning, etc.
+sonar integrate copilot   # GitHub Copilot CLI: MCP setup
 ```
 
-Then start a new Claude Code session (or otherwise reload the session) so the plugin loads.
+Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill in Claude Code if you prefer a guided flow (install/update CLI, login, then integrate).
 
-The catalog name `sonar` comes from `.claude-plugin/marketplace.json`; the plugin id `sonarqube` comes from `.claude-plugin/plugin.json`. Alternatively, run `/plugin`, open the **Discover** tab, and install **sonarqube** from the Sonar marketplace interactively (pick user, project, or local [scope](https://code.claude.com/en/settings#configuration-scopes) as needed).
+### Other agents (Cursor, Gemini CLI, Codex, Kiro)
 
-From a system terminal you can use the same ids (optional `--scope`):
+Each layout includes **MCP configuration** (for example **`mcp.json`**, **`gemini-extension.json`**, or **`kiro-power/mcp.json`**) that runs the **`mcp/sonarqube`** image and **relies on SonarQube CLI** for authentication—the same **`sonar auth login`** session.
 
-```shell
-claude plugin install sonarqube@sonar
-```
+---
 
-#### Prerequisites
+## Repository layout
 
-- **Node.js** — required to run the `SessionStart` hook (`scripts/setup.js`).
-- **sonarqube-cli** (`sonar`) — install it yourself before running `/sonarqube:sonar-integrate`. Agent will also guide you through the installation process:
+| Agent | Location |
+| ----- | -------- |
+| **Claude Code** | `.claude-plugin/`, `skills/`, `claude-hooks/`, `scripts/` |
+| **Cursor** | `.cursor-plugin/` (+ shared `mcp.json`) |
+| **GitHub Copilot CLI** | `.github/plugin/` (+ shared `mcp.json`) |
+| **Codex** | `.codex-plugin/` |
+| **Gemini CLI** | `gemini-extension.json`, `GEMINI.md` |
+| **Kiro** | `kiro-power/` |
 
-  | Platform             | Command                                                                                                                  |
-  | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-  | macOS / Linux        | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
-  | Windows (PowerShell) | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
+---
 
-#### Finish setup with `/sonarqube:sonar-integrate`
+## Usage
 
-Once `sonarqube-cli` is installed, run the guided setup skill:
+Capabilities are the same across agents. **Claude Code** exposes them as **slash commands** (skills). On other agents, ask in natural language or use the **SonarQube MCP** tools your client shows after MCP starts.
+
+ MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqube-mcp-server/).
+
+### Skills
+
+#### Set up
 
 ```
 /sonarqube:sonar-integrate
 ```
 
-This will:
-
-1. Verify `sonarqube-cli` is available (and run `sonar self-update` when the CLI is present)
-2. Authenticate with SonarQube Cloud or a self-hosted SonarQube Server via `sonar auth login` (opens browser — token stored in your system keychain, never pasted in chat)
-3. Run `sonar integrate claude` to register the SonarQube MCP Server, secrets-scanning hooks, and other Claude Code integration on your machine
-
-### Usage
-
-#### Set Up
+#### List projects
 
 ```
-/sonarqube:sonar-integrate
+/sonarqube:sonar-list-projects
+/sonarqube:sonar-list-projects my-project
 ```
 
-#### List Projects (CLI)
+#### List issues
 
 ```
-/sonarqube:sonar-list-projects             # all accessible projects
-/sonarqube:sonar-list-projects my-project     # search by name or key
-```
-
-#### List Issues (CLI)
-
-```
-/sonarqube:sonar-list-issues                              # issues in the current project
+/sonarqube:sonar-list-issues
 /sonarqube:sonar-list-issues my-project --severity CRITICAL
 ```
 
-#### Fix an Issue
+#### Fix an issue
 
 ```
 /sonarqube:sonar-fix-issue java:S1481 src/main/java/MyClass.java
 /sonarqube:sonar-fix-issue python:S2077 src/auth/login.py:34
 ```
 
-#### Quality gate (MCP)
+#### Quality gate / analyze / coverage / duplication / dependency risks
 
 ```
 /sonarqube:sonar-quality-gate
 /sonarqube:sonar-quality-gate my-project --branch main
-```
 
-#### Analyze a File (MCP)
-
-```
 /sonarqube:sonar-analyze
 /sonarqube:sonar-analyze src/auth/login.py
-```
 
-#### Coverage (MCP)
-
-```
 /sonarqube:sonar-coverage
 /sonarqube:sonar-coverage my-project --max 50
 /sonarqube:sonar-coverage my-project --file src/auth/login.py
-```
 
-#### Duplication (MCP)
-
-```
 /sonarqube:sonar-duplication
 /sonarqube:sonar-duplication my-project --pr 42
-/sonarqube:sonar-duplication my-project --file src/auth/login.py
-```
 
-#### Dependency Risks (MCP, Advanced Security)
-
-```
 /sonarqube:sonar-dependency-risks
 /sonarqube:sonar-dependency-risks my-project --pr 42
 ```
 
-### Configuration
+---
 
-Run `/sonarqube:sonar-integrate` — it handles everything interactively.
+## Claude Code plugin
 
-For reference, the connection scenarios and corresponding `sonar auth login` commands are:
+Install from Anthropic's marketplace **`claude-plugins-official`**:
 
-| Scenario                       | Command                                                 |
-| ------------------------------ | ------------------------------------------------------- |
-| SonarQube Cloud — EU (default) | `sonar auth login -o <org-key>`                         |
-| SonarQube Cloud — US           | `sonar auth login -o <org-key> -s https://sonarqube.us` |
-| SonarQube Server               | `sonar auth login -s <server-url>`                      |
-
-Credentials are stored in your system keychain. You can verify the current auth status with:
-
-```bash
-sonar auth status
+```shell
+/plugin install sonarqube@claude-plugins-official
 ```
 
-#### Optional: sonar-project.properties
-
-Create a `sonar-project.properties` file in your project root to set a project key for analysis:
-
-```properties
-sonar.projectKey=my-project
-sonar.projectName=My Project
-sonar.projectVersion=1.0
-sonar.sources=src
-sonar.sourceEncoding=UTF-8
+```shell
+claude plugin install sonarqube@claude-plugins-official
 ```
 
-#### Local development (`--plugin-dir`)
+### One-time setup
 
-```bash
-# From a clone of this repository
-claude --plugin-dir .
+- **Node.js** — for the SessionStart hook (`scripts/setup.js`).
+- Install **SonarQube CLI** if needed, then **`/sonarqube:sonar-integrate`** or **`sonar auth login`** + **`sonar integrate claude`**.
 
-# Or pass the path explicitly
-claude --plugin-dir ./path/to/sonarqube-agent-plugins
-```
+`sonar auth login` by scenario:
+
+| Scenario | Command |
+| -------- | ------- |
+| SonarQube Cloud (EU) | `sonar auth login -o <org-key>` |
+| SonarQube Cloud (US) | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+| SonarQube Server | `sonar auth login -s <server-url>` |
+
+Optional: add **`sonar-project.properties`** in the project root with `sonar.projectKey`, sources, etc.
+
+---
+
+## GitHub Copilot CLI
+
+Plugin bundle: **`.github/plugin/`** — catalog **`sonar`**, plugin **`sonarqube`** (see **[`.github/plugin/marketplace.json`](.github/plugin/marketplace.json)**).
+
+1. Add **SonarSource/sonarqube-agent-plugins** as a plugin marketplace in GitHub Copilot CLI / AgentHQ, then install **sonarqube** from that catalog (some builds expose the same flow as slash commands):
+
+   ```shell
+   /plugin marketplace add SonarSource/sonarqube-agent-plugins
+   /plugin install sonarqube@sonar
+   ```
+
+2. Run **`sonar auth login`**, then **`sonar integrate copilot`**, or invoke the `/sonarqube:sonar-integrate` skill.
+
+Same workflows as **[Usage](#usage)** once MCP is connected.
+
+---
+
+## Cursor
+
+**`.cursor-plugin/`** with MCP via **`mcp.json`**. Use **`sonar auth login`** so the MCP server picks up CLI credentials.
+
+---
+
+## Gemini CLI
+
+**`gemini-extension.json`** and **`GEMINI.md`**. **`sonar auth login`** and **[Usage](#usage)**.
+
+---
+
+## Codex CLI
+
+**`.codex-plugin/`**. **`sonar auth login`**; MCP follows the same **`mcp/sonarqube`** pattern as the rest of this repo. Client-specific wiring: **[Codex CLI quickstart](https://docs.sonarsource.com/sonarqube-mcp-server/quickstart-guide/codex-cli)**.
+
+---
+
+## Kiro
+
+**`kiro-power/`** (`POWER.md`, MCP config). **`sonar auth login`**, then enable the power per Kiro’s documentation.
 
 ---
 
@@ -190,4 +193,4 @@ Copyright (C) 2025-2026 SonarSource Sàrl. Licensed under [SSAL-1.0](LICENSE).
 
 ## Support
 
-- Issues: https://community.sonarsource.com/
+- Community: https://community.sonarsource.com/
