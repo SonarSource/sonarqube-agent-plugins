@@ -88,8 +88,9 @@ verify before continuing.
 
 Pick exactly one branch below based on which agent you are. Do not run the other branches.
 
-- Claude Code → **4.a**
-- Cursor, Copilot CLI, Gemini CLI, or Codex → **4.b**
+- Claude Code -> **4.a**
+- Copilot CLI -> **4.b**
+- Cursor, Gemini CLI, or Codex -> **4.c**
 
 #### 4.a — Claude Code (`sonar integrate claude`)
 
@@ -104,19 +105,38 @@ Ask the user using a single-choice selector with these options:
 
 Do not ask an open-ended text question for this decision.
 
-Then run the appropriate command yourself using a shell command, using the server/org
-from Step 2 or Step 3 and adding `--non-interactive`:
+Then run the appropriate command yourself using a shell command, and adding `--non-interactive`:
 
 | Scenario     | Command                                             |
 | ------------ | --------------------------------------------------- |
 | Project-only | `sonar integrate claude --non-interactive`          |
 | Global       | `sonar integrate claude --global --non-interactive` |
 
-#### 4.b — Cursor, Copilot CLI, Gemini CLI, and Codex
+#### 4.b — Copilot CLI (`sonar integrate copilot`)
+
+Run **`sonar integrate copilot`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
+
+It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Copilot CLI config.
+
+Ask the user using a single-choice selector with these options:
+
+1. Current project only (default)
+2. Global (all projects)
+
+Do not ask an open-ended text question for this decision.
+
+Then run the appropriate command yourself using a shell command, and adding `--non-interactive`:
+
+| Scenario     | Command                                             |
+| ------------ | --------------------------------------------------- |
+| Project-only | `sonar integrate copilot --non-interactive`          |
+| Global       | `sonar integrate copilot --global --non-interactive` |
+
+#### 4.c — Cursor, Gemini CLI, and Codex
 
 These agents start the SonarQube MCP Server via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
 
-Confirm that integration is ready — the MCP server will start automatically when the agent reads its config (`mcp.json` for Cursor, Copilot CLI, and Codex; `gemini-extension.json` for Gemini CLI).
+Confirm that integration is ready — the MCP server will start automatically when the agent reads its config (`mcp.json` for Cursor, and Codex; `gemini-extension.json` for Gemini CLI).
 
 ---
 
@@ -139,6 +159,12 @@ If path **4.a** (Claude Code) was taken, add this line to the summary:
 
 ```
   Secrets scanning:  hooks registered via sonar integrate claude
+```
+
+If path **4.b** (Copilot CLI) was taken, add this line to the summary:
+
+```
+  Secrets scanning:  hooks registered via sonar integrate copilot
 ```
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.

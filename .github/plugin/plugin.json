@@ -15,6 +15,5 @@
   ],
   "license": "SSAL-1.0",
   "repository": "https://github.com/SonarSource/sonarqube-agent-plugins",
-  "homepage": "https://www.sonarsource.com",
-  "mcpServers": "./mcp.json"
+  "homepage": "https://www.sonarsource.com"
 }
