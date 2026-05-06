@@ -62,9 +62,9 @@ Each layout includes **MCP configuration** (for example **`mcp.json`**, **`gemin
 
 ## Usage
 
-Capabilities are the same across agents. **Claude Code** exposes them as **slash commands** (skills). On other agents, ask in natural language or use the **SonarQube MCP** tools your client shows after MCP starts.
+Skills are the same across agents. Ask in natural language, invoke skills explicitly, or use the **SonarQube MCP** tools your client shows after MCP starts.
 
- MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqube-mcp-server/).
+MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqube-mcp-server/).
 
 ### Skills
 
@@ -177,7 +177,19 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ## Codex CLI
 
-**`.codex-plugin/`**. **`sonar auth login`**; MCP follows the same **`mcp/sonarqube`** pattern as the rest of this repo. Client-specific wiring: **[Codex CLI quickstart](https://docs.sonarsource.com/sonarqube-mcp-server/quickstart-guide/codex-cli)**.
+Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube`** (see **[`.codex-plugin/plugin.json`](.codex-plugin/plugin.json)**).
+
+1. Add **SonarSource/sonarqube-agent-plugins** as a plugin marketplace in Codex CLI:
+
+   ```shell
+   codex plugin marketplace add SonarSource/sonarqube-agent-plugins
+   ```
+
+2. Run **`sonar auth login`**.
+
+3. Start a Codex session and install **sonarqube** from that catalog using the `/plugins` command
+
+Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ---
 
