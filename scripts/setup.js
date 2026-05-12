@@ -5,6 +5,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
 
+const HOOK_DISPLAY_NAMES = {
+  "sonar-secrets": "Secrets Detection",
+  "sonar-sqaa": "Agentic Analysis",
+};
+
 function hasSonarCli() {
   const envPath = process.env.PATH || "";
   const dirs = envPath.split(path.delimiter);
@@ -26,7 +31,7 @@ function hasSonarCli() {
   return false;
 }
 
-function readClaudeCodeHooksInstalled() {
+function readState() {
   const statePath = path.join(
     os.homedir(),
     ".sonar",
@@ -34,32 +39,47 @@ function readClaudeCodeHooksInstalled() {
     "state.json"
   );
   try {
-    const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
-    const installed = state?.agents?.["claude-code"]?.hooks?.installed;
-    return Array.isArray(installed) ? installed : [];
+    return JSON.parse(fs.readFileSync(statePath, "utf8"));
   } catch {
-    return [];
+    return null;
   }
 }
 
-function hasNamedHook(installed, hookName) {
-  return installed.some((entry) => entry && entry.name === hookName);
+function samePath(a, b) {
+  if (!a || !b) return false;
+  const caseInsensitive =
+    process.platform === "darwin" || process.platform === "win32";
+  const norm = (p) =>
+    caseInsensitive ? path.resolve(p).toLowerCase() : path.resolve(p);
+  return norm(a) === norm(b);
 }
 
+const cwd = process.cwd();
+const state = readState();
 const sonarOk = hasSonarCli();
-const hooksInstalled = readClaudeCodeHooksInstalled();
-const agenticAnalysisOk = hasNamedHook(hooksInstalled, "sonar-sqaa");
-const secretsOk = hasNamedHook(hooksInstalled, "sonar-secrets");
-const integrateHint = "✗ not set up — run /sonarqube:sonar-integrate";
+
+const claudeHooks = (state?.agentExtensions ?? []).filter(
+  (e) =>
+    e?.agentId === "claude-code" &&
+    e.kind === "hook" &&
+    typeof e.name === "string"
+);
+const globalHooks = claudeHooks.filter((e) => e.global === true);
+const localHooks = claudeHooks.filter((e) => samePath(cwd, e.projectRoot));
+const installed = new Set([...globalHooks, ...localHooks].map((e) => e.name));
+
+const hookList = Array.from(installed)
+  .map((n) => HOOK_DISPLAY_NAMES[n] || n)
+  .join(", ");
 
 const lines = [
   "SonarQube plugin initialised.",
-  "  sonarqube-cli:    " +
+  "  sonarqube-cli: " +
     (sonarOk ? "✓ found" : "✗ not found — run /sonarqube:sonar-integrate"),
-  "  Agentic Analysis hook (sonar-sqaa): " +
-    (agenticAnalysisOk ? "✓ configured" : integrateHint),
-  "  Secrets hook (sonar-secrets): " +
-    (secretsOk ? "✓ configured" : integrateHint),
+  "  SonarQube hooks: " +
+    (installed.size > 0
+      ? "✓ " + hookList
+      : "✗ no hooks installed — run /sonarqube:sonar-integrate"),
 ];
 
 process.stdout.write(JSON.stringify({ systemMessage: lines.join("\n") }) + "\n");
