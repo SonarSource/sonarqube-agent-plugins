@@ -1,7 +1,7 @@
 {
   "name": "sonarqube",
   "description": "Automatically enforce SonarQube code quality and security in the agent coding loop — 7,000+ rules, secrets scanning, agentic analysis, and quality gates across 40+ languages.",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "mcpServers": {
     "sonarqube": {
       "command": "sonar",
