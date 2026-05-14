@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-"use strict";
 
-const fs = require("node:fs");
-const path = require("node:path");
-const os = require("node:os");
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
 
 function hasSonarCli() {
   const envPath = process.env.PATH || "";
