@@ -206,3 +206,5 @@ Copyright (C) 2025-2026 SonarSource Sàrl. Licensed under [SSAL-1.0](LICENSE).
 ## Support
 
 - Community: https://community.sonarsource.com/
+
+test commit
