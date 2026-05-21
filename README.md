@@ -3,7 +3,7 @@
 
   # SonarQube plugins for agents
 
-  **Bring SonarQube code quality and security into every AI coding agent — one set of plugins, six agents, zero context switching.**
+  ** SonarQube is the AI code quality and security verification platform used by millions of developers to catch bugs, vulnerabilities, and leaked secrets. This plugin enforces those standards automatically in the coding loop: 7,500+ distinct issue types, secrets scanning, agentic analysis, and quality gates across 40+ languages.**
 
   [![License: SSAL-1.0](https://img.shields.io/badge/license-SSAL--1.0-blue.svg)](./LICENSE)
   [![Version](https://img.shields.io/badge/version-2.1.0-green.svg)](./.claude-plugin/plugin.json)
