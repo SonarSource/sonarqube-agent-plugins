@@ -23,7 +23,7 @@ Catch bugs, vulnerabilities, hardcoded secrets, and dependency risks the moment 
 ## Documentation
 
 - 📘 **SonarQube docs:** [docs.sonarsource.com](https://docs.sonarsource.com/)
-- 🛠 **SonarQube CLI (the engine these plugins drive):** [cli.sonarqube.com](https://cli.sonarqube.com/) · [docs.sonarsource.com/sonarqube-cli](https://docs.sonarsource.com/sonarqube-cli/)
+- 🛠 **SonarQube CLI (the engine these plugins rely on):** [docs.sonarsource.com/sonarqube-cli](https://docs.sonarsource.com/sonarqube-cli/) · [cli.sonarqube.com](https://cli.sonarqube.com/)
 - 🌐 **SonarQube MCP Server:** [docs.sonarsource.com/sonarqube-mcp-server](https://docs.sonarsource.com/sonarqube-mcp-server/)
 
 ## Table of Contents
