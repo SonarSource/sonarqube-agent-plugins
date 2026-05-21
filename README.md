@@ -51,7 +51,7 @@ Catch bugs, vulnerabilities, hardcoded secrets, and dependency risks the moment 
 
 These plugins target three audiences, in the same package:
 
-1. **Individual developers** who want a quality check that runs inside the agent instead of after the PR is opened. Install one plugin, get slash commands and natural-language access to the SonarQube ruleset, coverage, and quality gates.
+1. **Individual developers** who want a quality check that runs inside the agent, in addition to the scan after the PR is opened. Install one plugin, get slash commands and natural-language access to the SonarQube ruleset, coverage, and quality gates.
 2. **Platform / DevEx teams** rolling SonarQube out across many engineers and many editors. Pin one CLI version, distribute one plugin per agent, get consistent rules and consistent auth flow regardless of which AI tool a team picks.
 3. **Security and compliance owners** who need credentials, secrets, and source code to stay on the developer's machine — not embedded in prompts sent to LLM providers. The PrePrompt and PreTool secrets hooks are the relevant controls.
 
