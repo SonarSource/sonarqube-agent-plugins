@@ -13,7 +13,7 @@
 Catch bugs, vulnerabilities, hardcoded secrets, and dependency risks the moment an agent writes the code — not three commits later in CI. These plugins wire SonarQube into **Claude Code, GitHub Copilot CLI, Cursor, Codex, Gemini CLI, and Kiro** through a single MCP backend and a shared set of skills.
 
 - 🔍 **7,500+ rules across 40+ languages** — SonarQube rules, on demand, from inside the agent.
-- 🔒 **Secrets blocked before they reach the LLM** — PrePrompt and PreTool hooks (Claude Code, Copilot CLI today) intercept hardcoded credentials before the agent sends them to its model.
+- 🔒 **Secrets blocked before they reach the LLM** — PromptSubmit and PreToolUse hooks (Claude Code, Copilot CLI today) intercept hardcoded credentials before the agent sends them to its model.
 - 🤖 **Agentic Analysis** — automatic post-edit verification against SonarQube Cloud, surfacing only the issues *this* change introduced.
 - 📊 **Quality gates, coverage, duplications, dependency risks** — the same data SonarQube serves to your CI, available to the agent during the edit.
 - 🔌 **One auth, six agents** — `sonar auth login` once; every plugin reads the same OS-keychain credential.
