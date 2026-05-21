@@ -1,7 +1,7 @@
 <div align="center">
   <img src="./assets/logo.svg" width="120" alt="SonarQube logo" />
 
-  # SonarQube agent plugins
+  # SonarQube plugins for agents
 
   **Bring SonarQube code quality and security into every AI coding agent — one set of plugins, six agents, zero context switching.**
 
