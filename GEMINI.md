@@ -83,8 +83,19 @@ Invoke it when another skill surfaces a failure that points to one of the condit
 - "Explain rule javascript:S1234"
 - "What metrics are available?"
 - "Show me code complexity metrics"
+- "Graph coverage for main over 90 days"
+- "What is the quality gate ratio for this portfolio?"
+- "Which projects currently have unresolved vulnerabilities?"
 
-**What to do:** No dedicated skill exists for this — call the MCP tools directly: `mcp__sonarqube__show_rule` for rule explanations, `mcp__sonarqube__search_metrics` for available metrics, and `mcp__sonarqube__get_component_measures` for specific metric values.
+**What to do:** For rule explanations, call `mcp__sonarqube__show_rule` directly. For generic metric-catalog requests such as "What metrics are available?" or "Show me code complexity metrics", call `mcp__sonarqube__search_metrics` directly.
+
+- For ambiguous analytics-discovery requests that need routing among the measure skills, start with `sonar-measures` as the router skill.
+- If the request already clearly asks for trend history, issue-count history, current portfolio aggregate measures, or issue inspection, bypass `sonar-measures` and invoke the concrete skill directly.
+- For project-branch or portfolio metric trend history, invoke `sonar-measures-history`.
+- For project-branch or portfolio issue count trend history, invoke `sonar-issue-count-history`.
+- For current portfolio aggregate measures from `/enterprises/portfolio-measures` such as quality-gate ratio, releasability rating, or project-branch counts, invoke `sonar-portfolio-measures`.
+- For portfolio membership, per-project rankings, top-N projects inside a portfolio, or other portfolio drilldown beyond current aggregate measures, do not route to `sonar-portfolio-measures`; no current skill owns that flow.
+- For current issue inspection such as unresolved vulnerabilities or severity/type searches, invoke `sonar-list-issues`.
 
 ## Important Parameter Guidelines
 

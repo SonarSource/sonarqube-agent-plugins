@@ -41,13 +41,21 @@ If a `--query` search term was provided, validate it matches `^[a-zA-Z0-9_\-\. ]
 
 ### Step 3: Run `sonar list projects`
 
-Build and run the command using a shell command:
+Build and run the command using a shell command. Use `--page-size 500` and continue paging until the full result set is retrieved.
 
 ```bash
-sonar list projects [--query <search-term>]
+sonar list projects --page-size 500 --page <page-number> [--query <search-term>]
 ```
 
 Only include `--query` if a search term was provided.
+
+Pagination rules:
+
+- Start with `--page 1`.
+- Keep incrementing `--page` until the full result set has been retrieved.
+- If the CLI exposes a total count, use it to decide when paging is complete.
+- If the CLI does not expose a total count, stop when a page returns fewer than `--page-size` results.
+- For requests that ask for "all projects" or for any downstream ranking/discovery workflow, do not stop after the first page.
 
 ### Step 4: Format the results
 
@@ -73,7 +81,7 @@ Found **8 project(s)**:
 No projects found. If you expected results, check your authentication with `sonar auth status`.
 ```
 
-**If the result is paginated** (500 projects returned), note: *"Showing first 500 projects. Use a search term to narrow results."*
+If results required multiple pages, note that the output was assembled from the full paginated result set.
 
 ### Step 5: Next steps
 
