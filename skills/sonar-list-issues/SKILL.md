@@ -1,7 +1,7 @@
 ---
 name: sonar-list-issues
 description: Search and filter SonarQube issues for a project, branch, or pull request via sonarqube-cli (`-p` is always required on the CLI; resolve the key from user arguments or sonar-project.properties)
-argument-hint: "[project-key?] [--severity value] [--types values] [--branch name]"
+argument-hint: "[project-key?] [--severities values] [--statuses values] [--branch name]"
 allowed-tools: Read, Grep, Bash(sonar:*)
 ---
 
@@ -16,13 +16,8 @@ Unlike SonarQube MCP tools (which may use a default project from integration), *
 ```
 sonar-list-issues                                          # issues in the current project
 sonar-list-issues my-project                               # issues in a specific project key
-sonar-list-issues my-project --severity CRITICAL           # filter by severity
-sonar-list-issues my-project --types BUG,VULNERABILITY     # filter by type
+sonar-list-issues my-project --severities CRITICAL,BLOCKER # filter by severities
 sonar-list-issues my-project --statuses OPEN,CONFIRMED     # filter by status
-sonar-list-issues my-project --rules python:S2077          # filter by rule key
-sonar-list-issues my-project --tags security               # filter by tag
-sonar-list-issues my-project --component src/auth/login.py # issues in a specific file
-sonar-list-issues my-project --resolved                    # only resolved issues
 sonar-list-issues my-project --branch main                 # on a specific branch
 sonar-list-issues my-project --pr 42                       # on a pull request
 ```
@@ -53,42 +48,33 @@ This flow uses **`sonar list issues`** (CLI), not MCP. The CLI **always** needs 
 
 ### Step 2: Parse optional flags from the user-provided arguments
 
-| Flag                  | Maps to CLI option                                           |
-| --------------------- | ------------------------------------------------------------ |
-| `--severity <value>`  | `--severity`                                                 |
-| `--types <values>`    | `--types`                                                    |
-| `--statuses <values>` | `--statuses`                                                 |
-| `--rules <values>`    | `--rules`                                                    |
-| `--tags <values>`     | `--tags`                                                     |
-| `--component <path>`  | `--component-keys` (file key format: `project-key:src/path`) |
-| `--resolved`          | `--resolved`                                                 |
-| `--branch <name>`     | `--branch`                                                   |
-| `--pr <id>`           | `--pull-request`                                             |
+| Flag                     | Maps to CLI option |
+| ------------------------ | ------------------ |
+| `--severities <values>`  | `--severities`     |
+| `--statuses <values>`    | `--statuses`       |
+| `--branch <name>`        | `--branch`         |
+| `--pr <id>`              | `--pull-request`   |
 
-When `--component` is given as a plain path, prepend the resolved project key to form the component key (e.g. `my-project:src/auth/login.py`).
+> `sonar list issues` does **not** support filtering by issue type, rule, tag, or component, nor a `--resolved` flag. Only the options above (plus `--format`, `--page`, and `--page-size`) exist. To filter by rule/type/tag/component or to drill into a single file, use the MCP-based skills (e.g. sonar-analyze for a file, or `mcp__sonarqube__search_sonar_issues_in_projects`).
 
 ### Step 3: Validate arguments
 
 Before building the command, validate each user-supplied value against the following rules. If any value fails validation, stop and tell the user what was rejected and why — do not run the command. Validate the resolved project key (from args or `sonar-project.properties`) against the project-key pattern before running the CLI.
 
-| Argument      | Allowed pattern                                                                                                |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| project key   | `^[a-zA-Z0-9_\-\.:]+$`                                                                                         |
-| `--severity`  | one of: `BLOCKER`, `CRITICAL`, `MAJOR`, `MINOR`, `INFO`, `HIGH`, `MEDIUM`, `LOW`                               |
-| `--types`     | comma-separated subset of: `BUG`, `VULNERABILITY`, `CODE_SMELL`, `SECURITY_HOTSPOT`                            |
-| `--statuses`  | comma-separated subset of: `OPEN`, `CONFIRMED`, `REOPENED`, `RESOLVED`, `CLOSED`, `ACCEPTED`, `FALSE_POSITIVE` |
-| `--rules`     | comma-separated values matching `^[a-zA-Z0-9_\-:]+$`                                                           |
-| `--tags`      | comma-separated values matching `^[a-zA-Z0-9_\-]+$`                                                            |
-| `--component` | file path matching `^[a-zA-Z0-9_\-\./:,]+$`                                                                    |
-| `--branch`    | `^[a-zA-Z0-9_\-\./]+$`                                                                                         |
-| `--pr`        | digits only                                                                                                    |
+| Argument       | Allowed pattern                                                                       |
+| -------------- | ------------------------------------------------------------------------------------- |
+| project key    | `^[a-zA-Z0-9_\-\.:]+$`                                                                |
+| `--severities` | comma-separated subset of: `INFO`, `MINOR`, `MAJOR`, `CRITICAL`, `BLOCKER`, `HIGH`, `MEDIUM`, `LOW` |
+| `--statuses`   | comma-separated subset of: `OPEN`, `CONFIRMED`, `FALSE_POSITIVE`, `ACCEPTED`, `FIXED` |
+| `--branch`     | `^[a-zA-Z0-9_\-\./]+$`                                                                |
+| `--pr`         | digits only                                                                           |
 
 ### Step 4: Run `sonar list issues`
 
 Build and run the command using a shell command. **Always** pass **`-p`** with the key resolved in Step 1.
 
 ```bash
-sonar list issues -p <project-key> --format toon [--severity <value>] [--types <values>] [--statuses <values>] [--rules <values>] [--tags <values>] [--component-keys <key>] [--resolved] [--branch <name>] [--pull-request <id>]
+sonar list issues -p <project-key> --format toon [--severities <values>] [--statuses <values>] [--branch <name>] [--pull-request <id>]
 ```
 
 Only include optional flags that were provided.
