@@ -185,9 +185,15 @@ Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube
    codex plugin marketplace add SonarSource/sonarqube-agent-plugins
    ```
 
-2. Run **`sonar auth login`**.
+2. Install the **sonarqube** plugin from the **sonar** marketplace:
 
-3. Start a Codex session and install **sonarqube** from that catalog using the `/plugins` command
+   ```shell
+   codex plugin add sonarqube@sonar
+   ```
+
+3. Run **`sonar auth login`**.
+
+4. Start a Codex session and use the SonarQube skills from the plugin.
 
 Same workflows as **[Usage](#usage)** once MCP is connected.
 
