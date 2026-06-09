@@ -8,7 +8,7 @@ SonarQube combines deterministic checks with AI-assisted workflows so quality ru
 
 ## What do the plugins include
 
-The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage & duplications, fetch dependency risks, etc. Claude Code & Copilot integrations (through SonarQube CLI) install agent hooks. This is coming soon for other agents too.
+The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, and Codex integrations (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Agentic Analysis.
 
 How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Agentic Analysis enabled, verification happens automatically after each edit with no manual invocation required.
 
@@ -36,12 +36,13 @@ sonar auth status
 
 ```bash
 sonar integrate claude    # Claude Code: MCP, hooks, secrets scanning, etc.
-sonar integrate copilot   # GitHub Copilot CLI: MCP setup
+sonar integrate copilot   # GitHub Copilot CLI: MCP, hooks, secrets scanning, etc.
+sonar integrate codex     # Codex: MCP, hooks, secrets scanning, Agentic Analysis hook
 ```
 
 Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill in Claude Code if you prefer a guided flow (install/update CLI, login, then integrate).
 
-### Other agents (Cursor, Gemini CLI, Codex, Kiro)
+### Other agents (Cursor, Gemini CLI, Kiro)
 
 Each layout includes **MCP configuration** (for example **`mcp.json`**, **`gemini-extension.json`**, or **`kiro-power/mcp.json`**) that runs the **`mcp/sonarqube`** image and **relies on SonarQube CLI** for authentication—the same **`sonar auth login`** session.
 
@@ -188,6 +189,8 @@ Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube
 2. Run **`sonar auth login`**.
 
 3. Start a Codex session and install **sonarqube** from that catalog using the `/plugins` command
+
+4. From your project directory, run **`sonar integrate codex`** (add **`--project <key>`** if needed). This wires MCP in **`.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Agentic Analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit.
 
 Same workflows as **[Usage](#usage)** once MCP is connected.
 
