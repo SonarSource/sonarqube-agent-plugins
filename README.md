@@ -186,9 +186,15 @@ Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube
    codex plugin marketplace add SonarSource/sonarqube-agent-plugins
    ```
 
-2. Run **`sonar auth login`**.
+2. Install the **sonarqube** plugin from the **sonar** marketplace:
 
-3. Start a Codex session and install **sonarqube** from that catalog using the `/plugins` command
+   ```shell
+   codex plugin add sonarqube@sonar
+   ```
+
+3. Run **`sonar auth login`**.
+
+4. Start a Codex session and use the SonarQube skills from the plugin.
 
 4. From your project directory, run **`sonar integrate codex`** (add **`--project <key>`** if needed). This wires MCP in **`.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Agentic Analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit.
 
