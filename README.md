@@ -86,7 +86,7 @@ MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqub
 
 ```
 /sonarqube:sonar-list-issues
-/sonarqube:sonar-list-issues my-project --severity CRITICAL
+/sonarqube:sonar-list-issues my-project --severities CRITICAL
 ```
 
 #### Fix an issue
