@@ -4,9 +4,8 @@
         {
             "name": "sonarqube",
             "source": {
-                "source": "url",
-                "url": "https://github.com/SonarSource/sonarqube-agent-plugins.git",
-                "ref": "master"
+                "source": "local",
+                "path": "./"
             },
             "policy": {
                 "installation": "AVAILABLE",
