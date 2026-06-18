@@ -161,15 +161,18 @@ Cursor starts the SonarQube MCP Server via `sonar run mcp`, which handles contai
 
 Confirm that integration is ready — the MCP server will start automatically when Cursor reads **`mcp.json`**.
 
-#### 4.e — Antigravity (`agy plugin install` + `sonar integrate antigravity`)
+#### 4.e — Antigravity (`sonar integrate antigravity`)
 
-Antigravity uses **two surfaces**: the **plugin bundle** (skills, rules, MCP) and **`sonar integrate antigravity`** (secrets hooks, Agentic Analysis instructions, Context Augmentation, MCP patch). Complete both.
+**Prerequisite — plugin must be installed first:** Skills (including this one) ship with the SonarQube Antigravity plugin. If you can invoke this skill, the plugin is already present. If the user has not installed the plugin yet, show the command below, tell them to run it in a terminal, restart Antigravity, then invoke this skill again — **do not continue** until the plugin is installed.
 
-**Plugin bundle:** run **`agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins`** yourself using a shell command. If the user is developing this repo locally, use the workspace path instead. Re-running install is safe when the plugin is already present.
+| Scenario                        | Command                                                                     |
+|---------------------------------|-----------------------------------------------------------------------------|
+| Fresh install                   | `agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins` |
+| Migrating from Gemini extension | `agy plugin import gemini`                                                  |
 
-If the user is migrating from the **SonarQube Gemini extension**, run **`agy plugin import gemini`** instead of a fresh plugin install. Then continue with **`sonar integrate antigravity`** below.
+If the user is developing this repo locally, use the workspace path instead of the Git URL.
 
-**CLI integrate:** run **`sonar integrate antigravity`**, which configures **secrets-scanning hooks**, **prompt-secrets and Agentic Analysis instructions**, **Context Augmentation** (when entitled), and **MCP** in the Antigravity harness.
+**CLI integrate:** after Steps 1–3, run **`sonar integrate antigravity`**, which configures **secrets-scanning hooks**, **prompt-secrets and Agentic Analysis instructions**, **Context Augmentation** (when entitled), and **MCP** in the Antigravity harness. The plugin bundle alone provides skills, rules, and plugin MCP; integrate adds the harness wiring above.
 
 Ask the user using a single-choice selector with these options:
 
@@ -237,8 +240,7 @@ If path **4.d** (Cursor) was taken, no extra line is required beyond the default
 If path **4.e** (Antigravity) was taken, add these lines to the summary:
 
 ```
-  Plugin bundle:     installed via agy plugin install
-  Hooks & MCP:       wired via sonar integrate antigravity
+  CLI integrate:     wired via sonar integrate antigravity
 ```
 
 If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the default MCP summary.

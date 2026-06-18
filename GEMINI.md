@@ -47,7 +47,7 @@ Invoke it when another skill surfaces a failure that points to one of the condit
 - "Check this code for quality problems"  
 - "Generate a method that does X and analyze it for issues"
 
-**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Agentic Analysis) and falls back to `mcp__sonarqube__analyze_code_snippet` / `mcp__sonarqube__analyze_file_list`, handling file reading, language detection, and scope selection.
+**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Agentic Analysis) and falls back to `mcp__sonarqube__analyze_code_snippet`, handling file reading, language detection, and scope selection.
 
 ### Coverage
 **Example user requests:**
@@ -90,14 +90,12 @@ Invoke it when another skill surfaces a failure that points to one of the condit
 
 ### Project Keys
 
-Always resolve the project key using the following lookup order — **never guess**:
+MCP tools often **do not require** an explicit project key when the SonarQube MCP server is configured for this workspace. Resolve a key only when a tool schema requires it, the user targets another project, or a CLI command always needs `-p`:
 
-1. **SonarQube for IDE (connected mode)**: If the MCP server is running with IDE integration (`SONARQUBE_IDE_PORT` is set), the project key may already be available from the IDE context.
-2. **`.sonarlint/connectedMode.json`**: Look for this file in the workspace root (or any parent directory). It contains the project key in the `projectKey` field.
-3. **Project-level configuration file**: Search for a `sonar.projectKey` property in files such as `sonar-project.properties`, `pom.xml`, `build.gradle`, `build.gradle.kts`, or `package.json` in the root project folder.
-4. **CI/CD pipeline definitions**: Search for `sonar.projectKey` in pipeline files such as `.github/workflows/*.yml`, `Jenkinsfile`, `.gitlab-ci.yml`, `azure-pipelines.yml`, `.circleci/config.yml`, etc.
-5. **User-provided project name**: When a user mentions a project by name or partial key, invoke the `sonar-list-projects` skill to find the exact project key.
-6. **No key found**: If none of the above methods yield a project key, invoke the `sonar-list-projects` skill to list available projects.
+- If the user provided a project key, use it.
+- Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root (or in `pom.xml`, `build.gradle`, `build.gradle.kts`, or `package.json`).
+- For CLI commands such as `sonar list issues`, `-p` is always required — invoke the `sonar-list-projects` skill if no key is known.
+- When no key is found and the tool allows it, omit `projectKey` and rely on the integration default.
 
 ### Branch and Pull Request Context
 - Many operations support branch-specific analysis
@@ -109,10 +107,8 @@ Always resolve the project key using the following lookup order — **never gues
 
 ## Common Troubleshooting
 
-### Authentication Issues
-- SonarQube requires USER tokens (not project tokens)
-- When the error `SonarQube answered with Not authorized` occurs, verify the token type
-- For setup or re-authentication, invoke the `sonar-integrate` skill
+### Authentication or MCP Issues
+- For setup, re-authentication, or missing MCP tools, invoke the `sonar-integrate` skill
 
 ### Project Not Found
 - Invoke the `sonar-list-projects` skill to confirm available projects
