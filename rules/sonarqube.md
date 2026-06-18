@@ -44,14 +44,6 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 
 **What to do:** Invoke the `sonar-list-issues` skill end-to-end. It supports filtering by severity, type, status, rule, tag, component, branch, and pull request, and always passes `-p <project-key>` to the CLI.
 
-### Code Snippet Analysis
-**Example user requests:**
-- "Analyze this code snippet for issues"
-- "Check this code for quality problems"
-- "Generate a method that does X and analyze it for issues"
-
-**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Agentic Analysis) and falls back to `mcp__sonarqube__analyze_code_snippet`, handling file reading, language detection, and scope selection.
-
 ### Coverage
 **Example user requests:**
 - "Which files have the worst test coverage?"
@@ -105,9 +97,6 @@ After `sonar integrate antigravity`, MCP tools often **do not require** an expli
 - If user mentions working on a feature branch, include the branch parameter
 - Pull request analysis is available for PR-specific insights
 
-### Code Issues and Violations
-- After fixing issues, do not attempt to verify them using `mcp__sonarqube__search_sonar_issues_in_projects`, as the server will not yet reflect the updates
-
 ## Common Troubleshooting
 
 ### Authentication or MCP Issues
@@ -118,8 +107,3 @@ After `sonar integrate antigravity`, MCP tools often **do not require** an expli
 - Invoke the `sonar-list-projects` skill to confirm available projects
 - Check if user has access to the specific project
 - Verify project key spelling and format
-
-### Code Analysis Issues
-- Remind users that snippet analysis doesn't replace full project scans
-- Provide full file content for better analysis results when the MCP tool requires it
-- Mention that code snippet analysis has limited capabilities compared to full SonarQube scans
