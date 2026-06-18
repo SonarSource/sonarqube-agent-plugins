@@ -1,19 +1,22 @@
-# SonarQube Gemini CLI Extension - Agent Context
+# SonarQube Antigravity Plugin — Agent Context
 
-## What This Extension Provides
+## What This Plugin Provides
 
-This Gemini CLI extension gives the agent SonarQube's code quality and security capabilities through a set of skills backed by the SonarQube MCP server and `sonarqube-cli`. With it, you can analyze code, check project quality, manage issues, and get detailed insights without leaving the chat.
+This Antigravity plugin gives the agent SonarQube's code quality and security capabilities through a set of skills backed by the SonarQube MCP server and `sonarqube-cli`. With it, you can analyze code, check project quality, manage issues, and get detailed insights without leaving the chat.
 
 ## Integration and Recovery
 
-The `sonar-integrate` skill is a preliminary initialization and recovery skill for the extension itself. It:
+The `sonar-integrate` skill is a preliminary initialization and recovery skill for the plugin itself. It:
 
 - installs `sonarqube-cli` if missing and updates it to the latest version,
-- authenticates the CLI via `sonar auth login` (token stored in system keychain).
+- authenticates the CLI via `sonar auth login` (token stored in system keychain),
+- runs `sonar integrate antigravity` to wire secrets scanning hooks, Agentic Analysis instructions, Context Augmentation, and MCP configuration.
+
+Migrating from the SonarQube Gemini extension? Run `agy plugin import gemini`, then `sonar integrate antigravity`.
 
 `sonar run mcp` handles container runtime detection (Docker, Podman, Nerdctl) and auth automatically — no environment variables are needed.
 
-Invoke it when another skill surfaces a failure that points to one of the conditions above (missing CLI, failed auth).
+Invoke the `sonar-integrate` skill when another skill surfaces a failure that points to one of the conditions above (missing CLI, failed auth, or incomplete integrate wiring).
 
 ## How Users Typically Interact
 
@@ -79,7 +82,7 @@ Invoke it when another skill surfaces a failure that points to one of the condit
 
 ### Understanding Rules and Metrics
 **Example user requests:**
-- "What does this rule mean?" 
+- "What does this rule mean?"
 - "Explain rule javascript:S1234"
 - "What metrics are available?"
 - "Show me code complexity metrics"
@@ -90,7 +93,7 @@ Invoke it when another skill surfaces a failure that points to one of the condit
 
 ### Project Keys
 
-MCP tools often **do not require** an explicit project key when the SonarQube MCP server is configured for this workspace. Resolve a key only when a tool schema requires it, the user targets another project, or a CLI command always needs `-p`:
+After `sonar integrate antigravity`, MCP tools often **do not require** an explicit project key — the integration stores a default project for the workspace. Resolve a key only when a tool schema requires it, the user targets another project, or a CLI command always needs `-p`:
 
 - If the user provided a project key, use it.
 - Otherwise look for `sonar.projectKey` in `sonar-project.properties` at the repo root (or in `pom.xml`, `build.gradle`, `build.gradle.kts`, or `package.json`).
@@ -102,13 +105,11 @@ MCP tools often **do not require** an explicit project key when the SonarQube MC
 - If user mentions working on a feature branch, include the branch parameter
 - Pull request analysis is available for PR-specific insights
 
-### Code Issues and Violations
-- After fixing issues, do not attempt to verify them using `mcp__sonarqube__search_sonar_issues_in_projects`, as the server will not yet reflect the updates
-
 ## Common Troubleshooting
 
 ### Authentication or MCP Issues
-- For setup, re-authentication, or missing MCP tools, invoke the `sonar-integrate` skill
+- For setup, re-authentication, missing MCP tools, or incomplete wiring, invoke the `sonar-integrate` skill
+- Restart the Antigravity session after integrate if MCP tools do not appear
 
 ### Project Not Found
 - Invoke the `sonar-list-projects` skill to confirm available projects

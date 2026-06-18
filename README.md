@@ -8,7 +8,7 @@ SonarQube combines deterministic checks with AI-assisted workflows so quality ru
 
 ## What do the plugins include
 
-The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, and Codex integrations (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Agentic Analysis.
+The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, and Antigravity (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Agentic Analysis.
 
 How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Agentic Analysis enabled, verification happens automatically after each edit with no manual invocation required.
 
@@ -35,29 +35,42 @@ sonar auth status
 **SonarQube CLI** can wire everything for you:
 
 ```bash
-sonar integrate claude    # Claude Code: MCP, hooks, secrets scanning, etc.
-sonar integrate copilot   # GitHub Copilot CLI: MCP, hooks, secrets scanning, etc.
-sonar integrate codex     # Codex: MCP, hooks, secrets scanning, Agentic Analysis hook
+sonar integrate claude        # Claude Code: MCP, hooks, secrets scanning, etc.
+sonar integrate copilot       # GitHub Copilot CLI: MCP, hooks, secrets scanning, etc.
+sonar integrate codex         # Codex: MCP, hooks, secrets scanning, Agentic Analysis hook
+sonar integrate antigravity   # Antigravity: hooks, instructions, CAG, MCP patch (after plugin install)
 ```
 
-Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill in Claude Code if you prefer a guided flow (install/update CLI, login, then integrate).
+Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill if you prefer a guided flow (install/update CLI, login, then integrate).
 
-### Other agents (Cursor, Gemini CLI, Kiro)
+### Other agents (Cursor, Kiro)
 
-Each layout includes **MCP configuration** (for example **`mcp.json`**, **`gemini-extension.json`**, or **`kiro-power/mcp.json`**) that runs the **`mcp/sonarqube`** image and **relies on SonarQube CLI** for authentication—the same **`sonar auth login`** session.
+Each layout includes **MCP configuration** (for example **`mcp.json`** or **`kiro-power/mcp.json`**) that runs the **`mcp/sonarqube`** image and **relies on SonarQube CLI** for authentication—the same **`sonar auth login`** session.
+
+### Antigravity (two-step setup)
+
+Antigravity uses **two independent install surfaces**. For full parity with Claude/Copilot you need both:
+
+| Step                 | Command                              | What it installs                                                              |
+|----------------------|--------------------------------------|-------------------------------------------------------------------------------|
+| **1. Plugin bundle** | `agy plugin install <git-url\|path>` | Skills, agent rules (`rules/sonarqube.md`), MCP (`mcp_config.json`)           |
+| **2. CLI integrate** | `sonar integrate antigravity`        | Secrets hooks, Agentic Analysis instructions, Context Augmentation, MCP patch |
+
+There is **no** `@vendor` marketplace install (for example `sonarqube@sonar` is not supported). Use a Git URL, archive, or local path.
 
 ---
 
 ## Repository layout
 
-| Agent | Location |
-| ----- | -------- |
-| **Claude Code** | `.claude-plugin/`, `skills/`, `claude-hooks/`, `scripts/` |
-| **Cursor** | `.cursor-plugin/` (+ shared `mcp.json`) |
-| **GitHub Copilot CLI** | `.github/plugin/` (+ shared `mcp.json`) |
-| **Codex** | `.codex-plugin/` |
-| **Gemini CLI** | `gemini-extension.json`, `GEMINI.md` |
-| **Kiro** | `kiro-power/` |
+| Agent                     | Location                                                     |
+|---------------------------|--------------------------------------------------------------|
+| **Claude Code**           | `.claude-plugin/`, `skills/`, `claude-hooks/`, `scripts/`    |
+| **Cursor**                | `.cursor-plugin/` (+ shared `mcp.json`)                      |
+| **GitHub Copilot CLI**    | `.github/plugin/` (+ shared `mcp.json`)                      |
+| **Codex**                 | `.codex-plugin/`                                             |
+| **Antigravity**           | `plugin.json`, `mcp_config.json`, `rules/`, shared `skills/` |
+| **Gemini CLI** *(legacy)* | `gemini-extension.json`, `GEMINI.md`                         |
+| **Kiro**                  | `kiro-power/`                                                |
 
 ---
 
@@ -137,11 +150,11 @@ claude plugin install sonarqube@claude-plugins-official
 
 `sonar auth login` by scenario:
 
-| Scenario | Command |
-| -------- | ------- |
-| SonarQube Cloud (EU) | `sonar auth login -o <org-key>` |
+| Scenario             | Command                                                 |
+|----------------------|---------------------------------------------------------|
+| SonarQube Cloud (EU) | `sonar auth login -o <org-key>`                         |
 | SonarQube Cloud (US) | `sonar auth login -o <org-key> -s https://sonarqube.us` |
-| SonarQube Server | `sonar auth login -s <server-url>` |
+| SonarQube Server     | `sonar auth login -s <server-url>`                      |
 
 Optional: add **`sonar-project.properties`** in the project root with `sonar.projectKey`, sources, etc.
 
@@ -170,9 +183,62 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ---
 
-## Gemini CLI
+## Antigravity
+
+Repo-root plugin: **`plugin.json`**, **`mcp_config.json`**, **`rules/sonarqube.md`**, and shared **`skills/`**. Hooks and managed instructions are **not** in the plugin bundle—they are installed by **`sonar integrate antigravity`**.
+
+### Recommended flow (full integration)
+
+```bash
+# 1. Plugin bundle — skills, rules, MCP
+agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins
+
+# 2. Auth + hooks / instructions / CAG / MCP patch
+sonar auth login
+sonar integrate antigravity              # project-scoped (default)
+# sonar integrate antigravity -g         # global (all projects; Agentic Analysis skipped)
+```
+
+Or use **`/sonarqube:sonar-integrate`** inside Antigravity for a guided flow. Restart the agent session if MCP tools do not appear.
+
+### Install options
+
+| Option            | Command / path                                | What you get                                            |
+|-------------------|-----------------------------------------------|---------------------------------------------------------|
+| **CLI global**    | `agy plugin install <git-url\|path\|archive>` | Plugin copied to `~/.gemini/config/plugins/sonarqube/`  |
+| **IDE workspace** | `<project>/.agents/plugins/sonarqube/`        | Plugin for that workspace only                          |
+| **Monorepo dev**  | Open `sonarqube-agent-plugins` as workspace   | Auto-discovery from repo root — no `agy plugin install` |
+
+Installing the **whole repo** is acceptable — other agents' dot-folders are inert in Antigravity.
+
+### Migrating from Gemini CLI
+
+Gemini CLI is being replaced by Antigravity. Migrate platform config first (layout, skills paths, and cleanup), then update SonarQube as below.
+
+If you already had the **SonarQube Gemini extension** installed:
+
+```bash
+agy plugin import gemini          # converts legacy extensions → native plugins
+sonar integrate antigravity       # add hooks, instructions, CAG (new vs Gemini)
+```
+
+`agy plugin import gemini` scans legacy Gemini directories and migrates inline `mcpServers` into `mcp_config.json`. Expect output like `✔ mcpServers : 1 server definition migrated to mcp_config.json` for SonarQube.
+
+If you had custom skills under `.gemini/skills/`, move them to `.agents/skills/`.
+
+After verifying Antigravity works, remove any duplicate legacy Gemini extension install if import created a copy.
+
+For a fresh install, use the [recommended flow](#recommended-flow-full-integration) above.
+
+Same workflows as **[Usage](#usage)** once MCP is connected.
+
+---
+
+## Gemini CLI *(legacy)*
 
 **`gemini-extension.json`** and **`GEMINI.md`**. **`sonar auth login`** and **[Usage](#usage)**.
+
+Migrate to **[Antigravity](#antigravity)** with **`agy plugin import gemini`** and **`sonar integrate antigravity`** as described above.
 
 ---
 
