@@ -1,7 +1,7 @@
 ---
 name: sonar-integrate
 description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
-allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
+allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(agy:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
 ---
 
 # Integrate SonarQube
@@ -91,7 +91,9 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 - Claude Code -> **4.a**
 - Copilot CLI -> **4.b**
 - Codex -> **4.c**
-- Cursor or Gemini CLI -> **4.d**
+- Cursor -> **4.d**
+- Antigravity -> **4.e**
+- Gemini CLI -> **4.f**
 
 #### 4.a — Claude Code (`sonar integrate claude`)
 
@@ -153,11 +155,47 @@ Then run the appropriate command yourself using a shell command, and adding `--n
 
 If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
 
-#### 4.d — Cursor and Gemini CLI
+#### 4.d — Cursor
 
-These agents start the SonarQube MCP Server via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
+Cursor starts the SonarQube MCP Server via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
 
-Confirm that integration is ready — the MCP server will start automatically when the agent reads its config (`mcp.json` for Cursor; `gemini-extension.json` for Gemini CLI).
+Confirm that integration is ready — the MCP server will start automatically when Cursor reads **`mcp.json`**.
+
+#### 4.e — Antigravity (`agy plugin install` + `sonar integrate antigravity`)
+
+Antigravity uses **two surfaces**: the **plugin bundle** (skills, rules, MCP) and **`sonar integrate antigravity`** (secrets hooks, Agentic Analysis instructions, Context Augmentation, MCP patch). Complete both.
+
+**Plugin bundle:** run **`agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins`** yourself using a shell command. If the user is developing this repo locally, use the workspace path instead. Re-running install is safe when the plugin is already present.
+
+If the user is migrating from the **SonarQube Gemini extension**, run **`agy plugin import gemini`** instead of a fresh plugin install. Then continue with **`sonar integrate antigravity`** below.
+
+**CLI integrate:** run **`sonar integrate antigravity`**, which configures **secrets-scanning hooks**, **prompt-secrets and Agentic Analysis instructions**, **Context Augmentation** (when entitled), and **MCP** in the Antigravity harness.
+
+Ask the user using a single-choice selector with these options:
+
+1. Current project only (default)
+2. Global (all projects)
+
+Do not ask an open-ended text question for this decision.
+
+Then run the appropriate command yourself using a shell command, adding **`--non-interactive`**:
+
+| Scenario     | Command                                                |
+| ------------ | ------------------------------------------------------ |
+| Project-only | `sonar integrate antigravity --non-interactive`        |
+| Global       | `sonar integrate antigravity --global --non-interactive` |
+
+If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
+
+Tell the user to restart the Antigravity session if MCP tools do not appear after integrate completes.
+
+#### 4.f — Gemini CLI *(legacy)*
+
+Gemini CLI starts the SonarQube MCP Server via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
+
+Confirm that integration is ready — the MCP server will start automatically when Gemini CLI reads **`gemini-extension.json`**.
+
+Recommend migrating to **Antigravity** (**4.e**): run **`agy plugin import gemini`**, then **`sonar integrate antigravity`**. Gemini CLI did not support SonarQube hooks or Agentic Analysis wiring.
 
 ---
 
@@ -193,6 +231,17 @@ If path **4.c** (Codex) was taken, add this line to the summary:
 ```
   Hooks & MCP:       wired via sonar integrate codex
 ```
+
+If path **4.d** (Cursor) was taken, no extra line is required beyond the default MCP summary.
+
+If path **4.e** (Antigravity) was taken, add these lines to the summary:
+
+```
+  Plugin bundle:     installed via agy plugin install
+  Hooks & MCP:       wired via sonar integrate antigravity
+```
+
+If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the default MCP summary.
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
 
