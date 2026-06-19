@@ -155,11 +155,27 @@ Then run the appropriate command yourself using a shell command, and adding `--n
 
 If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
 
-#### 4.d — Cursor
+#### 4.d — Cursor (`sonar integrate cursor`)
 
-Cursor starts the SonarQube MCP Server via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
+Run **`sonar integrate cursor`**, which configures **secrets-scanning hooks** (`beforeSubmitPrompt`, `beforeReadFile`, and `preToolUse`), **MCP**, **Context Augmentation** (when entitled), and **Agentic Analysis instructions** (when entitled, project scope only).
 
-Confirm that integration is ready — the MCP server will start automatically when Cursor reads **`mcp.json`**.
+Ask the user using a single-choice selector with these options:
+
+1. Current project only (default)
+2. Global (all projects)
+
+Do not ask an open-ended text question for this decision.
+
+Then run the appropriate command yourself using a shell command, adding **`--non-interactive`**:
+
+| Scenario     | Command                                                |
+| ------------ | ------------------------------------------------------ |
+| Project-only | `sonar integrate cursor --non-interactive`             |
+| Global       | `sonar integrate cursor --global --non-interactive`    |
+
+If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
+
+After integrate completes, tell the user to enable the MCP server manually in Cursor: open **Settings → MCP**, find the `sonarqube` entry, and toggle it on. A Cursor session restart may be needed for the tools to appear.
 
 #### 4.e — Antigravity (`sonar integrate antigravity`)
 
@@ -226,7 +242,14 @@ If path **4.c** (Codex) was taken, add this line to the summary:
   Hooks & MCP:       wired via sonar integrate codex
 ```
 
-If path **4.d** (Cursor) was taken, no extra line is required beyond the default MCP summary.
+If path **4.d** (Cursor) was taken, add these lines to the summary:
+
+```
+  CLI integrate:     wired via sonar integrate cursor
+  MCP Server:        enable manually in Cursor Settings → MCP (restart may be needed)
+```
+
+And **omit** the default `MCP Server` line (it is replaced by the Cursor-specific one above).
 
 If path **4.e** (Antigravity) was taken, add these lines to the summary:
 
