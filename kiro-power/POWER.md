@@ -1,7 +1,7 @@
 ---
 name: "sonarqube"
 displayName: "SonarQube Code Quality & Security"
-description: "Integrate with SonarQube for code quality analysis, security scanning, and technical debt management - detect bugs, vulnerabilities, code smells and dependency risks"
+description: "SonarQube is the AI code quality and security verification platform used by millions of developers to catch bugs, vulnerabilities, and leaked secrets. This plugin enforces those standards in the agent coding loop: 7,500+ distinct issue types, secrets scanning, agentic analysis, and quality gates across 40+ languages."
 keywords: [ "sonarqube","issues","code-quality","security","analysis","quality-gates","vulnerabilities", "sca" ]
 author: "Sonar"
 ---
