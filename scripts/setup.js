@@ -5,10 +5,19 @@ const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
 
+const CLAUDE_INTEGRATION_ID = "claude-code";
+
 const HOOK_DISPLAY_NAMES = {
   "sonar-secrets": "Secrets Detection",
   "sonar-sqaa": "Agentic Analysis",
+  "sonar-secrets-hooks": "Secrets Detection",
+  "sonar-sqaa-hook": "Agentic Analysis",
 };
+
+const DECLARATIVE_HOOK_FEATURE_IDS = new Set([
+  "sonar-secrets-hooks",
+  "sonar-sqaa-hook",
+]);
 
 function hasSonarCli() {
   const envPath = process.env.PATH || "";
@@ -64,23 +73,64 @@ function samePath(a, b) {
   return norm(a) === norm(b);
 }
 
+function featureAppliesToCwd(feature, cwd) {
+  if (feature?.scope === "global") {
+    return true;
+  }
+  if (feature?.scope === "project") {
+    return samePath(cwd, feature.targetRoot);
+  }
+  return false;
+}
+
+function collectLegacyHookNames(state, cwd) {
+  const claudeHooks = (state?.agentExtensions ?? []).filter(
+    (entry) =>
+      entry?.agentId === CLAUDE_INTEGRATION_ID &&
+      entry.kind === "hook" &&
+      typeof entry.name === "string"
+  );
+  const globalHooks = claudeHooks.filter((entry) => entry.global === true);
+  const localHooks = claudeHooks.filter((entry) =>
+    samePath(cwd, entry.projectRoot)
+  );
+  return [...globalHooks, ...localHooks].map((entry) => entry.name);
+}
+
+function collectDeclarativeHookNames(state, cwd) {
+  const claudeIntegration = (state?.integrations?.installed ?? []).find(
+    (entry) => entry?.integrationId === CLAUDE_INTEGRATION_ID
+  );
+  if (!claudeIntegration) {
+    return [];
+  }
+
+  return (claudeIntegration.features ?? [])
+    .filter(
+      (feature) =>
+        typeof feature?.featureId === "string" &&
+        DECLARATIVE_HOOK_FEATURE_IDS.has(feature.featureId) &&
+        featureAppliesToCwd(feature, cwd)
+    )
+    .map((feature) => feature.featureId);
+}
+
+function collectInstalledHookNames(state, cwd) {
+  const names = [
+    ...collectLegacyHookNames(state, cwd),
+    ...collectDeclarativeHookNames(state, cwd),
+  ];
+  return new Set(names);
+}
+
 const cwd = process.cwd();
 const state = readState();
 const sonarOk = hasSonarCli();
+const installed = collectInstalledHookNames(state, cwd);
 
-const claudeHooks = (state?.agentExtensions ?? []).filter(
-  (e) =>
-    e?.agentId === "claude-code" &&
-    e.kind === "hook" &&
-    typeof e.name === "string"
-);
-const globalHooks = claudeHooks.filter((e) => e.global === true);
-const localHooks = claudeHooks.filter((e) => samePath(cwd, e.projectRoot));
-const installed = new Set([...globalHooks, ...localHooks].map((e) => e.name));
-
-const hookList = Array.from(installed)
-  .map((n) => HOOK_DISPLAY_NAMES[n] || n)
-  .join(", ");
+const hookList = Array.from(
+  new Set(Array.from(installed).map((name) => HOOK_DISPLAY_NAMES[name] || name))
+).join(", ");
 
 const lines = [
   "SonarQube plugin initialised.",
