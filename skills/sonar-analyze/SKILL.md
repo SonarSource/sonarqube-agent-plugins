@@ -20,7 +20,7 @@ sonar-analyze src/auth/login.py      # analyze a specific file
 
 This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_code_snippet`, or `mcp__sonarqube__analyze_file_list` to be available in your session.
 
-**Before proceeding**, verify at least one of these tools is accessible. If none are, do not attempt to call any CLI commands or invent alternatives, and show the user:
+**Before proceeding**, verify at least one of these tools is accessible. If none are, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` does not exist), and show the user:
 
 > Unable to reach the SonarQube MCP Server.
 >

@@ -175,7 +175,7 @@ Then run the appropriate command yourself using a shell command, adding **`--non
 
 If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
 
-After integrate completes, tell the user to enable the MCP server manually in Cursor: open **Settings → MCP**, find the `sonarqube` entry, and toggle it on. A Cursor session restart may be needed for the tools to appear.
+After integrate completes, tell the user to enable the MCP server manually in Cursor: open **Settings → MCP**, find the `sonarqube` entry, and toggle it on. Also tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running. A Cursor session restart may be needed for the tools to appear.
 
 #### 4.e — Antigravity (`sonar integrate antigravity`)
 
@@ -197,7 +197,7 @@ Then run the appropriate command yourself using a shell command, adding **`--non
 
 If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
 
-Tell the user to restart the Antigravity session if MCP tools do not appear after integrate completes.
+Tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running, and to restart the Antigravity session if MCP tools do not appear after integrate completes.
 
 #### 4.f — Gemini CLI *(legacy)*
 
@@ -218,7 +218,7 @@ After all steps complete, print a summary:
 
   sonarqube-cli:     updated via sonar self-update
   Authentication:    token stored in system keychain
-  MCP Server:        configured (restart the agent session if tools do not appear)
+  MCP Server:        configured (ensure a container runtime (Docker, Podman, or Nerdctl) is running, then restart the agent session if tools do not appear)
 
 You can verify at any time with:  sonar auth status
 To refresh CLI + wiring later:    invoke the sonar-integrate skill again
@@ -246,7 +246,7 @@ If path **4.d** (Cursor) was taken, add these lines to the summary:
 
 ```
   CLI integrate:     wired via sonar integrate cursor
-  MCP Server:        enable manually in Cursor Settings → MCP (restart may be needed)
+  MCP Server:        enable manually in Cursor Settings → MCP (ensure a container runtime (Docker, Podman, or Nerdctl) is running; restart may be needed)
 ```
 
 And **omit** the default `MCP Server` line (it is replaced by the Cursor-specific one above).
