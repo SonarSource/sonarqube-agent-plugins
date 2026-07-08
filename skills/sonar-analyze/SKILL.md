@@ -1,8 +1,8 @@
 ---
 name: sonar-analyze
 description: Analyze a file or code snippet for quality and security issues using SonarQube
-argument-hint: [file-path]
-allowed-tools: Read, Glob, Bash(git branch:*)
+argument-hint: "[file-path]"
+allowed-tools: Read, Glob, Bash(git branch:*), Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
 ---
 
 # SonarQube — Code Analysis
@@ -20,17 +20,24 @@ sonar-analyze src/auth/login.py      # analyze a specific file
 
 This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_code_snippet`, or `mcp__sonarqube__analyze_file_list` to be available in your session.
 
-**Before proceeding**, verify at least one of these tools is accessible. If none are, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` does not exist), and show the user:
+**Before proceeding**, verify at least one of these tools is accessible. If none are, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` does not exist).
+
+**First, narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration.
+
+- **Not enabled / not registered** → recommend running the sonar-integrate skill.
+- **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to check: if it errors, the runtime is down — ask the user to start it, then to restart the agent session so the tools reload.
+
+Either way, show the user:
 
 > Unable to reach the SonarQube MCP Server.
 >
 > **Possible causes:**
 > - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Container runtime not running — the SonarQube MCP Server starts inside Docker/Podman/Nerdctl via `sonar run mcp`, so a correctly configured server still produces no tools if the daemon is stopped (i.e. `docker ps` errors). Ask the user to start their container runtime, confirm `docker ps` (or `podman ps` / `nerdctl ps`) succeeds, then restart the agent session
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the sonar-integrate skill for this project
-> - No container runtime available — the MCP server needs Docker, Podman, or Nerdctl running to start
 
-Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running and to restart the agent session so the new MCP tools become available; if they decline, stop.
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly explain what it does: it checks the SonarQube setup on their machine — installing or updating `sonarqube-cli` and verifying authentication — and re-configures the integration for this agent, including the SonarQube MCP server and secrets-scanning hooks. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running and to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 
