@@ -23,7 +23,7 @@ sonar-duplication my-project --file src/auth/login.py   # duplication detail for
 
 This skill requires the SonarQube MCP Server to be configured and the tools `mcp__sonarqube__search_duplicated_files` and `mcp__sonarqube__get_duplications` to be available in your session.
 
-**Before proceeding**, verify the tools are accessible. If they are not, do not attempt to call any CLI commands or invent alternatives, and show the user:
+**Before proceeding**, verify the tools are accessible. If they are not, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` or `sonar duplication` do not exist), and show the user:
 
 > Unable to reach the SonarQube MCP Server, or project key not found.
 >
@@ -31,8 +31,9 @@ This skill requires the SonarQube MCP Server to be configured and the tools `mcp
 > - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
+> - No container runtime available — the MCP server needs Docker, Podman, or Nerdctl running to start
 
-Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to restart the agent session so the new MCP tools become available; if they decline, stop.
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running and to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 
