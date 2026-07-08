@@ -12,26 +12,12 @@ Guide the user through installing **sonarqube-cli** (if needed), **updating it t
 
 Interaction rule: for every finite decision, always present predefined selector options (single-choice or multi-choice as appropriate) instead of asking for free-form text. If the user gives an invalid answer, re-show the same selector.
 
-### Step 1 — Check for sonarqube-cli and update it
+### Step 1 — Ensure the SonarQube CLI is installed and up to date
 
-Check if `sonar` is available on the PATH by running `which sonar` (macOS/Linux) or `Get-Command sonar` (Windows) yourself.
+Invoke the **sonar-install-cli** skill and follow it end-to-end in this session. It checks for the `sonar` binary, installs it (with the user's confirmation) if missing, and updates it to the latest version when already present.
 
-**If found:**
-
-1. Run **`sonar self-update`** yourself and wait for it to finish.
-   - **If it succeeds:** briefly tell the user the CLI is up to date (or was upgraded), then go to Step 2.
-   - **If it fails:** show the relevant output, suggest they run `sonar self-update` manually (e.g. offline or network issues), then **still continue** to Step 2 if `sonar` remains usable — do not block the rest of the flow unless the binary is missing or broken.
-
-**If not found:** pick the platform-appropriate install command from the table below, show it to the user, and ask for explicit confirmation **before running it**. Do **not** execute the command until the user confirms.
-
-| Platform      | Install command                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| macOS / Linux | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
-| Windows (PS)  | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
-
-**If the user confirms:** run the command yourself using a shell command. After it finishes, re-run the PATH check (`which sonar` or `Get-Command sonar`) yourself to verify before continuing.
-
-**If the user declines:** stop the skill and ask the user to install `sonarqube-cli` manually and then re-invoke the sonar-integrate skill.
+- If it finishes with `sonar` available, continue to Step 2.
+- If the user declined installation, or `sonar` is still unavailable afterward, **stop** — authentication and agent wiring require the CLI.
 
 ---
 
