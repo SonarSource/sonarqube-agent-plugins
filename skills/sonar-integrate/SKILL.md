@@ -1,6 +1,6 @@
 ---
 name: sonar-integrate
-description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
+description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Can also offer Git hook setup via the sonar-git-hooks skill. Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
 allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(agy:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
 ---
 
@@ -209,6 +209,19 @@ Recommend migrating to **Antigravity** (**4.e**): run **`agy plugin import gemin
 
 ---
 
+### Step 5 — Optional: Git hooks (secrets & dependency risks)
+
+SonarQube can also install a **Git** pre-commit or pre-push hook that scans for secrets (and optionally dependency risks) before code is committed or pushed — independently of the agent, even outside an agent session. This is handled by a dedicated skill.
+
+Ask with a single-choice selector:
+
+1. Yes — set up Git hooks now
+2. No — skip
+
+If **Yes**, invoke the **sonar-git-hooks** skill and follow it end-to-end in this session (it prints its own summary). If **No**, continue to the Summary message.
+
+---
+
 ### Summary message
 
 After all steps complete, print a summary:
@@ -258,6 +271,8 @@ If path **4.e** (Antigravity) was taken, add these lines to the summary:
 ```
 
 If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the default MCP summary.
+
+If Git hooks were set up in Step 5, the sonar-git-hooks skill prints its own summary — do not duplicate it here.
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
 
