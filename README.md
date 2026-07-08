@@ -62,21 +62,23 @@ There is **no** `@vendor` marketplace install (for example `sonarqube@sonar` is 
 
 ## Repository layout
 
-| Agent                     | Location                                                     |
-|---------------------------|--------------------------------------------------------------|
-| **Claude Code**           | `.claude-plugin/`, `skills/`, `claude-hooks/`, `scripts/`    |
-| **Cursor**                | `.cursor-plugin/` (+ shared `mcp.json`)                      |
-| **GitHub Copilot CLI**    | `.github/plugin/` (+ shared `mcp.json`)                      |
-| **Codex**                 | `.codex-plugin/`                                             |
-| **Antigravity**           | `plugin.json`, `mcp_config.json`, `rules/`, shared `skills/` |
-| **Gemini CLI** *(legacy)* | `gemini-extension.json`, `GEMINI.md`                         |
-| **Kiro**                  | `kiro-power/`                                                |
+| Agent                     | Location                                                             |
+|---------------------------|-----------------------------------------------------------------------|
+| **Claude Code**           | `.claude-plugin/`, `skills/`, `agents/`, `claude-hooks/`, `scripts/` |
+| **Cursor**                | `.cursor-plugin/` (+ shared `mcp.json`, `agents/`)                   |
+| **GitHub Copilot CLI**    | `.github/plugin/` (+ shared `mcp.json`, `agents/`)                   |
+| **Codex**                 | `.codex-plugin/`                                                     |
+| **Antigravity**           | `plugin.json`, `mcp_config.json`, `rules/`, shared `skills/`         |
+| **Gemini CLI** *(legacy)* | `gemini-extension.json`, `GEMINI.md`                                 |
+| **Kiro**                  | `kiro-power/`                                                        |
 
 ---
 
 ## Usage
 
 Skills are the same across agents. Ask in natural language, invoke skills explicitly, or use the **SonarQube MCP** tools your client shows after MCP starts.
+
+On **Claude Code**, **GitHub Copilot CLI**, and **Cursor**, the plugin also ships a **`sonarqube-reviewer`** agent (`agents/sonarqube-reviewer.agent.md`) that composes the skills below into a single PR/diff review — quality gate, issues, dependency risks, duplication, and coverage — without editing code itself.
 
 MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqube-mcp-server/).
 
