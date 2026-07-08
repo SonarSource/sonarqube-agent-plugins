@@ -2,7 +2,7 @@
 name: sonar-duplication
 description: Find files with code duplications in a SonarQube project and inspect duplication blocks for a file (project key optional when MCP integration already defines the default project)
 argument-hint: "[project-key?] [--pr id] [--page-size n] [--page n] [--file key]"
-allowed-tools: Read, Grep, Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
+allowed-tools: Read, Grep, Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*), Bash(sonar:*)
 ---
 
 # SonarQube — Duplication
@@ -23,9 +23,9 @@ sonar-duplication my-project --file src/auth/login.py   # duplication detail for
 
 This skill requires the SonarQube MCP Server to be configured and the tools `mcp__sonarqube__search_duplicated_files` and `mcp__sonarqube__get_duplications` to be available in your session.
 
-**Before proceeding**, verify the tools are accessible. If they are not, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` or `sonar duplication` do not exist).
+**Before proceeding**, verify the tools are accessible. If they are not, try the `sonar api` CLI fallback in Step 3 before giving up — don't invent other CLI commands (e.g. `sonar mcp call` or `sonar duplication` do not exist).
 
-**First, narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration.
+**If the CLI fallback also fails (for example `sonar` not installed/authenticated, or no project key can be resolved), narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration.
 
 - **Not enabled / not registered** → recommend running the sonar-integrate skill.
 - **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl via `sonar run mcp`, so a correctly configured server still produces no tools if the daemon is stopped. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to confirm which cause applies: if it errors, the runtime is down; after the user starts it, confirm the same command succeeds before asking them to restart the agent session.
@@ -112,6 +112,14 @@ Then offer to drill in:
 
 *"Ask me to open duplications for any file, or invoke the sonar-duplication skill with `--file <file-key>` (add a project key only if needed)."*
 
+**If `mcp__sonarqube__search_duplicated_files` is unavailable, fall back to `sonar api`.** This needs an explicit project key (no MCP default) — if none was resolved in Step 1, ask the user or invoke sonar-list-projects, then stop.
+
+```bash
+sonar api get "/api/measures/component_tree?component=<project-key>&metricKeys=duplicated_lines,duplicated_blocks,duplicated_lines_density&qualifiers=FIL&strategy=leaves[&pullRequest=<id>]"
+```
+
+Use `metricKeys`; add `-v` if a call 400s unexpectedly. Manual pagination maps to `&p=<page>&ps=<page-size>`; there's no auto-fetch-all mode, so page yourself up to the 10,000-file cap if needed. Filter out components with all-zero duplication metrics, then present the same table as above.
+
 #### Flow B — Duplication detail (`--file <key>` given, or user asks to inspect a file)
 
 Call `mcp__sonarqube__get_duplications`:
@@ -138,6 +146,16 @@ Present duplication **blocks** from the response: for each block, show ranges, s
 ```
 
 If the file has no duplications in the response, say: *"No duplications were reported for this file."*
+
+**If `mcp__sonarqube__get_duplications` is unavailable, fall back to `sonar api`:**
+
+```bash
+sonar api get "/api/duplications/show?key=<file-key>[&pullRequest=<id>]"
+```
+
+Omit `pullRequest` when `--pr` was not given. The same **Browse** permission requirement applies. Present the returned blocks in the same format as above.
+
+If this also fails, show the standard message above — don't guess further commands.
 
 ### Step 4: Next steps
 
