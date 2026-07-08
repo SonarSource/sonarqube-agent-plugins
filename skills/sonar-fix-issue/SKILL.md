@@ -2,7 +2,7 @@
 name: sonar-fix-issue
 description: Fix a specific SonarQube issue in code by rule key and location
 argument-hint: "[rule-key] [file-path:line]"
-allowed-tools: Read, Edit
+allowed-tools: Read, Edit, Bash(sonar:*)
 ---
 
 # SonarQube — Fix Issue
@@ -33,7 +33,7 @@ If neither a rule key nor a file path can be determined, ask: *"Which rule and f
 Call `mcp__sonarqube__show_rule` with the rule key to retrieve the full rule description,
 rationale, and remediation guidance before touching any code. **Do not add extra parameters** (such as `projectKey`) unless the tool schema requires them — after integration, rule lookup usually needs only the rule key.
 
-If the MCP server is unavailable, rely on built-in knowledge of SonarQube rules.
+If the MCP tool is unavailable, fall back to `sonar api get "/api/rules/show?key=<rule-key>"`. If `sonar` is also unavailable or unauthenticated, rely on built-in knowledge of SonarQube rules.
 
 ### Step 3: Read the file
 

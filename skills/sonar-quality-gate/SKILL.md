@@ -2,7 +2,7 @@
 name: sonar-quality-gate
 description: Show SonarQube quality gate status for a project — pass/fail and each condition (metric key, threshold, actual value). Project key optional when MCP integration already defines the default project.
 argument-hint: "[project-key?] [--branch name] [--pr id]"
-allowed-tools: Read, Grep, Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
+allowed-tools: Read, Grep, Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*), Bash(sonar:*)
 ---
 
 # SonarQube — Quality gate
@@ -22,9 +22,9 @@ sonar-quality-gate my-project --pr 42
 
 This skill requires the SonarQube MCP Server to be configured and the tool `mcp__sonarqube__get_project_quality_gate_status` to be available in your session.
 
-**Before proceeding**, verify the tool is accessible. If it is not, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` or `sonar quality-gate` do not exist).
+**Before proceeding**, verify the tool is accessible. If it is not, try the `sonar api` CLI fallback in Step 3 before giving up — don't invent other CLI commands (e.g. `sonar mcp call` or `sonar quality-gate` do not exist).
 
-**First, narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration.
+**If the CLI fallback also fails (for example `sonar` not installed/authenticated, or no project key can be resolved), narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration.
 
 - **Not enabled / not registered** → recommend running the sonar-integrate skill.
 - **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl via `sonar run mcp`, so a correctly configured server still produces no tools if the daemon is stopped. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to confirm which cause applies: if it errors, the runtime is down; after the user starts it, confirm the same command succeeds before asking them to restart the agent session.
@@ -149,6 +149,14 @@ The tool returns a top-level **`status`** (`OK`, `ERROR`, or other values your s
 }
 ```
 
+**If `mcp__sonarqube__get_project_quality_gate_status` is unavailable, fall back to `sonar api`.** This needs an explicit project key (no MCP default) — if none was resolved in Step 1, ask the user or invoke sonar-list-projects, then stop.
+
+```bash
+sonar api get "/api/qualitygates/project_status?projectKey=<project-key>[&branch=<name>][&pullRequest=<id>]"
+```
+
+Note the query params are `branch` and `pullRequest`. Response shape (`status` + `conditions`) is the same as above.
+
 ### Step 4: Format the results
 
 Present a concise report:
@@ -171,6 +179,14 @@ If the quality gate payload is missing or analysis has not run, say so clearly i
 ### Step 5: Deeper metrics (`get_component_measures`)
 
 To investigate **beyond** the gate (e.g. overall coverage, line coverage, bug counts, detailed ratings), call **`mcp__sonarqube__get_component_measures`** with the same branch/PR context if applicable, and pass `metricKeys` for the measures you need. Add **`projectKey` only when** the tool requires it and you have a resolved key; otherwise rely on the integration default (you can start from the `metricKey` values that failed or from the [SonarQube metric keys](https://docs.sonarsource.com/) documentation).
+
+**If the tool is unavailable, fall back to `sonar api`** (requires a resolved project key, same as Step 3's fallback):
+
+```bash
+sonar api get "/api/measures/component?component=<project-key>&metricKeys=<comma-separated-keys>[&branch=<name>][&pullRequest=<id>]"
+```
+
+If this also fails, show the standard message above — don't guess further commands.
 
 ### Step 6: Related skills
 

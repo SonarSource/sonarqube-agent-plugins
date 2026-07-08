@@ -2,7 +2,7 @@
 name: sonar-dependency-risks
 description: Search for software composition analysis (SCA) dependency risks in a SonarQube project (project key optional when MCP integration already defines the default project)
 argument-hint: "[project-key?] [--branch name] [--pr id]"
-allowed-tools: Read, Grep, Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
+allowed-tools: Read, Grep, Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*), Bash(sonar:*)
 ---
 
 # SonarQube — Dependency Risks
@@ -22,9 +22,9 @@ sonar-dependency-risks my-project --pr 42
 
 This skill requires SonarQube Advanced Security (available on SonarQube Cloud Enterprise plan, or SonarQube Server 2025.4 Enterprise edition or higher), the SonarQube MCP Server to be configured, and the tool `mcp__sonarqube__search_dependency_risks` to be available in your session.
 
-**Before proceeding**, verify the tool is accessible. If it is not, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` or `sonar dependency-risks` do not exist).
+**Before proceeding**, verify the tool is accessible. If it is not, try the CLI fallback in Step 3 before giving up — don't invent other CLI commands (e.g. `sonar mcp call` or `sonar dependency-risks` do not exist).
 
-**First, narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration. (This only explains missing tools, not the Advanced Security entitlement — see the first cause below.)
+**If the CLI fallback also fails or doesn't apply, narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration. (This only explains missing tools, not the Advanced Security entitlement — see the first cause below.)
 
 - **Not enabled / not registered** → recommend running the sonar-integrate skill.
 - **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl via `sonar run mcp`, so a correctly configured server still produces no tools if the daemon is stopped. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to confirm which cause applies: if it errors, the runtime is down; after the user starts it, confirm the same command succeeds before asking them to restart the agent session.
@@ -72,6 +72,24 @@ Include **`projectKey` only if** you resolved one in Step 1 **and** the tool req
 ```
 
 Omit `projectKey` from the payload when the integration default applies. Omit unused optional fields.
+
+**If `mcp__sonarqube__search_dependency_risks` is unavailable, fall back to the CLI.** This needs an explicit project key — if none was resolved in Step 1, ask the user or invoke sonar-list-projects, then stop.
+
+Run `sonar auth status` to check the connected server. On a self-hosted **SonarQube Server**:
+
+```bash
+sonar api get "/api/v2/sca/issues-releases?projectKey=<project-key>[&branchKey=<name>][&pullRequestKey=<id>]"
+```
+
+On **SonarQube Cloud**, `sonar api` can't reach this endpoint yet (lives on a separate subdomain; may change in a future CLI release) — run a fresh scan instead:
+
+```bash
+sonar analyze dependency-risks -p <project-key> --format table
+```
+
+This re-scans manifests rather than querying prior results, so it may surface issues not yet on the server dashboard — expected, not an error. Map its output into the same table as Step 4.
+
+If this also fails, show the standard message above — don't guess further commands.
 
 ### Step 4: Format the results
 
