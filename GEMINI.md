@@ -47,7 +47,7 @@ Invoke it when another skill surfaces a failure that points to one of the condit
 - "Check this code for quality problems"
 - "Generate a method that does X and analyze it for issues"
 
-**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Agentic Analysis) and falls back to `mcp__sonarqube__analyze_code_snippet`, handling file reading, language detection, and scope selection.
+**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Vortex agentic analysis) and falls back to `mcp__sonarqube__analyze_code_snippet`, handling file reading, language detection, and scope selection.
 
 ### Coverage
 **Example user requests:**

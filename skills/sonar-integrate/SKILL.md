@@ -106,7 +106,7 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 
 Run **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
-It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config. When available, SonarQube Agentic Analysis hooks are also installed.
+It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config. When available, SonarQube Vortex agentic analysis hooks are also installed.
 
 Ask the user using a single-choice selector with these options:
 
@@ -144,7 +144,7 @@ Then run the appropriate command yourself using a shell command, and adding `--n
 
 #### 4.c — Codex (`sonar integrate codex`)
 
-Run **`sonar integrate codex`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and—when your SonarQube Cloud org has Agentic Analysis—a **PostToolUse** hook on **`apply_patch`** that surfaces findings inline after edits.
+Run **`sonar integrate codex`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and—when your SonarQube Cloud org has Vortex agentic analysis—a **PostToolUse** hook on **`apply_patch`** that surfaces findings inline after edits.
 
 Ask the user using a single-choice selector with these options:
 
@@ -164,7 +164,7 @@ If the project key is not already known from `sonar-project.properties` or prior
 
 #### 4.d — Cursor (`sonar integrate cursor`)
 
-Run **`sonar integrate cursor`**, which configures **secrets-scanning hooks** (`beforeSubmitPrompt`, `beforeReadFile`, and `preToolUse`), **MCP**, **Context Augmentation** (when entitled), and **Agentic Analysis instructions** (when entitled, project scope only).
+Run **`sonar integrate cursor`**, which configures **secrets-scanning hooks** (`beforeSubmitPrompt`, `beforeReadFile`, and `preToolUse`), **MCP**, **Context Augmentation** (when entitled), and **Vortex agentic analysis instructions** (when entitled, project scope only).
 
 Ask the user using a single-choice selector with these options:
 
@@ -186,7 +186,7 @@ After integrate completes, tell the user to enable the MCP server manually in Cu
 
 #### 4.e — Antigravity (`sonar integrate antigravity`)
 
-Run **`sonar integrate antigravity`**, which configures **secrets-scanning hooks**, **prompt-secrets and Agentic Analysis instructions**, **Context Augmentation** (when entitled), and **MCP** in the Antigravity harness.
+Run **`sonar integrate antigravity`**, which configures **secrets-scanning hooks**, **prompt-secrets and Vortex agentic analysis instructions**, **Context Augmentation** (when entitled), and **MCP** in the Antigravity harness.
 
 Ask the user using a single-choice selector with these options:
 
@@ -212,7 +212,7 @@ Gemini CLI starts the SonarQube MCP Server via `sonar run mcp`, which handles co
 
 Confirm that integration is ready — the MCP server will start automatically when Gemini CLI reads **`gemini-extension.json`**.
 
-Recommend migrating to **Antigravity** (**4.e**): run **`agy plugin import gemini`**, then **`sonar integrate antigravity`**. Gemini CLI did not support SonarQube hooks or Agentic Analysis wiring.
+Recommend migrating to **Antigravity** (**4.e**): run **`agy plugin import gemini`**, then **`sonar integrate antigravity`**. Gemini CLI did not support SonarQube hooks or Vortex agentic analysis wiring.
 
 ---
 

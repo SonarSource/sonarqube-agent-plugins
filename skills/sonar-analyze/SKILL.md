@@ -76,9 +76,9 @@ Do not accept a directory as input. If the user provides one, ask them to specif
 
 After running the sonar-integrate skill, the SonarQube MCP Server often has a **default project** for this workspace, so **`projectKey` is sometimes unnecessary** — pass it only when the tool schema requires it or the user targets another project.
 
-Two tools may be available depending on whether the connected organization is eligible for Agentic Analysis:
+Two tools may be available depending on whether the connected organization is eligible for Vortex agentic analysis:
 
-**Try `mcp__sonarqube__run_advanced_code_analysis` first** (available when the organization is eligible for Agentic Analysis).
+**Try `mcp__sonarqube__run_advanced_code_analysis` first** (available when the organization is eligible for Vortex agentic analysis).
 
 Before calling it, detect the current branch name using `git branch --show-current`. If git is unavailable, use `main` as a fallback.
 
@@ -98,7 +98,7 @@ Then call with:
 - `language` — detected language key
 - `scope` — `"TEST"` or `"MAIN"`
 
-**If none of the three MCP tools are available, fall back to the CLI:**
+**If none of the three MCP tools are available, fall back to the CLI's Vortex agentic analysis:**
 
 ```bash
 sonar analyze agentic --file <file-path> [--file <other-file-path> ...] --format json [--branch <branch-name>] [-p <project-key>]
@@ -106,7 +106,7 @@ sonar analyze agentic --file <file-path> [--file <other-file-path> ...] --format
 
 Same backend as `run_advanced_code_analysis` (repeatable `--file` covers multi-file too), and the practical fallback for `analyze_code_snippet`/`analyze_file_list` as well — they have no direct CLI equivalent, but this achieves the same goal.
 
-Requires an Agentic Analysis-eligible organization. If the org isn't eligible, or `sonar` isn't installed/authenticated, show the standard message from Prerequisites — don't guess further commands.
+Requires a Vortex agentic analysis-eligible organization. If the org isn't eligible, or `sonar` isn't installed/authenticated, show the standard message from Prerequisites — don't guess further commands.
 
 ### Step 4: Format the results
 
