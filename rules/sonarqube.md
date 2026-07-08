@@ -10,7 +10,7 @@ The `sonar-integrate` skill is a preliminary initialization and recovery skill f
 
 - installs `sonarqube-cli` if missing and updates it to the latest version,
 - authenticates the CLI via `sonar auth login` (token stored in system keychain),
-- runs `sonar integrate antigravity` to wire secrets scanning hooks, Agentic Analysis instructions, Context Augmentation, and MCP configuration.
+- runs `sonar integrate antigravity` to wire secrets scanning hooks, Vortex agentic analysis instructions, Context Augmentation, and MCP configuration.
 
 Migrating from the SonarQube Gemini extension? Run `agy plugin import gemini`, then `sonar integrate antigravity`.
 
@@ -50,7 +50,7 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 - "Check this code for quality problems"
 - "Generate a method that does X and analyze it for issues"
 
-**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Agentic Analysis) and falls back to `mcp__sonarqube__analyze_code_snippet`, handling file reading, language detection, and scope selection.
+**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Vortex agentic analysis) and falls back to `mcp__sonarqube__analyze_code_snippet`, handling file reading, language detection, and scope selection.
 
 ### Coverage
 **Example user requests:**
