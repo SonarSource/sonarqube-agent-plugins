@@ -2,7 +2,7 @@
 name: sonar-dependency-risks
 description: Search for software composition analysis (SCA) dependency risks in a SonarQube project (project key optional when MCP integration already defines the default project)
 argument-hint: "[project-key?] [--branch name] [--pr id]"
-allowed-tools: Read, Grep
+allowed-tools: Read, Grep, Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
 ---
 
 # SonarQube — Dependency Risks
@@ -22,18 +22,25 @@ sonar-dependency-risks my-project --pr 42
 
 This skill requires SonarQube Advanced Security (available on SonarQube Cloud Enterprise plan, or SonarQube Server 2025.4 Enterprise edition or higher), the SonarQube MCP Server to be configured, and the tool `mcp__sonarqube__search_dependency_risks` to be available in your session.
 
-**Before proceeding**, verify the tool is accessible. If it is not, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` or `sonar dependency-risks` do not exist), and show the user:
+**Before proceeding**, verify the tool is accessible. If it is not, do not attempt to call any CLI commands or invent alternatives (e.g. `sonar mcp call` or `sonar dependency-risks` do not exist).
+
+**First, narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration. (This only explains missing tools, not the Advanced Security entitlement — see the first cause below.)
+
+- **Not enabled / not registered** → recommend running the sonar-integrate skill.
+- **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl via `sonar run mcp`, so a correctly configured server still produces no tools if the daemon is stopped. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to confirm which cause applies: if it errors, the runtime is down; after the user starts it, confirm the same command succeeds before asking them to restart the agent session.
+
+Either way, show the user:
 
 > Unable to fetch dependency risks.
 >
 > **Possible causes:**
 > - This feature requires SonarQube Advanced Security — available on SonarQube Cloud Enterprise edition, or SonarQube Server 2025.4 Enterprise or higher
 > - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
+> - Container runtime not running — the SonarQube MCP Server runs inside a container (Docker, Podman, or Nerdctl); start your container runtime, then restart the agent session
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
-> - No container runtime available — the MCP server needs Docker, Podman, or Nerdctl running to start
 
-Then ask the user (yes/no) whether to run the sonar-integrate skill now. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running and to restart the agent session so the new MCP tools become available; if they decline, stop.
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly explain what it does: it checks the SonarQube setup on their machine — installing or updating `sonarqube-cli` and verifying authentication — and re-configures the integration for this agent, including the SonarQube MCP server and secrets-scanning hooks. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running and to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 

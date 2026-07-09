@@ -1,7 +1,7 @@
 ---
 name: sonar-integrate
 description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
-allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(agy:*), Bash(curl:*), Bash(irm:*), Bash(iex:*)
+allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(agy:*), Bash(curl:*), Bash(irm:*), Bash(iex:*), Bash(brew:*), Bash(mise:*), Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
 ---
 
 # Integrate SonarQube
@@ -16,18 +16,23 @@ Interaction rule: for every finite decision, always present predefined selector 
 
 Check if `sonar` is available on the PATH by running `which sonar` (macOS/Linux) or `Get-Command sonar` (Windows) yourself.
 
-**If found:**
+**If found:** first determine how it was installed, because the upgrade path differs:
 
-1. Run **`sonar update`** yourself and wait for it to finish.
-   - **If it succeeds:** briefly tell the user the CLI is up to date (or was upgraded), then go to Step 2.
-   - **If it fails:** show the relevant output, suggest they run `sonar update` manually (e.g. offline or network issues), then **still continue** to Step 2 if `sonar` remains usable — do not block the rest of the flow unless the binary is missing or broken.
+- **Managed by a package or version manager** (e.g. installed via Homebrew or mise — the binary lives under the manager's prefix rather than `~/.local/share/sonarqube-cli/bin`): do **not** run `sonar self-update`, as it conflicts with the manager. Run the manager's upgrade command yourself instead (Homebrew: `brew upgrade --cask sonarqube-cli`; mise: `mise upgrade aqua:SonarSource/sonarqube-cli`), then go to Step 2. If the upgrade fails, show the output but **still continue** to Step 2 as long as `sonar` remains usable.
+- **Installed via the shell/PowerShell script, or unsure:** run **`sonar self-update`** yourself and wait for it to finish.
+  - **If it succeeds:** briefly tell the user the CLI is up to date (or was upgraded), then go to Step 2.
+  - **If it fails:** show the relevant output, suggest they run `sonar self-update` manually (e.g. offline or network issues), then **still continue** to Step 2 if `sonar` remains usable — do not block the rest of the flow unless the binary is missing or broken.
 
-**If not found:** pick the platform-appropriate install command from the table below, show it to the user, and ask for explicit confirmation **before running it**. Do **not** execute the command until the user confirms.
+**If not found:** pick an install command from the table below, show it to the user, and ask for explicit confirmation **before running it**. Do **not** execute the command until the user confirms.
 
-| Platform      | Install command                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| macOS / Linux | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
-| Windows (PS)  | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
+The shell/PowerShell script is the default and works everywhere. If the user already manages CLIs with **Homebrew** or **mise**, prefer that route so future upgrades stay managed by the tool — the Step 1 update above then defers to the manager.
+
+| Platform / method        | Install command                                                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| macOS / Linux (script)   | `curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh \| bash` |
+| macOS / Linux (Homebrew) | `brew install --cask sonarqube-cli`                                                                                      |
+| Any OS (mise)            | `mise use -g aqua:SonarSource/sonarqube-cli`                                                                             |
+| Windows (PowerShell)     | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
 
 **If the user confirms:** run the command yourself using a shell command. After it finishes, re-run the PATH check (`which sonar` or `Get-Command sonar`) yourself to verify before continuing.
 
@@ -85,6 +90,8 @@ verify before continuing.
 ---
 
 ### Step 4 — Agent-specific integration
+
+> **Container runtime requirement:** The SonarQube MCP Server runs inside a container, started via `sonar run mcp` (which detects Docker, Podman, or Nerdctl). A container runtime must be **installed and running** for the MCP tools to load — otherwise integration can complete successfully yet no `mcp__sonarqube__*` tools appear in the session. **Verify this yourself:** run `docker ps` (falling back to `podman ps` / `nerdctl ps`). If one succeeds, the runtime is up — proceed. If none do, tell the user their container runtime is not running and ask them to start it, then note they must restart the agent session afterward for the tools to load (starting the daemon and restarting the session are the only parts you cannot do for them).
 
 Pick exactly one branch below based on which agent you are. Do not run the other branches.
 
@@ -216,7 +223,7 @@ After all steps complete, print a summary:
 ```
 ✅ SonarQube integration is ready.
 
-  sonarqube-cli:     updated via sonar update
+  sonarqube-cli:     up to date
   Authentication:    token stored in system keychain
   MCP Server:        configured (ensure a container runtime (Docker, Podman, or Nerdctl) is running, then restart the agent session if tools do not appear)
 
@@ -261,6 +268,6 @@ If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the def
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
 
-If **`sonar update`** failed in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest `sonar update` in a terminal.
+If **`sonar self-update`** failed in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest `sonar self-update` in a terminal.
 
 If any other step failed, note it clearly and suggest the corrective action.
