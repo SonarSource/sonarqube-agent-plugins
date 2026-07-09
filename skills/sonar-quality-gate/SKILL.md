@@ -27,7 +27,7 @@ This skill requires the SonarQube MCP Server to be configured and the tool `mcp_
 **First, narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration.
 
 - **Not enabled / not registered** → recommend running the sonar-integrate skill.
-- **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to check: if it errors, the runtime is down — ask the user to start it, then to restart the agent session so the tools reload.
+- **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to confirm which cause applies: if it errors, the runtime is down.
 
 Either way, show the user:
 

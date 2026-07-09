@@ -18,10 +18,10 @@ Check if `sonar` is available on the PATH by running `which sonar` (macOS/Linux)
 
 **If found:** first determine how it was installed, because the upgrade path differs:
 
-- **Managed by a package or version manager** (e.g. installed via Homebrew or mise — the binary lives under the manager's prefix rather than `~/.local/share/sonarqube-cli/bin`): do **not** run `sonar update`, as it conflicts with the manager. Run the manager's upgrade command yourself instead (Homebrew: `brew upgrade --cask sonarqube-cli`; mise: `mise upgrade aqua:SonarSource/sonarqube-cli`), then go to Step 2. If the upgrade fails, show the output but **still continue** to Step 2 as long as `sonar` remains usable.
-- **Installed via the shell/PowerShell script, or unsure:** run **`sonar update`** yourself and wait for it to finish.
+- **Managed by a package or version manager** (e.g. installed via Homebrew or mise — the binary lives under the manager's prefix rather than `~/.local/share/sonarqube-cli/bin`): do **not** run `sonar self-update`, as it conflicts with the manager. Run the manager's upgrade command yourself instead (Homebrew: `brew upgrade --cask sonarqube-cli`; mise: `mise upgrade aqua:SonarSource/sonarqube-cli`), then go to Step 2. If the upgrade fails, show the output but **still continue** to Step 2 as long as `sonar` remains usable.
+- **Installed via the shell/PowerShell script, or unsure:** run **`sonar self-update`** yourself and wait for it to finish.
   - **If it succeeds:** briefly tell the user the CLI is up to date (or was upgraded), then go to Step 2.
-  - **If it fails:** show the relevant output, suggest they run `sonar update` manually (e.g. offline or network issues), then **still continue** to Step 2 if `sonar` remains usable — do not block the rest of the flow unless the binary is missing or broken.
+  - **If it fails:** show the relevant output, suggest they run `sonar self-update` manually (e.g. offline or network issues), then **still continue** to Step 2 if `sonar` remains usable — do not block the rest of the flow unless the binary is missing or broken.
 
 **If not found:** pick an install command from the table below, show it to the user, and ask for explicit confirmation **before running it**. Do **not** execute the command until the user confirms.
 
@@ -268,6 +268,6 @@ If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the def
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
 
-If **`sonar update`** failed in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest `sonar update` in a terminal.
+If **`sonar self-update`** failed in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest `sonar self-update` in a terminal.
 
 If any other step failed, note it clearly and suggest the corrective action.
