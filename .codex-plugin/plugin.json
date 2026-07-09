@@ -21,7 +21,7 @@
     "shortDescription": "Enforce code quality and security as it's written",
     "longDescription": "SonarQube is the AI code quality and security verification platform used by millions of developers to catch bugs, vulnerabilities, and leaked secrets. This plugin enforces those standards in the agent coding loop: 7,500+ distinct issue types, secrets scanning, agentic analysis, and quality gates across 40+ languages.",
     "developerName": "Sonar",
-    "category": "Code Review",
+    "category": "Developer Tools",
     "capabilities": ["Read", "Interactive"],
     "websiteURL": "https://www.sonarsource.com",
     "privacyPolicyURL": "https://www.sonarsource.com/company/privacy/",
@@ -30,8 +30,11 @@
       "Help me fix the most severe SonarQube issues for this project"
     ],
     "brandColor": "#290042",
+    "brandColorDark": "#FFFFFF",
     "composerIcon": "./assets/logo.png",
+    "composerIconDark": "./assets/logo-dark.png",
     "logo": "./assets/logo.png",
+    "logoDark": "./assets/logo-dark.png",
     "screenshots": []
   },
   "skills": "./skills/",
