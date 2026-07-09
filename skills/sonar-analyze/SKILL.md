@@ -25,7 +25,7 @@ This skill requires the SonarQube MCP Server to be configured and at least one o
 **First, narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration.
 
 - **Not enabled / not registered** → recommend running the sonar-integrate skill.
-- **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to confirm which cause applies: if it errors, the runtime is down.
+- **Enabled but its tools are still unavailable** → configuration is correct but the server failed to start. The most common cause is that the container runtime is not running — the MCP server launches inside Docker/Podman/Nerdctl via `sonar run mcp`, so a correctly configured server still produces no tools if the daemon is stopped. Run `docker ps` yourself (falling back to `podman ps` / `nerdctl ps`) to confirm which cause applies: if it errors, the runtime is down; after the user starts it, confirm the same command succeeds before asking them to restart the agent session.
 
 Either way, show the user:
 
@@ -33,7 +33,7 @@ Either way, show the user:
 >
 > **Possible causes:**
 > - MCP server not registered — invoke the sonar-integrate skill to configure the SonarQube MCP Server, then restart the agent session
-> - Container runtime not running — the SonarQube MCP Server starts inside Docker/Podman/Nerdctl via `sonar run mcp`, so a correctly configured server still produces no tools if the daemon is stopped (i.e. `docker ps` errors). Ask the user to start their container runtime, confirm `docker ps` (or `podman ps` / `nerdctl ps`) succeeds, then restart the agent session
+> - Container runtime not running — the SonarQube MCP Server runs inside a container (Docker, Podman, or Nerdctl); start your container runtime, then restart the agent session
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the sonar-integrate skill for this project
 
