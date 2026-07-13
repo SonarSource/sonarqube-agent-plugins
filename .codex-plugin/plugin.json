@@ -30,7 +30,7 @@
       "Help me fix the most severe SonarQube issues for this project"
     ],
     "brandColor": "#290042",
-    "brandColorDark": "#FFFFFF",
+    "brandColorDark": "#F3F6FB",
     "composerIcon": "./assets/logo.png",
     "composerIconDark": "./assets/logo-dark.png",
     "logo": "./assets/logo.png",
