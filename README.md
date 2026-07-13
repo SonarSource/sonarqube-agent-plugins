@@ -30,8 +30,6 @@ sonar auth status
 
 ## How plugins connect to SonarQube
 
-### Claude Code and GitHub Copilot CLI
-
 **SonarQube CLI** can wire everything for you:
 
 ```bash
@@ -39,41 +37,155 @@ sonar integrate claude        # Claude Code: MCP, hooks, secrets scanning, etc.
 sonar integrate copilot       # GitHub Copilot CLI: MCP, hooks, secrets scanning, etc.
 sonar integrate codex         # Codex: MCP, hooks, secrets scanning, Vortex agentic analysis hook
 sonar integrate antigravity   # Antigravity: hooks, instructions, CAG, MCP patch (after plugin install)
+sonar integrate cursor        # Cursor: MCP, secret-scanning hooks, Vortex agentic analysis instructions
 ```
 
 Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill if you prefer a guided flow (install/update CLI, login, then integrate).
 
-### Other agents (Cursor, Kiro)
+### Other agents (Kiro)
 
 Each layout includes **MCP configuration** (for example **`mcp.json`** or **`kiro-power/mcp.json`**) that runs the **`mcp/sonarqube`** image and **relies on SonarQube CLI** for authentication—the same **`sonar auth login`** session.
 
-### Antigravity (two-step setup)
+## Claude Code
 
-Antigravity uses **two independent install surfaces**. For full parity with Claude/Copilot you need both:
+Install from Anthropic's marketplace **`claude-plugins-official`**:
 
-| Step                 | Command                              | What it installs                                                              |
-|----------------------|--------------------------------------|-------------------------------------------------------------------------------|
-| **1. Plugin bundle** | `agy plugin install <git-url\|path>` | Skills, agent rules (`rules/sonarqube.md`), MCP (`mcp_config.json`)           |
-| **2. CLI integrate** | `sonar integrate antigravity`        | Secrets hooks, Vortex agentic analysis instructions, Context Augmentation, MCP patch |
+```shell
+/plugin install sonarqube@claude-plugins-official
+```
 
-There is **no** `@vendor` marketplace install (for example `sonarqube@sonar` is not supported). Use a Git URL, archive, or local path.
+```shell
+claude plugin install sonarqube@claude-plugins-official
+```
+
+### One-time setup
+
+- **Node.js** — for the SessionStart hook (`scripts/setup.js`).
+- Install **SonarQube CLI** if needed, then **`/sonarqube:sonar-integrate`** or **`sonar auth login`** + **`sonar integrate claude`**.
+
+`sonar auth login` by scenario:
+
+| Scenario             | Command                                                 |
+|----------------------|---------------------------------------------------------|
+| SonarQube Cloud (EU) | `sonar auth login -o <org-key>`                         |
+| SonarQube Cloud (US) | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+| SonarQube Server     | `sonar auth login -s <server-url>`                      |
+
+Optional: add **`sonar-project.properties`** in the project root with `sonar.projectKey`, sources, etc.
 
 ---
 
-## Repository layout
+## GitHub Copilot CLI
 
-| Agent                     | Location                                                             |
-|---------------------------|-----------------------------------------------------------------------|
-| **Claude Code**           | `.claude-plugin/`, `skills/`, `agents/`, `claude-hooks/`, `scripts/` |
-| **Cursor**                | `.cursor-plugin/` (+ shared `mcp.json`, `agents/`)                   |
-| **GitHub Copilot CLI**    | `.github/plugin/` (+ shared `mcp.json`, `agents/`)                   |
-| **Codex**                 | `.codex-plugin/`                                                     |
-| **Antigravity**           | `plugin.json`, `mcp_config.json`, `rules/`, shared `skills/`         |
-| **Gemini CLI** *(legacy)* | `gemini-extension.json`, `GEMINI.md`                                 |
-| **Kiro**                  | `kiro-power/`                                                        |
+Plugin bundle: **`.github/plugin/`**.
+
+1. Install **sonarqube** from the pre-packaged `awesome-copilot` plugins catalog:
+
+   ```shell
+   /plugin install sonarqube@awesome-copilot
+   ```
+
+2. Run **`sonar integrate copilot`**, or invoke the `/sonarqube:sonar-integrate` skill.
+
+Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ---
 
+## Cursor
+
+**`.cursor-plugin/`** with MCP via **`mcp.json`**.
+
+Install **SonarQube** plugin through [Cursor's marketplace](https://cursor.com/marketplace/sonarsource)
+
+---
+
+## Antigravity
+
+Repo-root plugin: **`plugin.json`**, **`mcp_config.json`**, **`rules/sonarqube.md`**, and shared **`skills/`**. Hooks and managed instructions are **not** in the plugin bundle—they are installed by **`sonar integrate antigravity`**.
+
+### Recommended flow (full integration)
+
+```bash
+# 1. Plugin bundle — skills, rules, MCP
+agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins
+
+# 2. Auth + hooks / instructions / CAG / MCP patch
+sonar auth login
+sonar integrate antigravity              # project-scoped (default)
+# sonar integrate antigravity -g         # global (all projects; Vortex agentic analysis skipped)
+```
+
+Or use **`/sonarqube:sonar-integrate`** inside Antigravity for a guided flow. Restart the agent session if MCP tools do not appear.
+
+### Install options
+
+| Option            | Command / path                                | What you get                                            |
+|-------------------|-----------------------------------------------|---------------------------------------------------------|
+| **CLI global**    | `agy plugin install <git-url\|path\|archive>` | Plugin copied to `~/.gemini/config/plugins/sonarqube/`  |
+| **IDE workspace** | `<project>/.agents/plugins/sonarqube/`        | Plugin for that workspace only                          |
+| **Monorepo dev**  | Open `sonarqube-agent-plugins` as workspace   | Auto-discovery from repo root — no `agy plugin install` |
+
+Installing the **whole repo** is acceptable — other agents' dot-folders are inert in Antigravity.
+
+### Migrating from Gemini CLI
+
+Gemini CLI is being replaced by Antigravity. Migrate platform config first (layout, skills paths, and cleanup), then update SonarQube as below.
+
+If you already had the **SonarQube Gemini extension** installed:
+
+```bash
+agy plugin import gemini          # converts legacy extensions → native plugins
+sonar integrate antigravity       # add hooks, instructions, CAG (new vs Gemini)
+```
+
+`agy plugin import gemini` scans legacy Gemini directories and migrates inline `mcpServers` into `mcp_config.json`. Expect output like `✔ mcpServers : 1 server definition migrated to mcp_config.json` for SonarQube.
+
+If you had custom skills under `.gemini/skills/`, move them to `.agents/skills/`.
+
+After verifying Antigravity works, remove any duplicate legacy Gemini extension install if import created a copy.
+
+For a fresh install, use the [recommended flow](#recommended-flow-full-integration) above.
+
+Same workflows as **[Usage](#usage)** once MCP is connected.
+
+---
+
+## Codex CLI
+
+Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube`** (see **[`.codex-plugin/plugin.json`](.codex-plugin/plugin.json)**).
+
+1. Add **SonarSource/sonarqube-agent-plugins** as a plugin marketplace in Codex CLI:
+
+   ```shell
+   codex plugin marketplace add SonarSource/sonarqube-agent-plugins
+   ```
+2. Install **sonarqube** plugin from that catalog:
+
+   ```shell
+   codex plugin add sonarqube@sonar
+   ```
+
+3. Run **`sonar auth login`**.
+
+4. From your project directory, run **`sonar integrate codex`** (add **`--project <key>`** if needed). This wires MCP in **`.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Vortex agentic analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit.
+
+Same workflows as **[Usage](#usage)** once MCP is connected.
+
+---
+
+## Kiro
+
+**`kiro-power/`** (`POWER.md`, MCP config). **`sonar auth login`**, then enable the power per Kiro’s documentation.
+
+---
+
+## Gemini CLI *(legacy)*
+
+**`gemini-extension.json`** and **`GEMINI.md`**. **`sonar auth login`** and **[Usage](#usage)**.
+
+Migrate to **[Antigravity](#antigravity)** with **`agy plugin import gemini`** and **`sonar integrate antigravity`** as described above.
+
+---
 ## Usage
 
 Skills are the same across agents. Ask in natural language, invoke skills explicitly, or use the **SonarQube MCP** tools your client shows after MCP starts.
@@ -130,143 +242,6 @@ MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqub
 /sonarqube:sonar-dependency-risks
 /sonarqube:sonar-dependency-risks my-project --pr 42
 ```
-
----
-
-## Claude Code plugin
-
-Install from Anthropic's marketplace **`claude-plugins-official`**:
-
-```shell
-/plugin install sonarqube@claude-plugins-official
-```
-
-```shell
-claude plugin install sonarqube@claude-plugins-official
-```
-
-### One-time setup
-
-- **Node.js** — for the SessionStart hook (`scripts/setup.js`).
-- Install **SonarQube CLI** if needed, then **`/sonarqube:sonar-integrate`** or **`sonar auth login`** + **`sonar integrate claude`**.
-
-`sonar auth login` by scenario:
-
-| Scenario             | Command                                                 |
-|----------------------|---------------------------------------------------------|
-| SonarQube Cloud (EU) | `sonar auth login -o <org-key>`                         |
-| SonarQube Cloud (US) | `sonar auth login -o <org-key> -s https://sonarqube.us` |
-| SonarQube Server     | `sonar auth login -s <server-url>`                      |
-
-Optional: add **`sonar-project.properties`** in the project root with `sonar.projectKey`, sources, etc.
-
----
-
-## GitHub Copilot CLI
-
-Plugin bundle: **`.github/plugin/`** — catalog **`sonar`**, plugin **`sonarqube`** (see **[`.github/plugin/marketplace.json`](.github/plugin/marketplace.json)**).
-
-1. Add **SonarSource/sonarqube-agent-plugins** as a plugin marketplace in GitHub Copilot CLI / AgentHQ, then install **sonarqube** from that catalog (some builds expose the same flow as slash commands):
-
-   ```shell
-   /plugin marketplace add SonarSource/sonarqube-agent-plugins
-   /plugin install sonarqube@sonar
-   ```
-
-2. Run **`sonar auth login`**, then **`sonar integrate copilot`**, or invoke the `/sonarqube:sonar-integrate` skill.
-
-Same workflows as **[Usage](#usage)** once MCP is connected.
-
----
-
-## Cursor
-
-**`.cursor-plugin/`** with MCP via **`mcp.json`**. Use **`sonar auth login`** so the MCP server picks up CLI credentials.
-
----
-
-## Antigravity
-
-Repo-root plugin: **`plugin.json`**, **`mcp_config.json`**, **`rules/sonarqube.md`**, and shared **`skills/`**. Hooks and managed instructions are **not** in the plugin bundle—they are installed by **`sonar integrate antigravity`**.
-
-### Recommended flow (full integration)
-
-```bash
-# 1. Plugin bundle — skills, rules, MCP
-agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins
-
-# 2. Auth + hooks / instructions / CAG / MCP patch
-sonar auth login
-sonar integrate antigravity              # project-scoped (default)
-# sonar integrate antigravity -g         # global (all projects; Vortex agentic analysis skipped)
-```
-
-Or use **`/sonarqube:sonar-integrate`** inside Antigravity for a guided flow. Restart the agent session if MCP tools do not appear.
-
-### Install options
-
-| Option            | Command / path                                | What you get                                            |
-|-------------------|-----------------------------------------------|---------------------------------------------------------|
-| **CLI global**    | `agy plugin install <git-url\|path\|archive>` | Plugin copied to `~/.gemini/config/plugins/sonarqube/`  |
-| **IDE workspace** | `<project>/.agents/plugins/sonarqube/`        | Plugin for that workspace only                          |
-| **Monorepo dev**  | Open `sonarqube-agent-plugins` as workspace   | Auto-discovery from repo root — no `agy plugin install` |
-
-Installing the **whole repo** is acceptable — other agents' dot-folders are inert in Antigravity.
-
-### Migrating from Gemini CLI
-
-Gemini CLI is being replaced by Antigravity. Migrate platform config first (layout, skills paths, and cleanup), then update SonarQube as below.
-
-If you already had the **SonarQube Gemini extension** installed:
-
-```bash
-agy plugin import gemini          # converts legacy extensions → native plugins
-sonar integrate antigravity       # add hooks, instructions, CAG (new vs Gemini)
-```
-
-`agy plugin import gemini` scans legacy Gemini directories and migrates inline `mcpServers` into `mcp_config.json`. Expect output like `✔ mcpServers : 1 server definition migrated to mcp_config.json` for SonarQube.
-
-If you had custom skills under `.gemini/skills/`, move them to `.agents/skills/`.
-
-After verifying Antigravity works, remove any duplicate legacy Gemini extension install if import created a copy.
-
-For a fresh install, use the [recommended flow](#recommended-flow-full-integration) above.
-
-Same workflows as **[Usage](#usage)** once MCP is connected.
-
----
-
-## Gemini CLI *(legacy)*
-
-**`gemini-extension.json`** and **`GEMINI.md`**. **`sonar auth login`** and **[Usage](#usage)**.
-
-Migrate to **[Antigravity](#antigravity)** with **`agy plugin import gemini`** and **`sonar integrate antigravity`** as described above.
-
----
-
-## Codex CLI
-
-Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube`** (see **[`.codex-plugin/plugin.json`](.codex-plugin/plugin.json)**).
-
-1. Add **SonarSource/sonarqube-agent-plugins** as a plugin marketplace in Codex CLI:
-
-   ```shell
-   codex plugin marketplace add SonarSource/sonarqube-agent-plugins
-   ```
-
-2. Run **`sonar auth login`**.
-
-3. Start a Codex session and install **sonarqube** from that catalog using the `/plugins` command
-
-4. From your project directory, run **`sonar integrate codex`** (add **`--project <key>`** if needed). This wires MCP in **`.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Vortex agentic analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit.
-
-Same workflows as **[Usage](#usage)** once MCP is connected.
-
----
-
-## Kiro
-
-**`kiro-power/`** (`POWER.md`, MCP config). **`sonar auth login`**, then enable the power per Kiro’s documentation.
 
 ---
 
