@@ -42,10 +42,6 @@ sonar integrate cursor        # Cursor: MCP, secret-scanning hooks, Vortex agent
 
 Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill if you prefer a guided flow (install/update CLI, login, then integrate).
 
-### Other agents (Kiro)
-
-Each layout includes **MCP configuration** (for example **`mcp.json`** or **`kiro-power/mcp.json`**) that runs the **`mcp/sonarqube`** image and **relies on SonarQube CLI** for authentication—the same **`sonar auth login`** session.
-
 ## Claude Code
 
 Install from Anthropic's marketplace **`claude-plugins-official`**:
@@ -95,7 +91,13 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 
 **`.cursor-plugin/`** with MCP via **`mcp.json`**.
 
-Install **SonarQube** plugin through [Cursor's marketplace](https://cursor.com/marketplace/sonarsource)
+1. Install **SonarQube** plugin through [Cursor's marketplace](https://cursor.com/marketplace/sonarsource):
+
+```
+/add-plugin sonarqube
+```
+
+2. Run **`sonar integrate cursor`**, or invoke the `/sonarqube:sonar-integrate` skill.
 
 ---
 
@@ -175,7 +177,9 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ## Kiro
 
-**`kiro-power/`** (`POWER.md`, MCP config). **`sonar auth login`**, then enable the power per Kiro’s documentation.
+Plugin includes **MCP configuration** (**`kiro-power/mcp.json`**) that runs the **`mcp/sonarqube`** image and **relies on SonarQube CLI** for authentication—the same **`sonar auth login`** session.
+
+**`sonar auth login`**, then enable the power per Kiro’s documentation.
 
 ---
 
