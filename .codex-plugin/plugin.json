@@ -18,7 +18,7 @@
   "homepage": "https://www.sonarsource.com",
   "interface": {
     "displayName": "SonarQube",
-    "shortDescription": "Enforce code quality and security as it's written",
+    "shortDescription": "Review code as it's written",
     "longDescription": "SonarQube is the AI code quality and security verification platform used by millions of developers to catch bugs, vulnerabilities, and leaked secrets. This plugin enforces those standards in the agent coding loop: 7,500+ distinct issue types, secrets scanning, agentic analysis, and quality gates across 40+ languages.",
     "developerName": "Sonar",
     "category": "Developer Tools",
