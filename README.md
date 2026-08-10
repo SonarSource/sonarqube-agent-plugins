@@ -8,13 +8,13 @@ SonarQube combines deterministic checks with AI-assisted workflows so quality ru
 
 ## What do the plugins include
 
-The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, and Antigravity (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex agentic analysis.
+The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, and Antigravity (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex analysis.
 
-How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Vortex agentic analysis enabled, verification happens automatically after each edit with no manual invocation required.
+How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Vortex analysis enabled, verification happens automatically after each edit with no manual invocation required.
 
 ## Prerequisites
 
-- A SonarQube account (**SonarQube Cloud**, **Server**, or **Community Build**). Some features (for example Vortex agentic analysis) depend on your SonarQube Cloud organization settings.
+- A SonarQube account (**SonarQube Cloud**, **Server**, or **Community Build**). Some features (for example Vortex analysis) depend on your SonarQube Cloud organization settings.
 - **[SonarQube CLI](https://cli.sonarqube.com/)** (`sonar`) on your machine.
 - A **container runtime** (Docker, Podman, or Nerdctl) for the MCP server image.
 
@@ -35,9 +35,9 @@ sonar auth status
 ```bash
 sonar integrate claude        # Claude Code: MCP, hooks, secrets scanning, etc.
 sonar integrate copilot       # GitHub Copilot CLI: MCP, hooks, secrets scanning, etc.
-sonar integrate codex         # Codex: MCP, hooks, secrets scanning, Vortex agentic analysis hook
+sonar integrate codex         # Codex: MCP, hooks, secrets scanning, Vortex analysis hook
 sonar integrate antigravity   # Antigravity: hooks, instructions, CAG, MCP patch (after plugin install)
-sonar integrate cursor        # Cursor: MCP, secret-scanning hooks, Vortex agentic analysis instructions
+sonar integrate cursor        # Cursor: MCP, secret-scanning hooks, Vortex analysis instructions
 ```
 
 Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill if you prefer a guided flow (install/update CLI, login, then integrate).
@@ -114,7 +114,7 @@ agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins
 # 2. Auth + hooks / instructions / CAG / MCP patch
 sonar auth login
 sonar integrate antigravity              # project-scoped (default)
-# sonar integrate antigravity -g         # global (all projects; Vortex agentic analysis skipped)
+# sonar integrate antigravity -g         # global (all projects; Vortex analysis skipped)
 ```
 
 Or use **`/sonarqube:sonar-integrate`** inside Antigravity for a guided flow. Restart the agent session if MCP tools do not appear.
@@ -169,7 +169,7 @@ Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube
 
 3. Run **`sonar auth login`**.
 
-4. From your project directory, run **`sonar integrate codex`** (add **`--project <key>`** if needed). This wires MCP in **`.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Vortex agentic analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit.
+4. From your project directory, run **`sonar integrate codex`** (add **`--project <key>`** if needed). This wires MCP in **`.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Vortex analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit.
 
 Same workflows as **[Usage](#usage)** once MCP is connected.
 

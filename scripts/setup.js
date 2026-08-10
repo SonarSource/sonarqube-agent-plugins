@@ -9,9 +9,9 @@ const CLAUDE_INTEGRATION_ID = "claude-code";
 
 const HOOK_DISPLAY_NAMES = {
   "sonar-secrets": "Secrets Detection",
-  "sonar-sqaa": "Vortex agentic analysis",
+  "sonar-sqaa": "Vortex analysis",
   "sonar-secrets-hooks": "Secrets Detection",
-  "sonar-sqaa-hook": "Vortex agentic analysis",
+  "sonar-sqaa-hook": "Vortex analysis",
 };
 
 const DECLARATIVE_HOOK_FEATURE_IDS = new Set([
