@@ -44,13 +44,13 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 
 **What to do:** Invoke the `sonar-list-issues` skill end-to-end. It supports filtering by severity, type, status, rule, tag, component, branch, and pull request, and always passes `-p <project-key>` to the CLI.
 
-### Code Snippet Analysis
+### Code Analysis
 **Example user requests:**
-- "Analyze this code snippet for issues"
+- "Analyze this code for issues"
 - "Check this code for quality problems"
 - "Generate a method that does X and analyze it for issues"
 
-**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Vortex analysis) and falls back to `mcp__sonarqube__analyze_code_snippet`, handling file reading, language detection, and scope selection.
+**What to do:** Invoke the `sonar-analyze` skill end-to-end. It prefers `mcp__sonarqube__run_advanced_code_analysis` (Vortex analysis) and falls back to `mcp__sonarqube__analyze_file_list`, handling file reading and scope selection.
 
 ### Coverage
 **Example user requests:**
