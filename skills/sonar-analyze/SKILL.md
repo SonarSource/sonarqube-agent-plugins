@@ -1,6 +1,6 @@
 ---
 name: sonar-analyze
-description: Analyze a file or code snippet for quality and security issues using SonarQube
+description: Analyze a file for quality and security issues using SonarQube
 argument-hint: "[file-path]"
 allowed-tools: Read, Glob, Bash(git branch:*), Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*), Bash(sonar:*)
 ---
@@ -18,7 +18,7 @@ sonar-analyze src/auth/login.py      # analyze a specific file
 
 ## Prerequisites
 
-This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_code_snippet`, or `mcp__sonarqube__analyze_file_list` to be available in your session.
+This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis` or `mcp__sonarqube__analyze_file_list` to be available in your session.
 
 **Before proceeding**, verify at least one of these tools is accessible. If none are, try the CLI fallback in Step 3 before giving up — don't invent other CLI commands (e.g. `sonar mcp call` does not exist).
 
@@ -51,26 +51,10 @@ Both analysis tools work on **one file at a time**. Resolve a single file path:
 
 Do not accept a directory as input. If the user provides one, ask them to specify a single file.
 
-### Step 2: Read the file and detect context
+### Step 2: Read the file and determine its scope
 
-1. Read the file's full content (needed for the fallback tool and language detection).
-2. Detect the language from the file extension (needed for the standard tool):
-
-| Extension              | Language key |
-| ---------------------- | ------------ |
-| `.py`                  | `py`         |
-| `.js` `.jsx`           | `js`         |
-| `.ts` `.tsx`           | `ts`         |
-| `.java`                | `java`       |
-| `.go`                  | `go`         |
-| `.php`                 | `php`        |
-| `.cs`                  | `cs`         |
-| `.rb`                  | `rb`         |
-| `.swift`               | `swift`      |
-| `.kt`                  | `kotlin`     |
-| `.c` `.cpp` `.cc` `.h` | `cpp`        |
-
-3. Determine the file scope: `"TEST"` or `"MAIN"`. Use the file path to deduce the scope. For example, if the file path contains `test`, `spec`, or `__tests__`, it's likely `"TEST"` scope.
+1. Read the file's full content — only needed as a fallback for `run_advanced_code_analysis`'s `fileContent` parameter (see Step 3).
+2. Determine the file scope: `"TEST"` or `"MAIN"`. Use the file path to deduce the scope. For example, if the file path contains `test`, `spec`, or `__tests__`, it's likely `"TEST"` scope.
 
 ### Step 3: Call the appropriate analysis tool
 
@@ -90,21 +74,17 @@ Then call with:
 - `fileContent` — full file content; **only pass if the tool requires it** (when the MCP server has a mount, it reads the file directly and this parameter will not be required)
 - `fileScope` — `["TEST"]` or `["MAIN"]`
 
-**If that tool is unavailable, fall back to `mcp__sonarqube__analyze_code_snippet` or `mcp__sonarqube__analyze_file_list`** (available for all organizations):
+**If that tool is unavailable, fall back to `mcp__sonarqube__analyze_file_list`** (requires a running SonarQube for IDE instance bridged to this session):
 
-- `projectKey` — **omit unless the tool requires it**; resolve the same way as above when needed
-- `filePath` — project-relative file path (e.g. `src/auth/login.py`)
-- `codeSnippet` — full file content (optional; provide to narrow analysis to a specific snippet)
-- `language` — detected language key
-- `scope` — `"TEST"` or `"MAIN"`
+- `file_absolute_paths` — array containing the absolute path to the file (e.g. `["/home/user/project/src/auth/login.py"]`); resolve it from the file path found in Step 1
 
-**If none of the three MCP tools are available, fall back to the CLI's Vortex analysis:**
+**If neither MCP tool is available, fall back to the CLI's Vortex analysis:**
 
 ```bash
 sonar analyze agentic --file <file-path> [--file <other-file-path> ...] --format json [--branch <branch-name>] [-p <project-key>]
 ```
 
-Same backend as `run_advanced_code_analysis` (repeatable `--file` covers multi-file too), and the practical fallback for `analyze_code_snippet`/`analyze_file_list` as well — they have no direct CLI equivalent, but this achieves the same goal.
+Same backend as `run_advanced_code_analysis` (repeatable `--file` covers multi-file too), and the practical fallback for `analyze_file_list` as well — it has no direct CLI equivalent, but this achieves the same goal.
 
 Requires a Vortex analysis-eligible organization. If the org isn't eligible, or `sonar` isn't installed/authenticated, show the standard message from Prerequisites — don't guess further commands.
 

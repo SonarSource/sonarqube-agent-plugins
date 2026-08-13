@@ -12,11 +12,11 @@ author: "Sonar"
 
 Integrate with SonarQube Server or Cloud. This power provides seamless access to SonarQube's comprehensive code analysis platform, enabling you to detect bugs, security vulnerabilities, dependency risks, code smells, and enforce quality standards throughout your development workflow.
 
-SonarQube supports 30+ programming languages and provides actionable insights to help teams write cleaner, safer, and more maintainable code. Use it to analyze code snippets on-the-fly, search for issues, track quality metrics, and ensure your projects meet quality gate standards before deployment.
+SonarQube supports 30+ programming languages and provides actionable insights to help teams write cleaner, safer, and more maintainable code. Use it to analyze files on-the-fly with Vortex analysis, search for issues, track quality metrics, and ensure your projects meet quality gate standards before deployment.
 
 **Key capabilities:**
 
-- **Code Analysis**: Analyze code snippets and files directly within your development context
+- **Code Analysis**: Analyze files directly within your development context
 - **Issue Management**: Search, filter, and manage code quality issues across projects
 - **Quality Gates**: Monitor and enforce quality standards before deployment
 - **Security Scanning**: Detect security vulnerabilities and hotspots
@@ -66,29 +66,28 @@ Always resolve the project key using the following lookup order — **never gues
 
 ### Code Analysis
 
-**Always provide complete file content for accurate analysis:**
+**Prefer Vortex analysis** (`run_advanced_code_analysis`) when the connected organization is eligible — it runs server-side with full project context for deeper cross-file detection:
 
 ```javascript
-// Analyze entire file - reports all issues
-analyze_code_snippet({
-    fileContent: `import { Item } from './types';\n\nfunction calculateTotal(items: Item[]) { ... }`,
-    language: "typescript",
-    projectKey: "my-project"
-});
-
-// Analyze with snippet filter (RECOMMENDED for generated code)
-// Analyzes complete file but only reports issues in the snippet
-analyze_code_snippet({
-    fileContent: `import { Item } from './types';\n\nfunction calculateTotal(items: Item[]) { return items.reduce((sum, item) => sum + item.price, 0); }`,
-    codeSnippet: "function calculateTotal(items: Item[]) { return items.reduce((sum, item) => sum + item.price, 0); }",
-    language: "typescript",
-    projectKey: "my-project"
+// Analyze a single file with Vortex
+run_advanced_code_analysis({
+    projectKey: "my-project",
+    branchName: "main",
+    filePath: "src/utils.ts",
+    fileScope: "MAIN"
 });
 ```
 
-**Supported Languages for Local Code Snippet Analysis:**
+- `fileContent` is optional — only pass it if the file isn't already accessible to the MCP server (e.g. no workspace mount configured).
+- `fileScope` is `"MAIN"` or `"TEST"`.
 
-The `analyze_code_snippet` tool supports the following languages: Java, Kotlin, Python, Ruby, Go, JavaScript, TypeScript, JSP, PHP, XML, HTML, CSS, CloudFormation, Kubernetes, Terraform, Azure Resource Manager, Ansible, Docker, Secrets detection
+**If the organization isn't Vortex-eligible, fall back to `analyze_file_list`** — this requires a running SonarQube for IDE instance bridged to the session:
+
+```javascript
+analyze_file_list({
+    file_absolute_paths: ["/workspace/src/utils.ts"]
+});
+```
 
 ### Issue Management
 
@@ -178,29 +177,20 @@ sonar run mcp --read-only
 ### Workflow 1: Analyze Generated Code Before Using It
 
 ```javascript
-// Step 1: Agent reads the existing file
-const originalContent = readFile("/workspace/src/utils.js");
+// Step 1: Agent generates a new method and writes it to the file
+writeFile("/workspace/src/utils.js", updatedContent);
 
-// Step 2: Agent generates a new method
-const newMethod = `
-function calculateTotal(items) {
-  return items.reduce((sum, item) => sum + item.price, 0);
-}`;
-
-// Step 3: Agent creates updated content with the new method
-const updatedContent = originalContent + "\n" + newMethod;
-
-// Step 4: Analyze just the generated method with full file context
-const analysis = analyze_code_snippet({
-    fileContent: updatedContent,
-    codeSnippet: newMethod,
-    language: "javascript",
-    projectKey: "my-project"
+// Step 2: Analyze the file with Vortex
+const analysis = run_advanced_code_analysis({
+    projectKey: "my-project",
+    branchName: "main",
+    filePath: "src/utils.js",
+    fileScope: "MAIN"
 });
 
-// Step 5: Review detected issues
-// Step 6: Fix issues in your code
-// Step 7: Re-analyze to verify fixes
+// Step 3: Review detected issues
+// Step 4: Fix issues in your code
+// Step 5: Re-analyze to verify fixes
 ```
 
 ### Workflow 2: Review Issues in Pull Request
@@ -371,20 +361,20 @@ const risks = get_file_coverage_details({
 4. For branches/PRs, ensure they've been analyzed
 5. Review project settings in SonarQube dashboard
 
-### Code snippet analysis fails
+### Code analysis fails
 
-**Cause:** Language not supported or analysis error
+**Cause:** Organization not Vortex-eligible, SonarQube for IDE not running, or analysis error
 **Solution:**
 
-1. Specify correct language parameter
-2. Check code snippet is valid syntax
-3. Provide project key for better context
+1. If `run_advanced_code_analysis` is unavailable, notify the user that it's not possible without Vortex eligibility
+2. If falling back to `analyze_file_list`, notify the user that it's not possible without setting up the bridge to SonarQube for IDE
+3. Provide the correct project key for better context
 4. Review MCP server logs at `/app/storage/logs/mcp.log` in the container
 
 ## Tips
 
 1. **Start with project discovery** - Use `search_my_sonarqube_projects` to find available projects
-2. **Analyze code snippets frequently** - Catch issues early in development
+2. **Analyze files frequently** - Catch issues early in development
 3. **Review rule details** - Understand why issues are flagged and how to fix them
 4. **Monitor trends, not just values** - Track if metrics are improving or degrading over time
 5. **Use selective toolsets** - Enable only what you need to reduce context overhead
