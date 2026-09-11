@@ -22,7 +22,7 @@ sonar-quality-gate my-project --pr 42
 
 This skill uses the `sonarqube-cli` command **`sonar quality-gate status`** (alias `sonar qg status`) as the primary path — don't invent other ones (e.g. `sonar mcp call` does not exist). Prefer it over the MCP tool: the CLI returns worst-offender breakdowns per failing condition in the same call — see Step 5 — while the MCP tool needs separate follow-up calls (measures, issues) for that detail.
 
-**Before proceeding**, verify `sonar` is available on your PATH and authenticated. If it is not, fall back to the MCP tool `mcp__sonarqube__get_project_quality_gate_status` in Step 3.
+**Before proceeding**, verify `sonar` is available on your PATH and authenticated. If it is **not installed or not authenticated**, the MCP fallback cannot help either — the SonarQube MCP Server is itself started via `sonar run mcp` and shares the CLI's stored credentials (true whenever it was set up through the sonar-integrate skill; doesn't apply if the `sonarqube` MCP server was configured independently, e.g. via a standalone Docker container with its own token) — so skip straight to the message below and recommend the sonar-integrate skill. Only when `sonar` works but `quality-gate status` itself is unavailable (unknown subcommand on an older CLI, or the command errors for another reason) fall back to the MCP tool `mcp__sonarqube__get_project_quality_gate_status` in Step 3.
 
 **If the MCP fallback also fails (for example the tool is unavailable, or no project key can be resolved), narrow down the cause** — check whether the `sonarqube` MCP server is enabled in this agent's configuration.
 
@@ -148,7 +148,7 @@ On a CLI new enough to support it, the same call also returns a **`breakdown`** 
 }
 ```
 
-**If `sonar quality-gate status` is unavailable (not installed/authenticated), fall back to `mcp__sonarqube__get_project_quality_gate_status`.** Include **`projectKey` only if** you resolved one in Step 1 **and** the tool requires it; otherwise omit it and rely on the integration default. Example payload:
+**If `sonar quality-gate status` itself is unavailable (unknown subcommand on an older CLI, or the command fails for a reason other than a missing/unauthenticated CLI), fall back to `mcp__sonarqube__get_project_quality_gate_status`.** If `sonar` is not installed or not authenticated, don't try the MCP tool — the MCP server runs via `sonar run mcp` and shares the CLI's credentials, so it will be unavailable too — unless the `sonarqube` MCP server was configured independently (e.g. via a standalone Docker container with its own token), in which case the MCP tool may still work, so try it; show the message in Prerequisites and recommend sonar-integrate instead. Include **`projectKey` only if** you resolved one in Step 1 **and** the tool requires it; otherwise omit it and rely on the integration default. Example payload:
 
 ```json
 {
