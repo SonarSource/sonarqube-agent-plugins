@@ -19,6 +19,22 @@ const DECLARATIVE_HOOK_FEATURE_IDS = new Set([
   "sonar-sqaa-hook",
 ]);
 
+// sonarqube-cli merged the standalone `sonar-sqaa-hook` container into the
+// shared Vortex container for Claude; the analysis hook now shows up as this
+// subfeature nested under `vortex-claude` instead of its own top-level id.
+const CLAUDE_VORTEX_FEATURE_ID = "vortex-claude";
+const VORTEX_ANALYSIS_SUBFEATURE_ID = "sqaa-posttooluse";
+
+function hasMergedVortexAnalysisHook(feature) {
+  return (
+    feature?.featureId === CLAUDE_VORTEX_FEATURE_ID &&
+    Array.isArray(feature.subfeatures) &&
+    feature.subfeatures.some(
+      (subfeature) => subfeature?.featureId === VORTEX_ANALYSIS_SUBFEATURE_ID
+    )
+  );
+}
+
 function hasSonarCli() {
   const envPath = process.env.PATH || "";
   const dirs = envPath.split(path.delimiter);
@@ -106,13 +122,16 @@ function collectDeclarativeHookNames(state, cwd) {
   }
 
   return (claudeIntegration.features ?? [])
+    .filter((feature) => featureAppliesToCwd(feature, cwd))
     .filter(
       (feature) =>
-        typeof feature?.featureId === "string" &&
-        DECLARATIVE_HOOK_FEATURE_IDS.has(feature.featureId) &&
-        featureAppliesToCwd(feature, cwd)
+        (typeof feature?.featureId === "string" &&
+          DECLARATIVE_HOOK_FEATURE_IDS.has(feature.featureId)) ||
+        hasMergedVortexAnalysisHook(feature)
     )
-    .map((feature) => feature.featureId);
+    .map((feature) =>
+      hasMergedVortexAnalysisHook(feature) ? "sonar-sqaa-hook" : feature.featureId
+    );
 }
 
 function collectInstalledHookNames(state, cwd) {
