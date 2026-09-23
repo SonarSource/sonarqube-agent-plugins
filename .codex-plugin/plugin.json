@@ -37,6 +37,5 @@
     "logoDark": "./assets/logo-dark.png",
     "screenshots": []
   },
-  "skills": "./skills/",
-  "mcpServers": "./mcp.json"
+  "skills": "./skills/"
 }
