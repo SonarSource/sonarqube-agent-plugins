@@ -70,6 +70,15 @@ Invoke it when another skill surfaces a failure that points to one of the condit
 
 **What to do:** Invoke the `sonar-dependency-risks` skill end-to-end (requires SonarQube Advanced Security).
 
+### Dependency Risk Triage
+**Example user requests:**
+- "Are we vulnerable to this CVE?"
+- "Triage the dependency risks"
+- "Check whether this vulnerable package is reachable"
+- "Prepare SAFE reasons for dependency risks"
+
+**What to do:** Invoke the `dependency-risk-triage` skill. It assesses reachability and can prepare user-authorized fixes (requires SonarQube Advanced Security).
+
 ### Fixing a Specific Issue
 **Example user requests:**
 - "Fix `python:S2077` in `src/auth/login.py:12`"
