@@ -106,103 +106,57 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 
 Run **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
-It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config. When available, SonarQube Vortex analysis hooks are also installed.
+It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config, applying to all Claude Code sessions on this machine. When available, SonarQube Vortex analysis hooks are also installed.
 
-Ask the user using a single-choice selector with these options:
+Run this command yourself using a shell command:
 
-1. Current project only (default)
-2. Global (all projects)
-
-Do not ask an open-ended text question for this decision.
-
-Then run the appropriate command yourself using a shell command, and adding `--non-interactive`:
-
-| Scenario     | Command                                             |
-| ------------ | --------------------------------------------------- |
-| Project-only | `sonar integrate claude --non-interactive`          |
-| Global       | `sonar integrate claude --global --non-interactive` |
+```bash
+sonar integrate claude --non-interactive
+```
 
 #### 4.b — Copilot CLI (`sonar integrate copilot`)
 
 Run **`sonar integrate copilot`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
 
-It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Copilot CLI config.
+It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Copilot CLI config, applying to all Copilot CLI sessions on this machine.
 
-Ask the user using a single-choice selector with these options:
+Run this command yourself using a shell command:
 
-1. Current project only (default)
-2. Global (all projects)
-
-Do not ask an open-ended text question for this decision.
-
-Then run the appropriate command yourself using a shell command, and adding `--non-interactive`:
-
-| Scenario     | Command                                             |
-| ------------ | --------------------------------------------------- |
-| Project-only | `sonar integrate copilot --non-interactive`          |
-| Global       | `sonar integrate copilot --global --non-interactive` |
+```bash
+sonar integrate copilot --non-interactive
+```
 
 #### 4.c — Codex (`sonar integrate codex`)
 
-Run **`sonar integrate codex`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and—when your SonarQube Cloud org has Vortex analysis—a **PostToolUse** hook on **`apply_patch`** that surfaces findings inline after edits.
+Run **`sonar integrate codex`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and—when your SonarQube Cloud org has Vortex analysis—a **PostToolUse** hook on **`apply_patch`** that surfaces findings inline after edits, applying to all Codex sessions on this machine.
 
-Ask the user using a single-choice selector with these options:
+Run this command yourself using a shell command:
 
-1. Current project only (default)
-2. Global (all projects)
-
-Do not ask an open-ended text question for this decision.
-
-Then run the appropriate command yourself using a shell command, and adding `--non-interactive`:
-
-| Scenario     | Command                                            |
-| ------------ | -------------------------------------------------- |
-| Project-only | `sonar integrate codex --non-interactive`          |
-| Global       | `sonar integrate codex --global --non-interactive` |
-
-If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
+```bash
+sonar integrate codex --non-interactive
+```
 
 #### 4.d — Cursor (`sonar integrate cursor`)
 
-Run **`sonar integrate cursor`**, which configures **secrets-scanning hooks** (`beforeSubmitPrompt`, `beforeReadFile`, and `preToolUse`), **MCP**, **Context Augmentation** (when entitled), and **Vortex analysis instructions** (when entitled, project scope only).
+Run **`sonar integrate cursor`**, which configures **secrets-scanning hooks** (`beforeSubmitPrompt`, `beforeReadFile`, and `preToolUse`), **MCP**, **Context Augmentation** (when entitled), and **Vortex analysis instructions** (when entitled), applying to all Cursor sessions on this machine. Note: Cursor's cloud/background agents only pick up hooks installed in the project itself, not machine-wide ones, so those agents won't see the installed hooks.
 
-Ask the user using a single-choice selector with these options:
+Run this command yourself using a shell command:
 
-1. Current project only (default)
-2. Global (all projects)
-
-Do not ask an open-ended text question for this decision.
-
-Then run the appropriate command yourself using a shell command, adding **`--non-interactive`**:
-
-| Scenario     | Command                                                |
-| ------------ | ------------------------------------------------------ |
-| Project-only | `sonar integrate cursor --non-interactive`             |
-| Global       | `sonar integrate cursor --global --non-interactive`    |
-
-If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
+```bash
+sonar integrate cursor --non-interactive
+```
 
 After integrate completes, tell the user to enable the MCP server manually in Cursor: open **Settings → MCP**, find the `sonarqube` entry, and toggle it on. Also tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running. A Cursor session restart may be needed for the tools to appear.
 
 #### 4.e — Antigravity (`sonar integrate antigravity`)
 
-Run **`sonar integrate antigravity`**, which configures **secrets-scanning hooks**, **prompt-secrets and Vortex analysis instructions**, **Context Augmentation** (when entitled), and **MCP** in the Antigravity harness.
+Run **`sonar integrate antigravity`**, which configures **secrets-scanning hooks**, **prompt-secrets and Vortex analysis instructions**, **Context Augmentation** (when entitled), and **MCP** in the Antigravity harness, applying to all Antigravity sessions on this machine.
 
-Ask the user using a single-choice selector with these options:
+Run this command yourself using a shell command:
 
-1. Current project only (default)
-2. Global (all projects)
-
-Do not ask an open-ended text question for this decision.
-
-Then run the appropriate command yourself using a shell command, adding **`--non-interactive`**:
-
-| Scenario     | Command                                                |
-| ------------ | ------------------------------------------------------ |
-| Project-only | `sonar integrate antigravity --non-interactive`        |
-| Global       | `sonar integrate antigravity --global --non-interactive` |
-
-If the project key is not already known from `sonar-project.properties` or prior context, add **`--project <key>`** to the project-only command.
+```bash
+sonar integrate antigravity --non-interactive
+```
 
 Tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running, and to restart the Antigravity session if MCP tools do not appear after integrate completes.
 
