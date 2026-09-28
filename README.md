@@ -113,8 +113,7 @@ agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins
 
 # 2. Auth + hooks / instructions / CAG / MCP patch
 sonar auth login
-sonar integrate antigravity              # project-scoped (default)
-# sonar integrate antigravity -g         # global (all projects; Vortex analysis skipped)
+sonar integrate antigravity
 ```
 
 Or use **`/sonarqube:sonar-integrate`** inside Antigravity for a guided flow. Restart the agent session if MCP tools do not appear.
@@ -169,7 +168,7 @@ Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube
 
 3. Run **`sonar auth login`**.
 
-4. From your project directory, run **`sonar integrate codex`** (add **`--project <key>`** if needed). This wires MCP in **`.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Vortex analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit.
+4. Run **`sonar integrate codex`**. This wires MCP in **`~/.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Vortex analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit, applying to all Codex sessions on this machine.
 
 Same workflows as **[Usage](#usage)** once MCP is connected.
 
