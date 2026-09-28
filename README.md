@@ -168,7 +168,7 @@ Plugin bundle: **`.codex-plugin/`** — catalog **`sonar`**, plugin **`sonarqube
 
 3. Run **`sonar auth login`**.
 
-4. From your project directory, run **`sonar integrate codex`**. This wires MCP in **`.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Vortex analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit.
+4. Run **`sonar integrate codex`**. This wires MCP in **`~/.codex/config.toml`**, secrets hooks, and—when your SonarQube Cloud org has Vortex analysis—a **PostToolUse** hook on **`apply_patch`** that runs analysis on the git change set after each edit, applying to all Codex sessions on this machine.
 
 Same workflows as **[Usage](#usage)** once MCP is connected.
 
