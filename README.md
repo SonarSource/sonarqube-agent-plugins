@@ -14,6 +14,8 @@ How to use: Run `/sonarqube:sonar-integrate` after installation to walk through 
 
 ## Prerequisites
 
+The CLI and container requirements below apply to the plugin's local `sonar run mcp` setup. If your agent already uses an authenticated remote HTTP SonarQube MCP server, run `/sonarqube:sonar-integrate` to verify and repair that connection before installing a second server. A successful file analysis is required to confirm the remote route; a configured server entry alone is not enough.
+
 - A SonarQube account (**SonarQube Cloud**, **Server**, or **Community Build**). Some features (for example Vortex analysis) depend on your SonarQube Cloud organization settings.
 - **[SonarQube CLI](https://cli.sonarqube.com/)** (`sonar`) on your machine.
 - A **container runtime** (Docker, Podman, or Nerdctl) for the MCP server image.

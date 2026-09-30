@@ -1,16 +1,26 @@
 ---
 name: sonar-integrate
-description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
+description: "Use when setting up or repairing SonarQube integration, including a configured MCP server whose analysis tools are unavailable in the current agent session."
 allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(agy:*), Bash(curl:*), Bash(irm:*), Bash(iex:*), Bash(brew:*), Bash(mise:*), Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
 ---
 
 # Integrate SonarQube
 
-Guide the user through installing **sonarqube-cli** (if needed), **updating it to the latest version** when already installed, authenticating, and completing agent-specific integration. Assume SonarQube itself is already set up; this skill only wires the assistant.
+First identify whether the agent uses an existing remote MCP server or a local `sonarqube-cli` server. Repair the existing route before installing a different one. This skill wires the assistant; it does not administer SonarQube projects or grant permission to create tokens.
 
 ## Instructions
 
 Interaction rule: for every finite decision, always present predefined selector options (single-choice or multi-choice as appropriate) instead of asking for free-form text. If the user gives an invalid answer, re-show the same selector.
+
+### Existing remote MCP — check before Step 1
+
+Inspect the agent's active MCP configuration and available tools. For Codex, `codex mcp get sonarqube --json` reveals whether the transport is remote HTTPS and which environment variable supplies its bearer token; never print the token itself. If the repository provides a tracked MCP client, launcher, or analysis hook, inspect that route before choosing the CLI installation below. A remote HTTP MCP does not require local `sonar`, Docker, Podman, or Nerdctl.
+
+If native Sonar tools are missing from a running session, do not conclude that a restart is required. Check whether the configured credential is available to the current process. If the environment uses a trusted launcher or OS credential store, use its existing scoped process or agent control interface when available; keep the credential in that process, never in chat, logs, repository files, or tool arguments. A project-approved direct MCP client may restore working analysis for the current session even if native tools cannot be hot-loaded. Do not create or rotate an account or token merely to repair a client-side session.
+
+Prove the route with an actual analysis call on a scanned, non-secret diagnostic file or an approved source file. Check `tools/list` only to discover the analysis tool and its schema; a successful list or token-presence check alone is insufficient. Record the project key, tool, result, current analyzed base, and quality gate separately. If a repository requires analysis after edits, verify its hook on a harmless test edit or run the approved analysis client after every coherent patch. State whether the analysis works manually, through a native tool, or automatically through the hook; these are distinct states. If the remote route works, stop this skill here. If no approved route works, report the specific failure and only then consider a new session or the local CLI route below.
+
+The steps below apply when the selected route actually uses `sonarqube-cli`.
 
 ### Step 1 — Check for sonarqube-cli and update it
 
@@ -91,7 +101,7 @@ verify before continuing.
 
 ### Step 4 — Agent-specific integration
 
-> **Container runtime requirement:** The SonarQube MCP Server runs inside a container, started via `sonar run mcp` (which detects Docker, Podman, or Nerdctl). A container runtime must be **installed and running** for the MCP tools to load — otherwise integration can complete successfully yet no `mcp__sonarqube__*` tools appear in the session. **Verify this yourself:** run `docker ps` (falling back to `podman ps` / `nerdctl ps`). If one succeeds, the runtime is up — proceed. If none do, tell the user their container runtime is not running and ask them to start it, then note they must restart the agent session afterward for the tools to load (starting the daemon and restarting the session are the only parts you cannot do for them).
+> **Local CLI container requirement:** When `sonar run mcp` is the selected transport, its MCP server runs inside Docker, Podman, or Nerdctl. Verify the selected runtime with `docker ps` (or `podman ps` / `nerdctl ps`). If none works, report that the local CLI route cannot start yet. This requirement does not apply to an already configured remote HTTP MCP. After repairing the runtime, test an actual analysis; request a session restart only when the agent cannot load or reach any verified analysis route in the running session.
 
 Pick exactly one branch below based on which agent you are. Do not run the other branches.
 
