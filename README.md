@@ -211,7 +211,7 @@ MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqub
 /sonarqube:sonarcloud-onboard
 ```
 
-[The onboarding skill](skills/sonarcloud-onboard/SKILL.md) reuses existing setup or imports the repository, waits for analysis, and reviews issues and security hotspots. It defaults to dev9 and requires the prototype CLI onboarding commands or an OAuth-capable MCP deployment with onboarding tools; the standard plugin MCP connection and stable CLI may not provide them. Billing failures have bounded recovery and require consent before continuing on an existing plan without billing verification.
+[The onboarding skill](skills/sonarcloud-onboard/SKILL.md) reuses existing setup or imports the repository, waits for analysis, and reviews issues and security hotspots. It defaults to dev9 and requires the prototype CLI onboarding commands or an OAuth-capable MCP deployment with onboarding tools; the standard plugin MCP connection and stable CLI may not provide them. A failed new Team trial automatically falls back to Free when safe to create or reuse it. Billing failures have bounded recovery; existing subscriptions are preserved and uncertain signup outcomes do not trigger duplicate creation.
 
 #### List projects
 
