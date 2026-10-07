@@ -78,6 +78,29 @@ Batch independent read-only checks when supported. Once authentication is confir
 
 Use `--no-browser --events` for browser-producing commands. Login also needs `--non-interactive`. The CLI prepares the action and waits without opening a browser. Run these commands with your shell tool's background/yield/session support so you can read output while the same process keeps running; do not kill or restart the process when a browser action is reported. macOS does not ship GNU `timeout`; use the command’s own `--timeout` where supported and shell-tool background sessions with monitored output. Keep waits short enough to provide progress updates.
 
+
+File-based event monitors must stop with their producer; a bare `tail -F` keeps running after the command exits. Use a separate log for each command, created before starting it. Have the command wrapper append `exit=<status>` to the event log after collecting the command's exit status on both success and failure (for example, `printf 'exit=%s\n' "$command_exit" >> "$EVENT_LOG"`). Keep final stdout JSON in a separate file so this sentinel does not corrupt it. The sentinel is wrapper metadata, not a CLI JSON event or proof of success.
+
+Watch newly appended lines with a terminating loop, then drain the final lines:
+
+```sh
+seen_lines=0
+read_new_lines() {
+  line_count=$(wc -l < "$EVENT_LOG")
+  if [ "$line_count" -gt "$seen_lines" ]; then
+    sed -n "$((seen_lines + 1)),${line_count}p" "$EVENT_LOG"
+    seen_lines=$line_count
+  fi
+}
+until grep -q '^exit=' "$EVENT_LOG"; do
+  read_new_lines
+  sleep 1
+done
+read_new_lines
+```
+
+Read the actual exit status before continuing. If the producer dies without writing its sentinel, detect that through the background session/process status and stop the watcher with an incomplete-command report. Cancel the associated watcher when its command is cancelled; do not leave monitors armed between onboarding steps.
+
 Structured events are JSON lines on **stderr**, alongside ordinary diagnostics. Final organization/analysis JSON stays on stdout. Read every stderr line, including ordinary warnings and error lines (such as `❌ Subscription creation failed (POST /billing/subscriptions)…`). Filter only when parsing events; never discard the rest of stderr. For events, parse only JSON objects with `schemaVersion: 1` and an `event` field:
 
 - `browser_required`: contains `step`, `actor: user`, `url`, and `message`. Explain the purpose and what the user must do in that page. Read `url` from the raw stderr JSON, before notification or UI rendering can turn `&` into `&amp;`. JSON-decode the field; do not copy an HTML-escaped display link or reconstruct the URL. Then open the **exact returned URL** with the same environment overrides:
