@@ -79,19 +79,13 @@ If a page returns 50 results, request the next page with `pageIndex` incremented
 
 **If `mcp__sonarqube__search_dependency_risks` is unavailable, fall back to the CLI.** This needs an explicit project key — if none was resolved in Step 1, ask the user or invoke sonar-list-projects, then stop.
 
-Run `sonar auth status` to check the connected server. On a self-hosted **SonarQube Server**:
+The same command works on SonarQube Server and SonarQube Cloud — `sonar api` routes the V2 path to the right host:
 
 ```bash
-sonar api get "/api/v2/sca/issues-releases?projectKey=<project-key>[&branchKey=<name>][&pullRequestKey=<id>]"
+sonar api get "/api/v2/sca/issues-releases?projectKey=<project-key>[&branchKey=<name>][&pullRequestKey=<id>]&pageIndex=1&pageSize=50"
 ```
 
-On **SonarQube Cloud**, `sonar api` can't reach this endpoint yet (lives on a separate subdomain; may change in a future CLI release) — run a fresh scan instead:
-
-```bash
-sonar analyze dependency-risks -p <project-key> --format table
-```
-
-This re-scans manifests rather than querying prior results, so it may surface issues not yet on the server dashboard — expected, not an error. Map its output into the same table as Step 4.
+Paginate the same way as the MCP call, using `page.total` from the response to know when you have every result. Each entry in `issuesReleases` carries the risk `key`, `status`, `severity`, `vulnerabilityId`, and the package under `release`.
 
 If this also fails, show the standard message above — don't guess further commands.
 
