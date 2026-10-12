@@ -278,6 +278,41 @@ const risks = get_file_coverage_details({
 // Step 4: Re-analyze on SonarQube to verify coverage is improved
 ```
 
+### Workflow 6: Triage Dependency Risks by Reachability
+
+Use this when the user asks "are we vulnerable to this CVE?", wants dependency risks triaged, or wants SAFE reasons prepared. A vulnerable package version alone is never a verdict.
+
+```javascript
+// Step 1: Fetch OPEN and CONFIRMED risks, paging until a page has fewer than 50 results
+const risks = search_dependency_risks({
+    projectKey: "my-project",
+    branchKey: "main",
+    pageIndex: 1,
+    pageSize: 50
+});
+
+// Step 2: For each unique package version, get advisory details
+// (vulnerable mechanism, CWEs, fixed versions, withdrawal status)
+const advisory = check_dependency({ /* package, version, package manager */ });
+
+// Step 3: Check whether the package ships at runtime (manifest, lockfile, build config)
+// Step 4: Search the codebase for call sites of the vulnerable API or configuration
+// Step 5: Assign one verdict per finding with file:line evidence
+```
+
+Use exactly one verdict per finding:
+
+- `VULNERABLE` — ships at runtime, the vulnerable precondition is reachable, and a fixed version exists
+- `VULNERABLE_NO_FIX` — reachable at runtime, but no upstream fixed version exists
+- `NOT_VULNERABLE` — the advisory is withdrawn, the dependency is dev/test/build-only and cannot process attacker-controlled input, or a narrow vulnerable API has no call sites after a complete runtime search
+- `NEEDS_HUMAN` — reachability, input control, or the advisory mechanism cannot be established with confidence (reflection, framework wiring, plugin loading, generated code, etc.)
+
+**Guardrails:**
+
+- Never mark a finding SAFE automatically. For `NOT_VULNERABLE`, prepare a self-contained writeup starting with "Not vulnerable because…" that the user pastes into the SonarQube UI.
+- Only upgrade dependencies when the user explicitly asks for fixes. Use one feature branch, one commit per package, and one pull request, and confirm before pushing and before opening the pull request.
+- After upgrading, re-run `sonar analyze dependency-risks` from the repository root to verify the remediated dependency graph.
+
 ## Configuration
 
 **Prerequisites:**

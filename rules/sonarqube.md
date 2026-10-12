@@ -80,7 +80,7 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 - "Check whether this vulnerable package is reachable"
 - "Prepare SAFE reasons for dependency risks"
 
-**What to do:** Invoke the `dependency-risk-triage` skill. It assesses reachability and can prepare user-authorized fixes (requires SonarQube Advanced Security).
+**What to do:** Invoke the `sonar-triage-dependency-risks` skill. It assesses reachability and can prepare user-authorized fixes (requires SonarQube Advanced Security).
 
 ### Fixing a Specific Issue
 **Example user requests:**

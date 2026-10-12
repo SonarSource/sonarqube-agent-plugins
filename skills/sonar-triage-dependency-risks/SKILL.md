@@ -1,22 +1,22 @@
 ---
-name: dependency-risk-triage
-description: Triage SonarQube or SonarCloud SCA dependency risks by CVE reachability, prepare safe UI writeups, and optionally bundle confirmed package fixes.
+name: sonar-triage-dependency-risks
+description: Triage SonarQube SCA dependency risks by CVE reachability, prepare safe UI writeups, and optionally bundle confirmed package fixes.
 argument-hint: "[project-key?] [--branch name] [--pr id] [--fix]"
-allowed-tools: Read, Edit, Write, Grep, Glob, Bash(sonar:*), Bash(git:*), Bash(gh:*), Bash(npm:*), Bash(yarn:*), Bash(pnpm:*), Bash(bun:*), Bash(mvn:*), Bash(./mvnw:*), Bash(gradle:*), Bash(./gradlew:*), Bash(pip:*), Bash(pipenv:*), Bash(poetry:*), Bash(uv:*), Bash(bundle:*), Bash(composer:*), Bash(dotnet:*), Bash(cargo:*), Bash(go:*), Agent, AskUserQuestion, mcp__sonarqube__search_dependency_risks, mcp__sonarqube__check_dependency
+allowed-tools: Read, Edit, Write, Grep, Glob, Bash(sonar:*), Bash(git:*), Bash(gh:*), Bash(npm:*), Bash(yarn:*), Bash(pnpm:*), Bash(bun:*), Bash(mvn:*), Bash(./mvnw:*), Bash(gradle:*), Bash(./gradlew:*), Bash(pip:*), Bash(pipenv:*), Bash(poetry:*), Bash(uv:*), Bash(bundle:*), Bash(composer:*), Bash(dotnet:*), Bash(cargo:*), Bash(go:*), Agent, AskUserQuestion, Skill, mcp__sonarqube__check_dependency
 ---
 
 # Dependency Risk Triage
 
-Use this skill to determine whether SonarQube or SonarCloud SCA findings are reachable in the current codebase. A vulnerable package version alone is never a verdict.
+Use this skill to determine whether SonarQube SCA findings are reachable in the current codebase. A vulnerable package version alone is never a verdict.
 
 ## Guardrails
 
-- Retrieve only `OPEN` and `CONFIRMED` findings. Preserve their server order in the final report.
+- Retrieve only `OPEN` and `CONFIRMED` findings. Preserve the order in which they were returned in the final report.
 - Never classify a risk as `NOT_VULNERABLE` from a clean search unless the advisory identifies a narrow vulnerable API and the search covers all runtime-reachable code.
 - Treat reflection, generated code, framework wiring, plugin loading, configuration-driven execution, and uncertain advisory details as `NEEDS_HUMAN` unless a focused subagent investigation produces decisive evidence.
-- Never automatically mark a SonarQube or SonarCloud finding SAFE. Prepare a paste-ready SAFE writeup for the user to apply in the UI.
+- Never automatically mark a SonarQube finding SAFE. Prepare a paste-ready SAFE writeup for the user to apply in the UI.
 - Never change the default branch. Never push or create a pull request without explicit user confirmation.
-- Use semantic navigation for source code searches. Use shell commands only for repository, package-manager, and Sonar operations.
+- Use semantic navigation for source code searches. Use shell commands only for repository, package-manager, and SonarQube operations.
 
 ## 1. Determine scope and mode
 
@@ -24,11 +24,11 @@ Determine whether the request targets one finding, a supplied ordered list, or t
 
 Use report-only mode for questions such as “are we vulnerable?” or when the request does not explicitly ask to fix risks. Use triage-and-fix mode only when the user explicitly requests fixes or passes `--fix`.
 
-Resolve the project and branch from the supplied arguments or the current Sonar integration. Map `--branch <name>` to `branchKey` and `--pr <id>` to `pullRequestKey`. Include an explicit `projectKey` only when the user supplied it, the integration requires it, or you resolved it from project configuration. Otherwise omit it and use the integration default. State the selected project, branch, scope, and mode before fetching findings.
+State the selected project, branch, scope, and mode before fetching findings.
 
 ## 2. Fetch and normalize findings
 
-Call `mcp__sonarqube__search_dependency_risks` with `pageIndex: 1` and `pageSize: 50`. Also pass the applicable `projectKey`, `branchKey`, or `pullRequestKey` from Step 1. Omit unused parameters. Fetch subsequent pages until a page contains fewer than 50 results.
+Invoke the sonar-dependency-risks skill with the project key, `--branch`, and `--pr` arguments the user supplied. That skill resolves the project, calls the MCP tool or its CLI fallback, and handles setup errors. If it reports that risks cannot be fetched, stop and relay its message. Work from the raw results it retrieved, not its severity-grouped table.
 
 Keep only `OPEN` and `CONFIRMED` risks. For each in-scope result, retain its key, CVE or vulnerability ID, severity, status, package name, version, package manager, direct or transitive status, and original result index. Group results by package and package manager.
 
@@ -67,24 +67,24 @@ Use exactly one verdict for each finding:
 | --- | --- |
 | `VULNERABLE` | The vulnerable code ships at runtime, the advisory precondition is reachable, and a fixed version exists. |
 | `VULNERABLE_NO_FIX` | The vulnerable code ships at runtime and is reachable, but no upstream fixed version exists. |
-| `NOT_VULNERABLE` | The advisory is withdrawn, the dependency is used only for development, testing, or build work and cannot process attacker-controlled input, or a narrow vulnerable API has no call sites after a complete runtime search. Prepare this verdict as a proposed SonarQube or SonarCloud `SAFE` status. |
+| `NOT_VULNERABLE` | The advisory is withdrawn, the dependency is used only for development, testing, or build work and cannot process attacker-controlled input, or a narrow vulnerable API has no call sites after a complete runtime search. Prepare this verdict as a proposed SonarQube `SAFE` status. |
 | `NEEDS_HUMAN` | Reachability, input control, advisory mechanism, or dynamic execution cannot be established with confidence. |
 
 Every verdict needs a concise rationale and one or two evidence items. Do not convert uncertainty into a negative result.
 
 ## 7. Report results
 
-Keep the server result order. Report a summary count, then emit an independent fenced block for every finding:
+Keep the returned result order. Report a summary count, then emit an independent fenced block for every finding:
 
 ```
-Risk: <CVE> — <package>@<version> (Sonar key: <key>)
+Risk: <CVE> — <package>@<version> (SonarQube key: <key>)
 Verdict: <VULNERABLE|VULNERABLE_NO_FIX|NOT_VULNERABLE|NEEDS_HUMAN>
 Fixed version: <version> (required for VULNERABLE only)
 Reason: <no more than three short sentences; maximum 400 characters>
 Evidence: <file:line or exact search summary>[, <second item>]
 ```
 
-For `VULNERABLE`, provide the recommended fixed version. For `VULNERABLE_NO_FIX`, omit `Fixed version` and state that no upstream fix exists in `Reason`. For `NOT_VULNERABLE`, add `Proposed UI status: SAFE` before `Reason`. Write `Reason` as a complete, copy-ready explanation that starts with `Not vulnerable because` and names the reachability or non-runtime evidence. Each block must stand alone because the user pastes it into the SonarQube or SonarCloud UI. Do not call a status-change API.
+For `VULNERABLE`, provide the recommended fixed version. For `VULNERABLE_NO_FIX`, omit `Fixed version` and state that no upstream fix exists in `Reason`. For `NOT_VULNERABLE`, add `Proposed UI status: SAFE` before `Reason`. Write `Reason` as a complete, copy-ready explanation that starts with `Not vulnerable because` and names the reachability or non-runtime evidence. Each block must stand alone because the user pastes it into the SonarQube UI. Do not call a status-change API.
 
 ## 8. Remediate only with explicit authorization
 
@@ -92,7 +92,7 @@ Enter this section only in triage-and-fix mode and after the user explicitly con
 
 Create a feature branch from the branch or pull-request head that was triaged. Use the current default branch only when no `--branch` or `--pr` was given. Before applying upgrades, confirm that the reported package version is present on that base. Apply direct dependency upgrades to a fixed version. For transitive dependencies, propose a pin only when it is high or blocker severity and has limited parent fan-out. For lower-severity, high-fan-out, or deeply integrated transitive dependencies, retain the `VULNERABLE` verdict and add a separate manual-remediation note with a suggested pin. Do not change a reachability verdict because its remediation needs human approval.
 
-Regenerate affected lockfiles and run the repository’s relevant validation. Run `sonar analyze dependency-risks` from the repository root to check the remediated dependency graph. Create one commit per package, with all CVEs resolved by that package in its commit message or body. Bundle all confirmed package commits into one pull request. Before publication, scan changed files for secrets and run the available Sonar analysis. Ask for confirmation immediately before `git push` and again immediately before creating the pull request.
+Regenerate affected lockfiles and run the repository’s relevant validation. Run `sonar analyze dependency-risks` from the repository root to check the remediated dependency graph. Create one commit per package, with all CVEs resolved by that package in its commit message or body. Bundle all confirmed package commits into one pull request. Before publication, scan changed files for secrets and run the available SonarQube analysis. Ask for confirmation immediately before `git push` and again immediately before creating the pull request.
 
 ## Completion checklist
 
