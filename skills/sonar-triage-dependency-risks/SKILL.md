@@ -11,7 +11,7 @@ Use this skill to determine whether SonarQube SCA findings are reachable in the 
 
 ## Guardrails
 
-- Retrieve only `OPEN` and `CONFIRMED` findings. Preserve the order in which they were returned in the final report.
+- Triage only `VULNERABILITY` findings with status `OPEN` or `CONFIRM`. Preserve the order in which they were returned in the final report.
 - Never classify a risk as `NOT_VULNERABLE` from a clean search unless the advisory identifies a narrow vulnerable API and the search covers all runtime-reachable code.
 - Treat reflection, generated code, framework wiring, plugin loading, configuration-driven execution, and uncertain advisory details as `NEEDS_HUMAN` unless a focused subagent investigation produces decisive evidence.
 - Never automatically mark a SonarQube finding SAFE. Prepare a paste-ready SAFE writeup for the user to apply in the UI.
@@ -30,7 +30,7 @@ State the selected project, branch, scope, and mode before fetching findings.
 
 Invoke the sonar-dependency-risks skill with the project key, `--branch`, and `--pr` arguments the user supplied. That skill resolves the project, calls the MCP tool or its CLI fallback, and handles setup errors. If it reports that risks cannot be fetched, stop and relay its message. Work from the raw results it retrieved, not its severity-grouped table.
 
-Keep only `OPEN` and `CONFIRMED` risks. For each in-scope result, retain its key, CVE or vulnerability ID, severity, status, package name, version, package manager, direct or transitive status, and original result index. Group results by package and package manager.
+Keep only risks whose `type` is `VULNERABILITY` and whose `status` is `OPEN` or `CONFIRM`. Never triage `MALWARE` risks by reachability, because malicious packages can execute at install time; list them first in the report as requiring immediate removal. License risks (`PROHIBITED_LICENSE`) have no reachability to assess; mention their count and leave them out. For each in-scope result, retain its key, CVE or vulnerability ID, severity, status, package name, version, package manager, direct or transitive status, and original result index. Group results by package and package manager.
 
 For each unique package version, call `mcp__sonarqube__check_dependency`. Keep the advisory mechanism, CWEs, fixed and unaffected versions, withdrawal status, and package metadata. If an advisory is withdrawn, classify that finding as `NOT_VULNERABLE` and record the stated withdrawal reason.
 
@@ -96,7 +96,7 @@ Regenerate affected lockfiles and run the repository’s relevant validation. Ru
 
 ## Completion checklist
 
-- Every in-scope OPEN or CONFIRMED finding has one verdict and evidence.
+- Every in-scope `OPEN` or `CONFIRM` vulnerability finding has one verdict and evidence.
 - No `NOT_VULNERABLE` verdict relies on package version alone or an incomplete source search.
 - UI writeups are concise, self-contained, and not automatically submitted.
 - Fixes, if authorized, use one branch, one commit per package, and one pull request.

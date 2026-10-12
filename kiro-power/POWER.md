@@ -283,7 +283,7 @@ const risks = get_file_coverage_details({
 Use this when the user asks "are we vulnerable to this CVE?", wants dependency risks triaged, or wants SAFE reasons prepared. A vulnerable package version alone is never a verdict.
 
 ```javascript
-// Step 1: Fetch OPEN and CONFIRMED risks, paging until a page has fewer than 50 results
+// Step 1: Fetch OPEN and CONFIRM vulnerability risks, paging until a page has fewer than 50 results
 const risks = search_dependency_risks({
     projectKey: "my-project",
     branchKey: "main",
