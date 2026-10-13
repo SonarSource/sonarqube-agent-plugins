@@ -10,6 +10,8 @@ SonarQube combines deterministic checks with AI-assisted workflows so quality ru
 
 The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, and Antigravity (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex analysis.
 
+Factory Droid supports the SonarQube plugin without agent hooks.
+
 How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Vortex analysis enabled, verification happens automatically after each edit with no manual invocation required.
 
 ## Prerequisites
@@ -148,6 +150,29 @@ After verifying Antigravity works, remove any duplicate legacy Gemini extension 
 For a fresh install, use the [recommended flow](#recommended-flow-full-integration) above.
 
 Same workflows as **[Usage](#usage)** once MCP is connected.
+
+---
+
+## Factory Droid
+
+Install the plugin from the SonarSource marketplace:
+
+```shell
+droid plugin marketplace add SonarSource/sonarqube-agent-plugins
+droid plugin install sonarqube@sonarqube-agent-plugins
+```
+
+Droid names the marketplace after the repository (`sonarqube-agent-plugins`), rather than the `sonar` name in `.claude-plugin/marketplace.json`. This is why the plugin is `sonarqube@sonarqube-agent-plugins`.
+
+The plugin brings the SonarQube MCP server from the root `mcp.json` through `sonar run mcp`, the `sonar-*` skills, and the `sonarqube-reviewer` subagent, which Droid shows as a droid.
+
+The plugin installs no hooks. Droid does not apply `claude-hooks/`, and there is no `sonar integrate factory` command. Secrets scanning and Vortex analysis hooks are not available in Droid.
+
+For one-time setup, install SonarQube CLI if needed, run `sonar auth login`, and keep a container runtime running. You can also use the `/sonarqube:sonar-integrate` skill. Restart the Droid session if the `sonarqube` MCP tools do not appear.
+
+Factory admins can register the marketplace and enable the plugin for everyone through managed settings, `extraKnownMarketplaces` and `enabledPlugins`. See [Factory docs: Plugins](https://docs.factory.com/harness/plugins).
+
+To uninstall, run `droid plugin uninstall sonarqube@sonarqube-agent-plugins`, then `droid plugin marketplace remove sonarqube-agent-plugins`.
 
 ---
 
