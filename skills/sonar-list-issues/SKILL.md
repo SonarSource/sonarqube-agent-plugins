@@ -81,21 +81,29 @@ Only include optional flags that were provided.
 
 ### Step 5: Format the results
 
-**If issues are found**, present a summary line then a table sorted by severity then line number:
+**If issues are found**, present a summary line then a table sorted by severity then line number. Write one row per issue with exactly the five columns below. Show severity as plain text, without emoji or other icons in table cells.
+
+Before writing each row, normalize every value from the issue data, including file paths and messages:
+
+1. Replace line breaks with a single space and collapse repeated whitespace.
+2. Escape each backslash first. Then escape each backtick, asterisk, underscore, angle bracket, square bracket, exclamation mark, tilde, ampersand, and pipe with a preceding backslash. Do this before joining cells with `|` so a value cannot create another column or use those characters as Markdown syntax.
+3. Use `—` only when a field has no value. Preserve values that are present; do not leave their cells empty.
+
+Keep each issue on one physical line. Pad columns if needed for terminal display, but keep the same five cells in every row.
 
 ```markdown
 ## SonarQube Issues — `my-project` (branch: `main`)
 
-Found **12 issue(s)**:
+Found **3 issue(s)**:
 
-| File                 | Line | Severity  | Rule         | Message                       |
-| -------------------- | ---- | --------- | ------------ | ----------------------------- |
-| src/auth/login.py    | 12   | 🔴 Blocker | python:S2077 | SQL injection risk            |
-| src/utils/helpers.py | 34   | 🟠 High    | python:S2259 | Null dereference              |
-| src/api/routes.py    | 67   | 🟡 Medium  | python:S3776 | Cognitive complexity too high |
+| File                 | Line | Severity | Rule         | Message                       |
+| -------------------- | ---- | -------- | ------------ | ----------------------------- |
+| src/auth/login.py    | 12   | Blocker  | python:S2077 | SQL injection risk            |
+| src/utils/helpers.py | 34   | High     | python:S2259 | Null dereference              |
+| src/api/routes.py    | 67   | Medium   | python:S3776 | Cognitive complexity too high |
 ```
 
-Severity icons (the label depends on the server version):
+If a visual severity cue helps, put it outside the table. Severity labels depend on the server version:
 - 🔴 Blocker
 - 🟠 Critical / High
 - 🟡 Major / Medium
