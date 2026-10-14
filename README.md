@@ -174,7 +174,7 @@ Factory admins can register the marketplace and enable the plugin for everyone t
 
 To uninstall, run `droid plugin uninstall sonarqube@sonarqube-agent-plugins`, then `droid plugin marketplace remove sonarqube-agent-plugins`.
 
-For maintainers: `droids/sonarqube-reviewer.agent.md` is a copy of `agents/sonarqube-reviewer.agent.md`. With its own manifest, Droid no longer translates `agents/` into droids, so keep the two files identical, and bump `.factory-plugin/plugin.json` with the other manifests at each release.
+For maintainers: `droids/sonarqube-reviewer.md` is the Droid version of `agents/sonarqube-reviewer.agent.md`. With its own manifest, Droid no longer translates `agents/` into droids, so the file carries Factory frontmatter (Factory tool IDs and `mcpServers`) and the same body: keep the bodies identical. Droid reads no field of `.factory-plugin/plugin.json`, so that manifest has no version to bump at release time.
 
 ---
 

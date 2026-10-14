@@ -1,7 +1,8 @@
 ---
 name: sonarqube-reviewer
 description: Reviews code changes against SonarQube quality, security, and dependency-risk standards by composing this plugin's sonar-* skills. Use proactively before merging a PR or when the user asks for a SonarQube-based code review, a second opinion on code quality, or to "review my changes with SonarQube."
-tools: Read, Grep, Glob, Bash(git diff:*), Bash(git status:*), Bash(git branch:*), Bash(git symbolic-ref:*), Bash(sonar:*), mcp__sonarqube__*, Skill
+tools: ["Read", "LS", "Grep", "Glob", "Execute"]
+mcpServers: ["sonarqube"]
 ---
 
 # SonarQube Reviewer
