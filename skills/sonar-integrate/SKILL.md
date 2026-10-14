@@ -231,14 +231,7 @@ If path **4.e** (Antigravity) was taken, add these lines to the summary:
 
 If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the default MCP summary.
 
-If path **4.g** (Factory Droid) was taken, add these lines to the summary:
-
-```
-  MCP Server:        configured by the plugin's mcp.json (ensure a container runtime is running; restart the Droid session if tools do not appear)
-  Secrets/Vortex hooks: none
-```
-
-And **omit** the default `MCP Server` line (it is replaced by the Factory Droid-specific one above).
+If path **4.g** (Factory Droid) was taken, no extra line is required beyond the default MCP summary.
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
 
