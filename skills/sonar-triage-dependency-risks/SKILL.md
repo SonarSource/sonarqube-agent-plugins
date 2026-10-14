@@ -63,12 +63,12 @@ Escalate one focused investigation to a subagent when reachability depends on re
 
 Use exactly one verdict for each finding:
 
-| Verdict | Required condition |
-| --- | --- |
-| `VULNERABLE` | The vulnerable code ships at runtime, the advisory precondition is reachable, and a fixed version exists. |
-| `VULNERABLE_NO_FIX` | The vulnerable code ships at runtime and is reachable, but no upstream fixed version exists. |
-| `NOT_VULNERABLE` | The advisory is withdrawn, the dependency is used only for development, testing, or build work and cannot process attacker-controlled input, or a narrow vulnerable API has no call sites after a complete runtime search. Prepare this verdict as a proposed SonarQube `SAFE` status. |
-| `NEEDS_HUMAN` | Reachability, input control, advisory mechanism, or dynamic execution cannot be established with confidence. |
+| Verdict             | Required condition                                                                                                                                                                                                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VULNERABLE`        | The vulnerable code ships at runtime, the advisory precondition is reachable, and a fixed version exists.                                                                                                                                                                              |
+| `VULNERABLE_NO_FIX` | The vulnerable code ships at runtime and is reachable, but no upstream fixed version exists.                                                                                                                                                                                           |
+| `NOT_VULNERABLE`    | The advisory is withdrawn, the dependency is used only for development, testing, or build work and cannot process attacker-controlled input, or a narrow vulnerable API has no call sites after a complete runtime search. Prepare this verdict as a proposed SonarQube `SAFE` status. |
+| `NEEDS_HUMAN`       | Reachability, input control, advisory mechanism, or dynamic execution cannot be established with confidence.                                                                                                                                                                           |
 
 Every verdict needs a concise rationale and one or two evidence items. Do not convert uncertainty into a negative result.
 
