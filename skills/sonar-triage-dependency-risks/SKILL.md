@@ -2,7 +2,7 @@
 name: sonar-triage-dependency-risks
 description: Triage SonarQube SCA dependency risks by CVE reachability, prepare safe UI writeups, and optionally bundle confirmed package fixes.
 argument-hint: "[project-key?] [--branch name] [--pr id] [--fix]"
-allowed-tools: Read, Edit, Write, Grep, Glob, Bash(sonar:*), Bash(git:*), Bash(gh:*), Bash(npm:*), Bash(yarn:*), Bash(pnpm:*), Bash(bun:*), Bash(mvn:*), Bash(./mvnw:*), Bash(gradle:*), Bash(./gradlew:*), Bash(pip:*), Bash(pipenv:*), Bash(poetry:*), Bash(uv:*), Bash(bundle:*), Bash(composer:*), Bash(dotnet:*), Bash(cargo:*), Bash(go:*), WebFetch, WebSearch, Agent, AskUserQuestion, Skill, mcp__sonarqube__check_dependency
+allowed-tools: Read, Grep, Glob, Bash(sonar:*), WebFetch, WebSearch, Agent, AskUserQuestion, Skill, mcp__sonarqube__check_dependency
 ---
 
 # Dependency Risk Triage
@@ -13,6 +13,8 @@ Use this skill to determine whether SonarQube SCA findings are reachable in the 
 
 - Triage only `VULNERABILITY` findings with status `OPEN` or `CONFIRM`. Preserve the order in which they were returned in the final report.
 - Never classify a risk as `NOT_VULNERABLE` from a clean search unless the advisory identifies a narrow vulnerable API and the search covers all runtime-reachable code.
+- Never classify a transitive dependency (`release.directSummary` is `false`) as `NOT_VULNERABLE` because the project's own code has no call sites. The parent library may call the vulnerable API, and semantic navigation does not index dependency code. Cap such verdicts at `NEEDS_HUMAN` unless the advisory is withdrawn or the dependency is non-runtime.
+- Treat a search with timed-out files (`timed_out_files`) or code in a language that semantic navigation does not support as incomplete. An incomplete search ends in `NEEDS_HUMAN`, never `NOT_VULNERABLE`.
 - Treat reflection, generated code, framework wiring, plugin loading, configuration-driven execution, and uncertain advisory details as `NEEDS_HUMAN` unless a focused subagent investigation produces decisive evidence.
 - Never automatically mark a SonarQube finding SAFE. Prepare a paste-ready SAFE writeup for the user to apply in the UI.
 - Never change the default branch. Never push or create a pull request without explicit user confirmation.
@@ -55,6 +57,8 @@ Start from the advisory details returned by `mcp__sonarqube__check_dependency`. 
 
 For supported languages, discover declarations with `sonar context navigation search-signatures`, then inspect callers with `trace-callers`. Use `search-bodies` for dynamic JavaScript or TypeScript call patterns. Search configuration and build files only when the mechanism requires them.
 
+A search without matches does not prove absence. If any search reports `timed_out_files`, or runtime code that could reach the package is in an unsupported language, the search is incomplete and the verdict is `NEEDS_HUMAN`.
+
 Record concise evidence as `file:line` references, or state the exact signal and the runtime scope searched when no call site exists.
 
 Escalate one focused investigation to a subagent when reachability depends on reflection, deserialization, framework auto-wiring, generated code, SPI or plugin loading, configuration-driven parsers, or several runtime services. Give the subagent the CVE, precondition, search signals, and runtime services. If its result is uncertain, use `NEEDS_HUMAN`.
@@ -63,12 +67,12 @@ Escalate one focused investigation to a subagent when reachability depends on re
 
 Use exactly one verdict for each finding:
 
-| Verdict             | Required condition                                                                                                                                                                                                                                                                     |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VULNERABLE`        | The vulnerable code ships at runtime, the advisory precondition is reachable, and a fixed version exists.                                                                                                                                                                              |
-| `VULNERABLE_NO_FIX` | The vulnerable code ships at runtime and is reachable, but no upstream fixed version exists.                                                                                                                                                                                           |
-| `NOT_VULNERABLE`    | The advisory is withdrawn, the dependency is used only for development, testing, or build work and cannot process attacker-controlled input, or a narrow vulnerable API has no call sites after a complete runtime search. Prepare this verdict as a proposed SonarQube `SAFE` status. |
-| `NEEDS_HUMAN`       | Reachability, input control, advisory mechanism, or dynamic execution cannot be established with confidence.                                                                                                                                                                           |
+| Verdict             | Required condition                                                                                                                                                                                                                                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VULNERABLE`        | The vulnerable code ships at runtime, the advisory precondition is reachable, and a fixed version exists.                                                                                                                                                                                                           |
+| `VULNERABLE_NO_FIX` | The vulnerable code ships at runtime and is reachable, but no upstream fixed version exists.                                                                                                                                                                                                                        |
+| `NOT_VULNERABLE`    | The advisory is withdrawn, the dependency is used only for development, testing, or build work and cannot process attacker-controlled input, or the dependency is direct and a narrow vulnerable API has no call sites after a complete runtime search. Prepare this verdict as a proposed SonarQube `SAFE` status. |
+| `NEEDS_HUMAN`       | Reachability, input control, advisory mechanism, or dynamic execution cannot be established with confidence, the search was incomplete, or a runtime transitive dependency has no call sites in project code.                                                                                                       |
 
 Every verdict needs a concise rationale and one or two evidence items. Do not convert uncertainty into a negative result.
 
@@ -88,7 +92,7 @@ For `VULNERABLE`, provide the recommended fixed version. For `VULNERABLE_NO_FIX`
 
 ## 8. Remediate only with explicit authorization
 
-Enter this section only in triage-and-fix mode and after the user explicitly confirms the selected fixes, branch push, and pull-request creation.
+Enter this section only in triage-and-fix mode and after the user explicitly confirms the selected fixes, branch push, and pull-request creation. The skill does not pre-approve file edits, `git`, `gh`, or package-manager commands, so each of these prompts for permission as usual.
 
 Create a feature branch from the branch or pull-request head that was triaged. Use the current default branch only when no `--branch` or `--pr` was given. Before applying upgrades, confirm that the reported package version is present on that base. Apply direct dependency upgrades to a fixed version. For transitive dependencies, propose a pin only when it is high or blocker severity and has limited parent fan-out. For lower-severity, high-fan-out, or deeply integrated transitive dependencies, retain the `VULNERABLE` verdict and add a separate manual-remediation note with a suggested pin. Do not change a reachability verdict because its remediation needs human approval.
 
@@ -97,6 +101,6 @@ Regenerate affected lockfiles and run the repository’s relevant validation. Ru
 ## Completion checklist
 
 - Every in-scope `OPEN` or `CONFIRM` vulnerability finding has one verdict and evidence.
-- No `NOT_VULNERABLE` verdict relies on package version alone or an incomplete source search.
+- No `NOT_VULNERABLE` verdict relies on package version alone, an incomplete source search, or missing call sites for a runtime transitive dependency.
 - UI writeups are concise, self-contained, and not automatically submitted.
 - Fixes, if authorized, use one branch, one commit per package, and one pull request.
