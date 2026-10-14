@@ -18,7 +18,7 @@ sonar-analyze src/auth/login.py      # analyze a specific file
 
 ## Prerequisites
 
-This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis` or `mcp__sonarqube__analyze_file_list` to be available in your session.
+This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_file_list`, or `mcp__sonarqube__analyze_code_snippet` to be available in your session.
 
 **Before proceeding**, verify at least one of these tools is accessible. If none are, try the CLI fallback in Step 3 before giving up — don't invent other CLI commands (e.g. `sonar mcp call` does not exist).
 
@@ -43,7 +43,7 @@ Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly
 
 ### Step 1: Resolve what to analyze
 
-Both analysis tools work on **one file at a time**. Resolve a single file path:
+Analyze **one file at a time**. Resolve a single file path:
 
 - If the user provided a file path, use it.
 - If no path was provided, look at the current conversation context for a recently mentioned or edited file.
@@ -53,40 +53,54 @@ Do not accept a directory as input. If the user provides one, ask them to specif
 
 ### Step 2: Read the file and determine its scope
 
-1. Read the file's full content — only needed as a fallback for `run_advanced_code_analysis`'s `fileContent` parameter (see Step 3).
+1. Read the file's full content for analysis tools whose schema requires `fileContent` (see Step 3).
 2. Determine the file scope: `"TEST"` or `"MAIN"`. Use the file path to deduce the scope. For example, if the file path contains `test`, `spec`, or `__tests__`, it's likely `"TEST"` scope.
 
 ### Step 3: Call the appropriate analysis tool
 
 After running the sonar-integrate skill, the SonarQube MCP Server often has a **default project** for this workspace, so **`projectKey` is sometimes unnecessary** — pass it only when the tool schema requires it or the user targets another project.
 
-Two tools may be available depending on whether the connected organization is eligible for Vortex analysis:
-
-**Try `mcp__sonarqube__run_advanced_code_analysis` first** (available when the organization is eligible for Vortex analysis).
+**Try `mcp__sonarqube__run_advanced_code_analysis` first if available.** On Cloud stdio, its presence does not prove that the selected organization is entitled to Vortex; entitlement is checked on each call.
 
 Before calling it, detect the current branch name using `git branch --show-current`. If git is unavailable, use `main` as a fallback.
 
-Then call with:
+Use the tool's published schema and call with:
 
+- `organization` — when the Cloud tool exposes it, pass the selected organization if one was chosen; otherwise use the server default
 - `projectKey` — **omit unless the tool requires it** (initial MCP configuration usually supplies the default project); if required, use the value from the user's arguments if provided, otherwise `sonar.projectKey` in `sonar-project.properties` at the repo root
-- `branchName` — detected branch name
+- `branch` — detected branch name
 - `filePath` — project-relative file path (e.g. `src/auth/login.py`)
 - `fileContent` — full file content; **only pass if the tool requires it** (when the MCP server has a mount, it reads the file directly and this parameter will not be required)
-- `fileScope` — `["TEST"]` or `["MAIN"]`
+- `fileScope` — `"TEST"` or `"MAIN"` as a string
 
-**If that tool is unavailable, fall back to `mcp__sonarqube__analyze_file_list`** (requires a running SonarQube for IDE instance bridged to this session):
+**If the tool is unavailable or returns an error containing `Vortex is not enabled`, continue with the local analysis fallbacks below.** Treat that error as Vortex being unavailable for the selected organization. Report other errors, including authentication or unresolved-organization errors, and stop instead of silently falling back.
+
+**Prefer `mcp__sonarqube__analyze_file_list` when available** (requires a running SonarQube for IDE instance bridged to this session):
 
 - `file_absolute_paths` — array containing the absolute path to the file (e.g. `["/home/user/project/src/auth/login.py"]`); resolve it from the file path found in Step 1
 
-**If neither MCP tool is available, fall back to the CLI's Vortex analysis:**
+This tool uses the IDE's project binding and has no `organization` parameter.
+
+**Otherwise, use `mcp__sonarqube__analyze_code_snippet` when available:**
+
+- `organization` — when exposed, preserve the organization selected for the advanced-analysis call
+- `projectKey` — pass only if exposed by the schema and needed for this project
+- `filePath` — project-relative path when the schema requires it (mounted workspace)
+- `fileContent` — complete file content when the schema requires it (unmounted workspace)
+- `language` — the file's language, using a value from the schema
+- `scope` — `"TEST"` or `"MAIN"` as a string
+
+`codeSnippet` only filters issues within the analyzed file; it does not replace required file content.
+
+**If no MCP analysis tool is available, fall back to the CLI's Vortex analysis:**
 
 ```bash
 sonar analyze agentic --file <file-path> [--file <other-file-path> ...] --format json [--branch <branch-name>] [-p <project-key>]
 ```
 
-Same backend as `run_advanced_code_analysis` (repeatable `--file` covers multi-file too), and the practical fallback for `analyze_file_list` as well — it has no direct CLI equivalent, but this achieves the same goal.
+This uses the same Vortex backend as `run_advanced_code_analysis` and requires an entitled organization. After a `Vortex is not enabled` error, skip this CLI fallback; if neither local MCP tool is available, explain that Vortex is unavailable for this organization and recommend connecting SonarQube for IDE.
 
-Requires a Vortex analysis-eligible organization. If the org isn't eligible, or `sonar` isn't installed/authenticated, show the standard message from Prerequisites — don't guess further commands.
+If the CLI fallback fails or `sonar` isn't installed/authenticated, show the standard message from Prerequisites — don't guess further commands.
 
 ### Step 4: Format the results
 
