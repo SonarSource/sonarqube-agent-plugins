@@ -26,7 +26,7 @@ Determine whether the request targets one finding, a supplied ordered list, or t
 
 Use report-only mode for questions such as “are we vulnerable?” or when the request does not explicitly ask to fix risks. Use triage-and-fix mode only when the user explicitly requests fixes or passes `--fix`.
 
-State the selected project, branch, scope, and mode before fetching findings.
+State the selected project, its bound directory, branch, scope, and mode before fetching findings.
 
 ## 2. Fetch and normalize findings
 
@@ -34,7 +34,7 @@ Invoke the sonar-dependency-risks skill with the project key, `--branch`, and `-
 
 Keep only risks whose `type` is `VULNERABILITY` and whose `status` is `OPEN` or `CONFIRM`. Never triage `MALWARE` risks by reachability, because malicious packages can execute at install time; list them first in the report as requiring immediate removal. License risks (`PROHIBITED_LICENSE`) have no reachability to assess; mention their count and leave them out. For each in-scope result, retain its key, CVE or vulnerability ID, severity, status, package name, version, package manager, direct or transitive status, and original result index. Group results by package and package manager.
 
-For each unique package version, call `mcp__sonarqube__check_dependency`. Keep the advisory mechanism, CWEs, fixed and unaffected versions, withdrawal status, and package metadata. If an advisory is withdrawn, classify that finding as `NOT_VULNERABLE` and record the stated withdrawal reason.
+For each unique package version, call `mcp__sonarqube__check_dependency`. If that tool is unavailable (for example, risks were fetched through the CLI fallback), read the advisory from GHSA or OSV with `WebFetch` instead; if fixed versions or withdrawal status still cannot be established, classify the finding as `NEEDS_HUMAN`. Keep the advisory mechanism, CWEs, fixed and unaffected versions, withdrawal status, and package metadata. If an advisory is withdrawn, classify that finding as `NOT_VULNERABLE` and record the stated withdrawal reason.
 
 ## 3. Determine whether the package ships at runtime
 
@@ -96,7 +96,7 @@ Enter this section only in triage-and-fix mode and after the user explicitly con
 
 Create a feature branch from the branch or pull-request head that was triaged. Use the current default branch only when no `--branch` or `--pr` was given. Before applying upgrades, confirm that the reported package version is present on that base. Apply direct dependency upgrades to a fixed version. For transitive dependencies, propose a pin only when it is high or blocker severity and has limited parent fan-out. For lower-severity, high-fan-out, or deeply integrated transitive dependencies, retain the `VULNERABLE` verdict and add a separate manual-remediation note with a suggested pin. Do not change a reachability verdict because its remediation needs human approval.
 
-Regenerate affected lockfiles and run the repository’s relevant validation. Run `sonar analyze dependency-risks` from the repository root to check the remediated dependency graph. Create one commit per package, with all CVEs resolved by that package in its commit message or body. Bundle all confirmed package commits into one pull request. Before publication, scan changed files for secrets and run the available SonarQube analysis. Ask for confirmation immediately before `git push` and again immediately before creating the pull request.
+Regenerate affected lockfiles and run the repository’s relevant validation. Run `sonar analyze dependency-risks` from the directory bound to the SonarQube project (the repository root for single-binding repositories) to check the remediated dependency graph. Create one commit per package, with all CVEs resolved by that package in its commit message or body. Bundle all confirmed package commits into one pull request. Before publication, scan changed files for secrets and run the available SonarQube analysis. Ask for confirmation immediately before `git push` and again immediately before creating the pull request.
 
 ## Completion checklist
 
