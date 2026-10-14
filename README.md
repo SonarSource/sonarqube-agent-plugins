@@ -153,28 +153,18 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ## Factory Droid
 
-Plugin bundle: **`.factory-plugin/`** (Droid's own manifest, with no hooks) and **`droids/`** (the subagent).
+**`.factory-plugin/`** with MCP via **`mcp.json`** and the reviewer in **`droids/`**. No hooks: secrets scanning and Vortex analysis hooks are not available in Droid.
 
-Install the plugin from the SonarSource marketplace:
+1. Install the plugin from the SonarSource marketplace:
 
 ```shell
 droid plugin marketplace add SonarSource/sonarqube-agent-plugins
 droid plugin install sonarqube@sonarqube-agent-plugins
 ```
 
-Droid names the marketplace after the repository (`sonarqube-agent-plugins`), rather than the `sonar` name in `.claude-plugin/marketplace.json`. This is why the plugin is `sonarqube@sonarqube-agent-plugins`.
+2. Run **`sonar auth login`**, or invoke the `/sonarqube:sonar-integrate` skill.
 
-The plugin brings the SonarQube MCP server from the root `mcp.json` through `sonar run mcp`, the `sonar-*` skills, and the `sonarqube-reviewer` droid.
-
-The plugin installs no hooks: its Factory manifest declares none, and there is no `sonar integrate factory` command. Secrets scanning and Vortex analysis hooks are not available in Droid.
-
-For one-time setup, install SonarQube CLI if needed, run `sonar auth login`, and keep a container runtime running. You can also use the `/sonarqube:sonar-integrate` skill. Restart the Droid session if the `sonarqube` MCP tools do not appear.
-
-Factory admins can register the marketplace and enable the plugin for everyone through managed settings, `extraKnownMarketplaces` and `enabledPlugins`. See [Factory docs: Plugins](https://docs.factory.com/harness/plugins).
-
-To uninstall, run `droid plugin uninstall sonarqube@sonarqube-agent-plugins`, then `droid plugin marketplace remove sonarqube-agent-plugins`.
-
-For maintainers: `droids/sonarqube-reviewer.md` is the Droid version of `agents/sonarqube-reviewer.agent.md`. With its own manifest, Droid no longer translates `agents/` into droids, so the file carries Factory frontmatter (Factory tool IDs and `mcpServers`) and the same body: keep the bodies identical. Droid reads no field of `.factory-plugin/plugin.json`, so that manifest has no version to bump at release time.
+<!-- Maintainers: droids/sonarqube-reviewer.md is the Droid version of agents/sonarqube-reviewer.agent.md. With its own manifest, Droid no longer imports agents/, so the droid keeps Factory frontmatter (Factory tool IDs, mcpServers) and the same body. Keep the bodies identical, and bump .factory-plugin/ with the other manifests at each release. -->
 
 ---
 

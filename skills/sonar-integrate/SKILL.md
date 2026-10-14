@@ -171,13 +171,9 @@ Recommend migrating to **Antigravity** (**4.e**): run **`agy plugin import gemin
 
 #### 4.g — Factory Droid
 
-The plugin's own **`mcp.json`** configures the SonarQube MCP Server. It starts through **`sonar run mcp`**, which detects the container runtime and authenticates automatically. Authentication was handled in Steps 2 and 3.
+Factory Droid starts the SonarQube MCP Server from the plugin's **`mcp.json`** via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
 
-There is no **`sonar integrate`** command for Factory Droid. Do not run one.
-
-Factory Droid gets the MCP Server and the plugin skills. It does not get secrets-scanning or Vortex analysis hooks.
-
-Make sure a container runtime is running, as described at the start of Step 4. Restart the Droid session if the **`sonarqube`** MCP tools do not appear.
+No `sonar integrate` command applies to Factory Droid. Factory Droid does not support SonarQube hooks or Vortex analysis wiring.
 
 ---
 
