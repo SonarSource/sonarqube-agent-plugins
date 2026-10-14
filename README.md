@@ -162,6 +162,8 @@ droid plugin marketplace add SonarSource/sonarqube-agent-plugins
 droid plugin install sonarqube@sonarqube-agent-plugins
 ```
 
+   Droid names the marketplace after the repository, not after the `name` in `marketplace.json`, so the plugin is `sonarqube@sonarqube-agent-plugins`.
+
 2. Run **`sonar auth login`**, or invoke the `/sonarqube:sonar-integrate` skill.
 
 <!-- Maintainers: droids/sonarqube-reviewer.md is the Droid version of agents/sonarqube-reviewer.agent.md. With its own manifest, Droid no longer imports agents/, so the droid keeps Factory frontmatter (Factory tool IDs, mcpServers) and the same body. Keep the bodies identical, and bump .factory-plugin/ with the other manifests at each release. -->
