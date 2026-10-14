@@ -166,7 +166,7 @@ droid plugin install sonarqube@sonarqube-agent-plugins
 
 2. Run **`sonar auth login`**, or invoke the `/sonarqube:sonar-integrate` skill.
 
-<!-- Maintainers: droids/sonarqube-reviewer.md is the Droid version of agents/sonarqube-reviewer.agent.md. With its own manifest, Droid no longer imports agents/, so the droid keeps Factory frontmatter (Factory tool IDs, mcpServers) and the same body. Keep the bodies identical, and bump .factory-plugin/ with the other manifests at each release. -->
+<!-- Maintainers: droids/sonarqube-reviewer.md is the Droid version of agents/sonarqube-reviewer.agent.md. With its own manifest, Droid no longer imports agents/, so the droid keeps Factory frontmatter (Factory tool IDs, mcpServers) and the same body. Its Execute is unrestricted because Factory cannot scope commands per droid; without it the reviewer could not run git diff or sonar. It has no edit tools. Keep the bodies identical, and bump .factory-plugin/ with the other manifests at each release. -->
 
 ---
 
