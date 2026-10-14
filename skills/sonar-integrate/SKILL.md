@@ -101,6 +101,7 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 - Cursor -> **4.d**
 - Antigravity -> **4.e**
 - Gemini CLI -> **4.f**
+- Factory Droid -> **4.g**
 
 #### 4.a — Claude Code (`sonar integrate claude`)
 
@@ -168,6 +169,12 @@ Confirm that integration is ready — the MCP server will start automatically wh
 
 Recommend migrating to **Antigravity** (**4.e**): run **`agy plugin import gemini`**, then **`sonar integrate antigravity`**. Gemini CLI did not support SonarQube hooks or Vortex analysis wiring.
 
+#### 4.g — Factory Droid
+
+Factory Droid starts the SonarQube MCP Server from the plugin's **`mcp.json`** via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
+
+No `sonar integrate` command applies to Factory Droid. Factory Droid does not support SonarQube hooks or Vortex analysis wiring.
+
 ---
 
 ### Summary message
@@ -219,6 +226,8 @@ If path **4.e** (Antigravity) was taken, add these lines to the summary:
 ```
 
 If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the default MCP summary.
+
+If path **4.g** (Factory Droid) was taken, no extra line is required beyond the default MCP summary.
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
 
