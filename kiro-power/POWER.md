@@ -72,7 +72,7 @@ Always resolve the project key using the following lookup order — **never gues
 // Analyze a single file with Vortex
 run_advanced_code_analysis({
     projectKey: "my-project",
-    branchName: "main",
+    branch: "main",
     filePath: "src/utils.ts",
     fileScope: "MAIN"
 });
@@ -81,13 +81,23 @@ run_advanced_code_analysis({
 - `fileContent` is optional — only pass it if the file isn't already accessible to the MCP server (e.g. no workspace mount configured).
 - `fileScope` is `"MAIN"` or `"TEST"`.
 
-**If the organization isn't Vortex-eligible, fall back to `analyze_file_list`** — this requires a running SonarQube for IDE instance bridged to the session:
+**If `run_advanced_code_analysis` is unavailable or returns an error containing `Vortex is not enabled`, try `analyze_file_list`** — this requires a running SonarQube for IDE instance bridged to the session:
 
 ```javascript
 analyze_file_list({
     file_absolute_paths: ["/workspace/src/utils.ts"]
 });
 ```
+
+**If the IDE tool is unavailable, use `analyze_code_snippet`** with `filePath` or `fileContent` as required by its schema, plus `language` and `scope` (`"MAIN"` or `"TEST"`). Preserve the selected `organization` for advanced and snippet analysis when the schema exposes it; IDE analysis uses the IDE's project binding.
+
+**If no MCP analysis tool is available, use the CLI only when no Vortex entitlement error occurred:**
+
+```bash
+sonar analyze agentic --file src/utils.ts --format json --branch main
+```
+
+The CLI uses the same Vortex backend. After a `Vortex is not enabled` error, skip it; if neither local MCP tool is available, recommend connecting SonarQube for IDE. Report other errors, including authentication or unresolved-organization errors, and stop.
 
 ### Issue Management
 
@@ -183,7 +193,7 @@ writeFile("/workspace/src/utils.js", updatedContent);
 // Step 2: Analyze the file with Vortex
 const analysis = run_advanced_code_analysis({
     projectKey: "my-project",
-    branchName: "main",
+    branch: "main",
     filePath: "src/utils.js",
     fileScope: "MAIN"
 });
@@ -366,10 +376,12 @@ const risks = get_file_coverage_details({
 **Cause:** Organization not Vortex-eligible, SonarQube for IDE not running, or analysis error
 **Solution:**
 
-1. If `run_advanced_code_analysis` is unavailable, notify the user that it's not possible without Vortex eligibility
-2. If falling back to `analyze_file_list`, notify the user that it's not possible without setting up the bridge to SonarQube for IDE
-3. Provide the correct project key for better context
-4. Review MCP server logs at `/app/storage/logs/mcp.log` in the container
+1. If `run_advanced_code_analysis` is unavailable or returns `Vortex is not enabled`, try `analyze_file_list`, then `analyze_code_snippet` if the IDE tool is unavailable
+2. If no MCP analysis tool is available and no Vortex entitlement error occurred, try `sonar analyze agentic`; skip this CLI path after an entitlement error
+3. If neither local MCP tool is available after an entitlement error, recommend connecting SonarQube for IDE
+4. Report other errors, including authentication or unresolved-organization errors, and stop
+5. Provide the correct project key for better context
+6. Review MCP server logs at `/app/storage/logs/mcp.log` in the container
 
 ## Tips
 
