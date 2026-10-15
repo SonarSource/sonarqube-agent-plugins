@@ -48,7 +48,7 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 - "Check this code for quality problems"
 - "Generate a method that does X and analyze it for issues"
 
-**What to do:** Invoke the `sonar-analyze` skill end-to-end. Try `mcp__sonarqube__run_advanced_code_analysis` first. If unavailable or it returns `Vortex is not enabled`, use `mcp__sonarqube__analyze_file_list` (IDE), then `mcp__sonarqube__analyze_code_snippet` if the IDE tool is unavailable. Use the CLI only when no MCP analysis tool is available and no Vortex entitlement error occurred. Report other errors and stop.
+**What to do:** Invoke the `sonar-analyze` skill end-to-end. Try `mcp__sonarqube__run_advanced_code_analysis` first. If unavailable or it returns `Vortex is not enabled`, use `mcp__sonarqube__analyze_file_list` (IDE), then `mcp__sonarqube__analyze_code_snippet` if the IDE tool is unavailable. Use the CLI only when no MCP analysis tool is available and no Vortex entitlement error occurred. After an entitlement error with no local MCP tool available, explain that local analysis requires restarting the MCP server with `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` and the `analysis` toolset enabled. Report other errors and stop.
 
 ### Coverage
 **Example user requests:**

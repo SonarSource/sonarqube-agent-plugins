@@ -62,6 +62,8 @@ After running the sonar-integrate skill, the SonarQube MCP Server often has a **
 
 **Try `mcp__sonarqube__run_advanced_code_analysis` first if available.** On Cloud stdio, its presence does not prove that the selected organization is entitled to Vortex; entitlement is checked on each call.
 
+Cloud stdio selects one analysis path at startup, so an advanced-analysis session may have no local fallback. `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` selects `analyze_code_snippet` directly, bypassing the IDE bridge; the `analysis` toolset must be enabled.
+
 Before calling it, detect the current branch name using `git branch --show-current`. If git is unavailable, use `main` as a fallback.
 
 Use the tool's published schema and call with:
@@ -98,7 +100,7 @@ This tool uses the IDE's project binding and has no `organization` parameter.
 sonar analyze agentic --file <file-path> [--file <other-file-path> ...] --format json [--branch <branch-name>] [-p <project-key>]
 ```
 
-This uses the same Vortex backend as `run_advanced_code_analysis` and requires an entitled organization. After a `Vortex is not enabled` error, skip this CLI fallback; if neither local MCP tool is available, explain that Vortex is unavailable for this organization and recommend connecting SonarQube for IDE.
+This uses the same Vortex backend as `run_advanced_code_analysis` and requires an entitled organization. After a `Vortex is not enabled` error, skip this CLI fallback. If neither local MCP tool is available, explain that the selected organization is not entitled to Vortex. To analyze it locally, restart the MCP server with `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` and the `analysis` toolset enabled; preserve the selected organization when retrying.
 
 If the CLI fallback fails or `sonar` isn't installed/authenticated, show the standard message from Prerequisites — don't guess further commands.
 

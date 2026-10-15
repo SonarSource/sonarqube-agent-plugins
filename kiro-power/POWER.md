@@ -91,13 +91,15 @@ analyze_file_list({
 
 **If the IDE tool is unavailable, use `analyze_code_snippet`** with `filePath` or `fileContent` as required by its schema, plus `language` and `scope` (`"MAIN"` or `"TEST"`). Preserve the selected `organization` for advanced and snippet analysis when the schema exposes it; IDE analysis uses the IDE's project binding.
 
+Cloud stdio selects one analysis path at startup. `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` selects snippets directly and bypasses the IDE bridge; the `analysis` toolset must be enabled.
+
 **If no MCP analysis tool is available, use the CLI only when no Vortex entitlement error occurred:**
 
 ```bash
 sonar analyze agentic --file src/utils.ts --format json --branch main
 ```
 
-The CLI uses the same Vortex backend. After a `Vortex is not enabled` error, skip it; if neither local MCP tool is available, recommend connecting SonarQube for IDE. Report other errors, including authentication or unresolved-organization errors, and stop.
+The CLI uses the same Vortex backend. After a `Vortex is not enabled` error, skip it. If neither local MCP tool is available, explain that local analysis requires restarting the MCP server with `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` and the `analysis` toolset enabled; preserve the selected organization when retrying. Report other errors, including authentication or unresolved-organization errors, and stop.
 
 ### Issue Management
 
@@ -415,7 +417,7 @@ Use exactly one verdict per finding:
 
 1. If `run_advanced_code_analysis` is unavailable or returns `Vortex is not enabled`, try `analyze_file_list`, then `analyze_code_snippet` if the IDE tool is unavailable
 2. If no MCP analysis tool is available and no Vortex entitlement error occurred, try `sonar analyze agentic`; skip this CLI path after an entitlement error
-3. If neither local MCP tool is available after an entitlement error, recommend connecting SonarQube for IDE
+3. If neither local MCP tool is available after an entitlement error, explain that local analysis requires restarting the MCP server with `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` and the `analysis` toolset enabled, then retry with the selected organization
 4. Report other errors, including authentication or unresolved-organization errors, and stop
 5. Provide the correct project key for better context
 6. Review MCP server logs at `/app/storage/logs/mcp.log` in the container
