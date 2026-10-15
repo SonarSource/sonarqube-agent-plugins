@@ -313,7 +313,7 @@ Use exactly one verdict per finding:
 - A search without matches does not prove absence. If the search timed out on any files, or runtime code that could reach the package is in a language the search does not support, treat it as incomplete and use `NEEDS_HUMAN`, never `NOT_VULNERABLE`.
 - Never mark a finding SAFE automatically. For `NOT_VULNERABLE`, prepare a self-contained writeup starting with "Not vulnerable because…" that the user pastes into the SonarQube UI.
 - Only upgrade dependencies when the user explicitly asks for fixes. Use one feature branch, one commit per package, and one pull request, and confirm before pushing and before opening the pull request.
-- After upgrading, re-run `sonar analyze dependency-risks` from the repository root to verify the remediated dependency graph.
+- After upgrading, re-run `sonar analyze dependency-risks` from the directory bound to the SonarQube project (the repository root for single-binding repositories) to verify the remediated dependency graph.
 
 ## Configuration
 
