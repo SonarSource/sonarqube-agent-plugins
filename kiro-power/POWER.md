@@ -304,11 +304,13 @@ Use exactly one verdict per finding:
 
 - `VULNERABLE` — ships at runtime, the vulnerable precondition is reachable, and a fixed version exists
 - `VULNERABLE_NO_FIX` — reachable at runtime, but no upstream fixed version exists
-- `NOT_VULNERABLE` — the advisory is withdrawn, the dependency is dev/test/build-only and cannot process attacker-controlled input, or a narrow vulnerable API has no call sites after a complete runtime search
-- `NEEDS_HUMAN` — reachability, input control, or the advisory mechanism cannot be established with confidence (reflection, framework wiring, plugin loading, generated code, etc.)
+- `NOT_VULNERABLE` — the advisory is withdrawn, the dependency is dev/test/build-only and cannot process attacker-controlled input, or the dependency is direct and a narrow vulnerable API has no call sites after a complete runtime search
+- `NEEDS_HUMAN` — reachability, input control, or the advisory mechanism cannot be established with confidence (reflection, framework wiring, plugin loading, generated code, etc.), the search was incomplete, or a runtime transitive dependency has no call sites in project code
 
 **Guardrails:**
 
+- Never classify a transitive dependency (`release.directSummary` is `false`) as `NOT_VULNERABLE` because project code has no call sites. The parent library may call the vulnerable API, and a project code search does not cover dependency code. Use `NEEDS_HUMAN` unless the advisory is withdrawn or the dependency is non-runtime.
+- A search without matches does not prove absence. If the search timed out on any files, or runtime code that could reach the package is in a language the search does not support, treat it as incomplete and use `NEEDS_HUMAN`, never `NOT_VULNERABLE`.
 - Never mark a finding SAFE automatically. For `NOT_VULNERABLE`, prepare a self-contained writeup starting with "Not vulnerable because…" that the user pastes into the SonarQube UI.
 - Only upgrade dependencies when the user explicitly asks for fixes. Use one feature branch, one commit per package, and one pull request, and confirm before pushing and before opening the pull request.
 - After upgrading, re-run `sonar analyze dependency-risks` from the repository root to verify the remediated dependency graph.
