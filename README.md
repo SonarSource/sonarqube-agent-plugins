@@ -263,6 +263,9 @@ MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqub
 
 /sonarqube:sonar-dependency-risks
 /sonarqube:sonar-dependency-risks my-project --pr 42
+
+/sonarqube:sonar-triage-dependency-risks
+/sonarqube:sonar-triage-dependency-risks my-project --branch main --fix
 ```
 
 ---
