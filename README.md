@@ -8,7 +8,7 @@ SonarQube combines deterministic checks with AI-assisted workflows so quality ru
 
 ## What do the plugins include
 
-The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, and Antigravity (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex analysis.
+The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, Antigravity, and Devin (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex analysis.
 
 How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Vortex analysis enabled, verification happens automatically after each edit with no manual invocation required.
 
@@ -38,6 +38,7 @@ sonar integrate copilot       # GitHub Copilot CLI: MCP, hooks, secrets scanning
 sonar integrate codex         # Codex: MCP, hooks, secrets scanning, Vortex analysis hook
 sonar integrate antigravity   # Antigravity: hooks, instructions, CAG, MCP patch (after plugin install)
 sonar integrate cursor        # Cursor: MCP, secret-scanning hooks, Vortex analysis instructions
+sonar integrate devin         # Devin: MCP, hooks, secrets scanning, Vortex analysis
 ```
 
 Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill if you prefer a guided flow (install/update CLI, login, then integrate).
@@ -167,6 +168,20 @@ droid plugin install sonarqube@sonarqube-agent-plugins
 2. Run **`sonar auth login`**, or invoke the `/sonarqube:sonar-integrate` skill.
 
 <!-- Maintainers: droids/sonarqube-reviewer.md is the Droid version of agents/sonarqube-reviewer.agent.md. With its own manifest, Droid no longer imports agents/, so the droid keeps Factory frontmatter (Factory tool IDs, mcpServers) and the same body. Its Execute is unrestricted because Factory cannot scope commands per droid; without it the reviewer could not run git diff or sonar. It has no edit tools. Keep the bodies identical, and bump .factory-plugin/ with the other manifests at each release. -->
+
+---
+
+## Devin
+
+**`.devin-plugin/`** with MCP via **`mcp.json`**.
+
+1. Install the plugin from GitHub:
+
+```shell
+devin plugins install SonarSource/sonarqube-agent-plugins
+```
+
+2. Run **`sonar auth login`**, then **`sonar integrate devin`**, or invoke the `/sonarqube:sonar-integrate` skill. Restart the Devin session afterwards so the hooks and MCP configuration are loaded.
 
 ---
 
