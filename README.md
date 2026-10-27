@@ -6,6 +6,8 @@ SonarQube is the AI code quality and security verification platform used by mill
 
 SonarQube combines deterministic checks with AI-assisted workflows so quality rules apply consistently to code from both developers and agents. Where your stack supports it, analysis and secrets scanning can run inside the agent loop instead of only in CI.
 
+<!-- Maintainers: at each release, bump "version" in every manifest: plugin.json, gemini-extension.json, .claude-plugin/plugin.json, .codex-plugin/plugin.json, .cursor-plugin/plugin.json, .devin-plugin/plugin.json, .factory-plugin/plugin.json, .github/plugin/plugin.json, and in the marketplace files .claude-plugin/marketplace.json, .cursor-plugin/marketplace.json, .factory-plugin/marketplace.json, .github/plugin/marketplace.json. Nothing checks that they agree. -->
+
 ## What do the plugins include
 
 The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, and Antigravity (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex analysis.

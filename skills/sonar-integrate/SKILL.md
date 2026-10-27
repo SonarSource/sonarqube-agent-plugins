@@ -102,6 +102,7 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 - Antigravity -> **4.e**
 - Gemini CLI -> **4.f**
 - Factory Droid -> **4.g**
+- Devin -> **4.h**
 
 #### 4.a — Claude Code (`sonar integrate claude`)
 
@@ -175,6 +176,18 @@ Factory Droid starts the SonarQube MCP Server from the plugin's **`mcp.json`** v
 
 No `sonar integrate` command applies to Factory Droid. Factory Droid does not support SonarQube hooks or Vortex analysis wiring.
 
+#### 4.h — Devin (`sonar integrate devin`)
+
+Run **`sonar integrate devin`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and—when available—**Vortex analysis hooks**, applying to all Devin sessions on this machine.
+
+Run this command yourself using a shell command:
+
+```bash
+sonar integrate devin --non-interactive
+```
+
+Tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running, and to restart the Devin session so the new hooks and MCP configuration are loaded.
+
 ---
 
 ### Summary message
@@ -228,6 +241,12 @@ If path **4.e** (Antigravity) was taken, add these lines to the summary:
 If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the default MCP summary.
 
 If path **4.g** (Factory Droid) was taken, no extra line is required beyond the default MCP summary.
+
+If path **4.h** (Devin) was taken, add this line to the summary:
+
+```
+  Hooks & MCP:       wired via sonar integrate devin (restart the Devin session to load them)
+```
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
 
