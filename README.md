@@ -183,8 +183,6 @@ devin plugins install SonarSource/sonarqube-agent-plugins
 
 2. Run **`sonar auth login`**, then **`sonar integrate devin`**, or invoke the `/sonarqube:sonar-integrate` skill. Restart the Devin session afterwards so the hooks and MCP configuration are loaded.
 
-Same workflows as **[Usage](#usage)** once MCP is connected.
-
 ---
 
 ## Codex CLI
