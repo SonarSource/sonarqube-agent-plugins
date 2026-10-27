@@ -24,6 +24,7 @@
     "category": "Developer Tools",
     "capabilities": ["Read", "Interactive"],
     "websiteURL": "https://www.sonarsource.com",
+    "supportURL": "https://community.sonarsource.com/",
     "privacyPolicyURL": "https://www.sonarsource.com/company/privacy/",
     "termsOfServiceURL": "https://www.sonarsource.com/legal/sonarcloud/terms-of-service/",
     "defaultPrompt": [
