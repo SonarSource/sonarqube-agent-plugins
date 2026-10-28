@@ -8,7 +8,7 @@ SonarQube combines deterministic checks with AI-assisted workflows so quality ru
 
 ## What do the plugins include
 
-The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, Antigravity, and Devin (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex analysis.
+The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, Antigravity, Devin, and Pi (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex analysis.
 
 How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Vortex analysis enabled, verification happens automatically after each edit with no manual invocation required.
 
@@ -39,6 +39,7 @@ sonar integrate codex         # Codex: MCP, hooks, secrets scanning, Vortex anal
 sonar integrate antigravity   # Antigravity: hooks, instructions, CAG, MCP patch (after plugin install)
 sonar integrate cursor        # Cursor: MCP, secret-scanning hooks, Vortex analysis instructions
 sonar integrate devin         # Devin: MCP, hooks, secrets scanning, Vortex analysis
+sonar integrate pi            # Pi: MCP, hooks, secrets scanning, Vortex analysis
 ```
 
 Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill if you prefer a guided flow (install/update CLI, login, then integrate).
@@ -213,6 +214,18 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 Plugin includes **MCP configuration** (**`kiro-power/mcp.json`**) that runs the **`mcp/sonarqube`** image and **relies on SonarQube CLI** for authentication—the same **`sonar auth login`** session.
 
 **`sonar auth login`**, then enable the power per Kiro’s documentation.
+
+---
+
+## Pi
+
+1. Install the SonarQube plugin:
+
+   ```bash
+   pi install git:github.com/SonarSource/sonarqube-agent-plugins
+   ```
+
+2. Run **`sonar integrate pi`**, or invoke the **`/skill:sonar-integrate`** skill.
 
 ---
 
