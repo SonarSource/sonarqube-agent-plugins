@@ -40,7 +40,7 @@ sonar integrate antigravity   # Antigravity: hooks, instructions, CAG, MCP patch
 sonar integrate cursor        # Cursor: MCP, secret-scanning hooks, Vortex analysis instructions
 sonar integrate devin         # Devin: MCP, hooks, secrets scanning, Vortex analysis
 sonar integrate pi            # Pi: MCP, hooks, secrets scanning, Vortex analysis
-sonar integrate opencode      # OpenCode: hooks, secrets scanning, Vortex analysis (plugin registers MCP)
+sonar integrate opencode      # OpenCode: MCP, hooks, secrets scanning, Vortex analysis
 ```
 
 Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill if you prefer a guided flow (install/update CLI, login, then integrate).
