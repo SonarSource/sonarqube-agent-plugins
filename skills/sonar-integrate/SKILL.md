@@ -191,7 +191,7 @@ Tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is runn
 
 #### 4.i — Pi (`sonar integrate pi`)
 
-Run this command yourself to configure **hooks** and—when available—**Vortex analysis**:
+Run this command yourself to configure the **SonarQube MCP Server**, **hooks**, and—when available—**Vortex analysis**:
 
 ```bash
 sonar integrate pi --non-interactive
