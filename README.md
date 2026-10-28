@@ -216,6 +216,18 @@ Plugin includes **MCP configuration** (**`kiro-power/mcp.json`**) that runs the 
 
 ---
 
+## Pi
+
+1. Install the SonarQube plugin:
+
+   ```bash
+   pi install git:github.com/SonarSource/sonarqube-agent-plugins
+   ```
+
+2. Run **`sonar integrate pi`**, or invoke the **`/skill:sonar-integrate`** skill.
+
+---
+
 ## Gemini CLI *(legacy)*
 
 **`gemini-extension.json`** and **`GEMINI.md`**. **`sonar auth login`** and **[Usage](#usage)**.

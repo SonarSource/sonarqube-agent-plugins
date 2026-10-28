@@ -14,7 +14,7 @@ Interaction rule: for every finite decision, always present predefined selector 
 
 ### Step 1 — Check for sonarqube-cli and update it
 
-Check if `sonar` is available on the PATH by running `which sonar` (macOS/Linux) or `Get-Command sonar` (Windows) yourself.
+Check if the CLI is available by running `sonar --version` (macOS/Linux) or `sonar.exe --version` (Windows) yourself; a zero exit code (version printed) means found.
 
 **If found:** first determine how it was installed, because the upgrade path differs:
 
@@ -34,7 +34,7 @@ The shell/PowerShell script is the default and works everywhere. If the user alr
 | Any OS (mise)            | `mise use -g aqua:SonarSource/sonarqube-cli`                                                                             |
 | Windows (PowerShell)     | `irm https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.ps1 \| iex`      |
 
-**If the user confirms:** run the command yourself using a shell command. After it finishes, re-run the PATH check (`which sonar` or `Get-Command sonar`) yourself to verify before continuing.
+**If the user confirms:** run the command yourself using a shell command. After it finishes, re-run the version check (`sonar --version` or `sonar.exe --version`) yourself to verify before continuing.
 
 **If the user declines:** stop the skill and ask the user to install `sonarqube-cli` manually and then re-invoke the sonar-integrate skill.
 
@@ -103,6 +103,7 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 - Gemini CLI -> **4.f**
 - Factory Droid -> **4.g**
 - Devin -> **4.h**
+- Pi -> **4.i**
 
 #### 4.a — Claude Code (`sonar integrate claude`)
 
@@ -188,6 +189,16 @@ sonar integrate devin --non-interactive
 
 Tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running, and to restart the Devin session so the new hooks and MCP configuration are loaded.
 
+#### 4.i — Pi (`sonar integrate pi`)
+
+Run this command yourself to configure **hooks** and—when available—**Vortex analysis**:
+
+```bash
+sonar integrate pi --non-interactive
+```
+
+Tell the user to restart Pi to load the integration. The plugin's extension registers MCP automatically.
+
 ---
 
 ### Summary message
@@ -246,6 +257,12 @@ If path **4.h** (Devin) was taken, add this line to the summary:
 
 ```
   Hooks & MCP:       wired via sonar integrate devin (restart the Devin session to load them)
+```
+
+If path **4.i** (Pi) was taken, add this line to the summary:
+
+```
+  CLI integrate:     wired via sonar integrate pi
 ```
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
