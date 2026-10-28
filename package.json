@@ -17,11 +17,21 @@
   "repository": "https://github.com/SonarSource/sonarqube-agent-plugins",
   "homepage": "https://www.sonarsource.com",
   "private": true,
+  "exports": {
+    ".": "./.opencode-plugin/index.ts"
+  },
   "pi": {
     "skills": ["./skills"],
     "extensions": ["./.pi-plugin/sonar-mcp.ts"]
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
+  },
+  "dependencies": {
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@opencode/plugin": "^2.0.16",
+    "@types/node": "^24.19.2"
   }
 }
