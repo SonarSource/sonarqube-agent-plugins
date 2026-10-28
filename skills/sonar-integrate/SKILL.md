@@ -93,122 +93,21 @@ verify before continuing.
 
 > **Container runtime requirement:** The SonarQube MCP Server runs inside a container, started via `sonar run mcp` (which detects Docker, Podman, or Nerdctl). A container runtime must be **installed and running** for the MCP tools to load — otherwise integration can complete successfully yet no `mcp__sonarqube__*` tools appear in the session. **Verify this yourself:** run `docker ps` (falling back to `podman ps` / `nerdctl ps`). If one succeeds, the runtime is up — proceed. If none do, tell the user their container runtime is not running and ask them to start it, then note they must restart the agent session afterward for the tools to load (starting the daemon and restarting the session are the only parts you cannot do for them).
 
-Pick exactly one branch below based on which agent you are. Do not run the other branches.
-
-- Claude Code -> **4.a**
-- Copilot CLI -> **4.b**
-- Codex -> **4.c**
-- Cursor -> **4.d**
-- Antigravity -> **4.e**
-- Gemini CLI -> **4.f**
-- Factory Droid -> **4.g**
-- Devin -> **4.h**
-- Pi -> **4.i**
-- OpenCode -> **4.j**
-
-#### 4.a — Claude Code (`sonar integrate claude`)
-
-Run **`sonar integrate claude`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
-
-It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Claude Code config, applying to all Claude Code sessions on this machine. When available, SonarQube Vortex analysis hooks are also installed.
-
-Run this command yourself using a shell command:
+For the current agent, run this command yourself using a shell command:
 
 ```bash
-sonar integrate claude --non-interactive
+sonar integrate <agent> --non-interactive
 ```
 
-#### 4.b — Copilot CLI (`sonar integrate copilot`)
+Use the current agent's name: `claude`, `copilot`, `codex`, `cursor`, `antigravity`, `devin`, `pi`, or `opencode`.
 
-Run **`sonar integrate copilot`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and any other supported integration the CLI applies.
+Exceptions:
 
-It wires **MCP** (for skills like sonar-quality-gate, sonar-analyze, sonar-coverage, sonar-duplication, sonar-dependency-risks) and **secrets-scanning hooks** into the user’s Copilot CLI config, applying to all Copilot CLI sessions on this machine.
+- **Cursor:** After the command completes, tell the user to open **Settings → MCP** and enable the `sonarqube` entry.
+- **Gemini CLI (legacy):** Skip the command; the extension's `gemini-extension.json` already configures the SonarQube MCP Server via `sonar run mcp`. Recommend migrating to Antigravity with `agy plugin import gemini`, then `sonar integrate antigravity --non-interactive`.
+- **Factory Droid:** Skip the command; the plugin's `mcp.json` already configures the SonarQube MCP Server via `sonar run mcp`.
 
-Run this command yourself using a shell command:
-
-```bash
-sonar integrate copilot --non-interactive
-```
-
-#### 4.c — Codex (`sonar integrate codex`)
-
-Run **`sonar integrate codex`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and—when your SonarQube Cloud org has Vortex analysis—a **PostToolUse** hook on **`apply_patch`** that surfaces findings inline after edits, applying to all Codex sessions on this machine.
-
-Run this command yourself using a shell command:
-
-```bash
-sonar integrate codex --non-interactive
-```
-
-#### 4.d — Cursor (`sonar integrate cursor`)
-
-Run **`sonar integrate cursor`**, which configures **secrets-scanning hooks** (`beforeSubmitPrompt`, `beforeReadFile`, and `preToolUse`), **MCP**, **Context Augmentation** (when entitled), and **Vortex analysis instructions** (when entitled), applying to all Cursor sessions on this machine. Note: Cursor's cloud/background agents only pick up hooks installed in the project itself, not machine-wide ones, so those agents won't see the installed hooks.
-
-Run this command yourself using a shell command:
-
-```bash
-sonar integrate cursor --non-interactive
-```
-
-After integrate completes, tell the user to enable the MCP server manually in Cursor: open **Settings → MCP**, find the `sonarqube` entry, and toggle it on. Also tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running. A Cursor session restart may be needed for the tools to appear.
-
-#### 4.e — Antigravity (`sonar integrate antigravity`)
-
-Run **`sonar integrate antigravity`**, which configures **secrets-scanning hooks**, **prompt-secrets and Vortex analysis instructions**, **Context Augmentation** (when entitled), and **MCP** in the Antigravity harness, applying to all Antigravity sessions on this machine.
-
-Run this command yourself using a shell command:
-
-```bash
-sonar integrate antigravity --non-interactive
-```
-
-Tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running, and to restart the Antigravity session if MCP tools do not appear after integrate completes.
-
-#### 4.f — Gemini CLI *(legacy)*
-
-Gemini CLI starts the SonarQube MCP Server via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
-
-Confirm that integration is ready — the MCP server will start automatically when Gemini CLI reads **`gemini-extension.json`**.
-
-Recommend migrating to **Antigravity** (**4.e**): run **`agy plugin import gemini`**, then **`sonar integrate antigravity`**. Gemini CLI did not support SonarQube hooks or Vortex analysis wiring.
-
-#### 4.g — Factory Droid
-
-Factory Droid starts the SonarQube MCP Server from the plugin's **`mcp.json`** via `sonar run mcp`, which handles container runtime detection (Docker, Podman, Nerdctl) and authentication automatically. Authentication was handled in Steps 2–3.
-
-No `sonar integrate` command applies to Factory Droid. Factory Droid does not support SonarQube hooks or Vortex analysis wiring.
-
-#### 4.h — Devin (`sonar integrate devin`)
-
-Run **`sonar integrate devin`**, which configures the **SonarQube MCP Server**, **secrets-scanning hooks**, and—when available—**Vortex analysis hooks**, applying to all Devin sessions on this machine.
-
-Run this command yourself using a shell command:
-
-```bash
-sonar integrate devin --non-interactive
-```
-
-Tell the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running, and to restart the Devin session so the new hooks and MCP configuration are loaded.
-
-#### 4.i — Pi (`sonar integrate pi`)
-
-Run this command yourself to configure the **SonarQube MCP Server**, **hooks**, and—when available—**Vortex analysis**:
-
-```bash
-sonar integrate pi --non-interactive
-```
-
-Tell the user to restart Pi to load the integration. The plugin's extension registers MCP automatically.
-
-#### 4.j — OpenCode (`sonar integrate opencode`)
-
-Run this command yourself to configure the **SonarQube MCP Server**, **hooks**, and—when available—**Vortex analysis**:
-
-```bash
-sonar integrate opencode --non-interactive
-```
-
-Tell the user to restart OpenCode to load the integration. The plugin registers MCP automatically.
+After integration completes, tell the user to ensure Docker, Podman, or Nerdctl is running, then restart the current agent session to load the configuration.
 
 ---
 
@@ -221,65 +120,27 @@ After all steps complete, print a summary:
 
   sonarqube-cli:     up to date
   Authentication:    token stored in system keychain
-  MCP Server:        configured (ensure a container runtime (Docker, Podman, or Nerdctl) is running, then restart the agent session if tools do not appear)
+  Integration:       configured
+
+Ensure Docker, Podman, or Nerdctl is running, then restart the current agent session to load the configuration.
 
 You can verify at any time with:  sonar auth status
 To refresh CLI + wiring later:    invoke the sonar-integrate skill again
 ```
 
-If path **4.a** (Claude Code) was taken, add this line to the summary:
+For **Cursor**, insert this message before the container runtime and restart instruction:
 
 ```
-  Secrets scanning:  hooks registered via sonar integrate claude
+Enable the sonarqube entry in Cursor Settings → MCP before restarting.
 ```
 
-If path **4.b** (Copilot CLI) was taken, add this line to the summary:
+For **Gemini CLI (legacy)**, add:
 
-```
-  Secrets scanning:  hooks registered via sonar integrate copilot
-```
+Consider migrating to Antigravity. To migrate, run:
 
-If path **4.c** (Codex) was taken, add this line to the summary:
-
-```
-  Hooks & MCP:       wired via sonar integrate codex
-```
-
-If path **4.d** (Cursor) was taken, add these lines to the summary:
-
-```
-  CLI integrate:     wired via sonar integrate cursor
-  MCP Server:        enable manually in Cursor Settings → MCP (ensure a container runtime (Docker, Podman, or Nerdctl) is running; restart may be needed)
-```
-
-And **omit** the default `MCP Server` line (it is replaced by the Cursor-specific one above).
-
-If path **4.e** (Antigravity) was taken, add these lines to the summary:
-
-```
-  CLI integrate:     wired via sonar integrate antigravity
-```
-
-If path **4.f** (Gemini CLI) was taken, no extra line is required beyond the default MCP summary.
-
-If path **4.g** (Factory Droid) was taken, no extra line is required beyond the default MCP summary.
-
-If path **4.h** (Devin) was taken, add this line to the summary:
-
-```
-  Hooks & MCP:       wired via sonar integrate devin (restart the Devin session to load them)
-```
-
-If path **4.i** (Pi) was taken, add this line to the summary:
-
-```
-  CLI integrate:     wired via sonar integrate pi
-```
-
-If path **4.j** (OpenCode) was taken, add this line to the summary:
-
-```
-  CLI integrate:     wired via sonar integrate opencode
+```bash
+agy plugin import gemini
+sonar integrate antigravity --non-interactive
 ```
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
