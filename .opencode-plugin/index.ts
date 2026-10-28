@@ -2,7 +2,7 @@ import type { Plugin } from "@opencode/plugin";
 import { loadSkills } from "./skills.ts";
 
 export default {
-  id: "sonarsource.sonarqube",
+  id: "sonarqube",
   async setup(ctx) {
     const skills = await loadSkills();
     await ctx.skill.transform((editor) => {
