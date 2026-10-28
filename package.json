@@ -19,7 +19,7 @@
   "private": true,
   "pi": {
     "skills": ["./skills"],
-    "extensions": ["./extensions/sonar-mcp.ts"]
+    "extensions": ["./.pi-plugin/sonar-mcp.ts"]
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
