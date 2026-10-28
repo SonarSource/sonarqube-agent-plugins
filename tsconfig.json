@@ -9,5 +9,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": [".opencode-plugin/**/*.ts", "extensions/**/*.ts"]
+  "include": [".opencode-plugin/**/*.ts", ".pi-plugin/**/*.ts"]
 }
