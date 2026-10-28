@@ -14,7 +14,7 @@ Interaction rule: for every finite decision, always present predefined selector 
 
 ### Step 1 — Check for sonarqube-cli and update it
 
-Check if the CLI is available by running `sonar --version` (macOS/Linux) or `sonar.exe --version` (Windows) yourself; a zero exit code (version printed) means found.
+Check if the CLI is available by running `sonar --version` (macOS/Linux) or `sonar.exe --version` (Windows) yourself; a zero exit code (version printed) means found. If found, also run `which sonar` (macOS/Linux) or `(Get-Command sonar.exe).Source` (Windows) to find the installation location.
 
 **If found:** first determine how it was installed, because the upgrade path differs:
 

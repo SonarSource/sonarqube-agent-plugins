@@ -12,15 +12,17 @@ function hasSonarQubeMcpConfig(configPath: string): boolean {
 }
 
 export default function registerSonarQubeMcp(pi: ExtensionAPI) {
-  if (
-    hasSonarQubeMcpConfig(join(getAgentDir(), "mcp.json")) ||
-    hasSonarQubeMcpConfig(join(process.cwd(), CONFIG_DIR_NAME, "mcp.json"))
-  ) {
-    return;
-  }
+  pi.on("session_start", (_event, ctx) => {
+    if (
+      hasSonarQubeMcpConfig(join(getAgentDir(), "mcp.json")) ||
+      (ctx.isProjectTrusted() && hasSonarQubeMcpConfig(join(ctx.cwd, CONFIG_DIR_NAME, "mcp.json")))
+    ) {
+      return;
+    }
 
-  pi.registerMcpServer("sonarqube", {
-    command: "sonar",
-    args: ["run", "mcp"],
+    pi.registerMcpServer("sonarqube", {
+      command: "sonar",
+      args: ["run", "mcp"],
+    });
   });
 }
