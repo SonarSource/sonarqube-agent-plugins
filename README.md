@@ -217,6 +217,18 @@ Plugin includes **MCP configuration** (**`kiro-power/mcp.json`**) that runs the 
 
 ---
 
+## OpenCode
+
+1. Install the SonarQube plugin in OpenCode V2:
+
+   ```bash
+   opencode plugin add 'github:SonarSource/sonarqube-agent-plugins#master'
+   ```
+
+2. Run **`sonar integrate opencode`**, or invoke the **`/sonar-integrate`** skill.
+
+---
+
 ## Pi
 
 1. Install the SonarQube plugin:

@@ -104,6 +104,7 @@ Pick exactly one branch below based on which agent you are. Do not run the other
 - Factory Droid -> **4.g**
 - Devin -> **4.h**
 - Pi -> **4.i**
+- OpenCode -> **4.j**
 
 #### 4.a — Claude Code (`sonar integrate claude`)
 
@@ -199,6 +200,16 @@ sonar integrate pi --non-interactive
 
 Tell the user to restart Pi to load the integration. The plugin's extension registers MCP automatically.
 
+#### 4.j — OpenCode (`sonar integrate opencode`)
+
+Run this command yourself to configure **hooks** and—when available—**Vortex analysis**:
+
+```bash
+sonar integrate opencode --non-interactive
+```
+
+Tell the user to restart OpenCode to load the integration. The plugin registers MCP automatically.
+
 ---
 
 ### Summary message
@@ -263,6 +274,12 @@ If path **4.i** (Pi) was taken, add this line to the summary:
 
 ```
   CLI integrate:     wired via sonar integrate pi
+```
+
+If path **4.j** (OpenCode) was taken, add this line to the summary:
+
+```
+  CLI integrate:     wired via sonar integrate opencode
 ```
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
