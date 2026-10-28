@@ -202,7 +202,7 @@ Tell the user to restart Pi to load the integration. The plugin's extension regi
 
 #### 4.j — OpenCode (`sonar integrate opencode`)
 
-Run this command yourself to configure **hooks** and—when available—**Vortex analysis**:
+Run this command yourself to configure the **SonarQube MCP Server**, **hooks**, and—when available—**Vortex analysis**:
 
 ```bash
 sonar integrate opencode --non-interactive
