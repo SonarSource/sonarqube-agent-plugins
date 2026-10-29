@@ -3,7 +3,7 @@
   "version": "2.7.0",
   "displayName": "SonarQube",
   "description": "Verify the code your AI agent writes: scan for secrets, catch bugs and vulnerabilities across 40+ languages with 7,500+ issue types, and enforce quality gates",
-  "shortDescription": "AI code quality and security checks",
+  "shortDescription": "Enforce code quality in the agent loop",
   "author": {
     "name": "Sonar",
     "url": "https://www.sonarsource.com/"
