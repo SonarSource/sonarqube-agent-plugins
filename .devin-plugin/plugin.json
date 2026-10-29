@@ -1,7 +1,9 @@
 {
   "name": "sonarqube",
   "version": "2.7.0",
-  "description": "SonarQube is the AI code quality and security verification platform used by millions of developers to catch bugs, vulnerabilities, and leaked secrets. This plugin enforces those standards in the agent coding loop: 7,500+ distinct issue types, secrets scanning, agentic analysis, and quality gates across 40+ languages.",
+  "displayName": "SonarQube",
+  "description": "Verify the code your AI agent writes: scan for secrets, catch bugs and vulnerabilities across 40+ languages with 7,500+ issue types, and enforce quality gates",
+  "shortDescription": "Enforce code quality in the agent loop",
   "author": {
     "name": "Sonar",
     "url": "https://www.sonarsource.com/"
@@ -16,5 +18,6 @@
   "license": "SSAL-1.0",
   "repository": "https://github.com/SonarSource/sonarqube-agent-plugins",
   "homepage": "https://www.sonarsource.com",
+  "logo": "assets/logo.svg",
   "mcpServers": "./mcp.json"
 }
