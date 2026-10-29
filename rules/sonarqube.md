@@ -12,8 +12,6 @@ The `sonar-integrate` skill is a preliminary initialization and recovery skill f
 - authenticates the CLI via `sonar auth login` (token stored in system keychain),
 - runs `sonar integrate antigravity` to wire secrets scanning hooks, Vortex analysis instructions, Context Augmentation, and MCP configuration.
 
-Migrating from the SonarQube Gemini extension? Run `agy plugin import gemini`, then `sonar integrate antigravity`.
-
 `sonar run mcp` handles container runtime detection (Docker, Podman, Nerdctl) and auth automatically — no environment variables are needed.
 
 Invoke the `sonar-integrate` skill when another skill surfaces a failure that points to one of the conditions above (missing CLI, failed auth, or incomplete integrate wiring).

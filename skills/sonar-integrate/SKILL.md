@@ -1,7 +1,7 @@
 ---
 name: sonar-integrate
 description: "Installs sonarqube-cli if not already installed, authenticates, and integrates SonarQube with the current agent (installs analysis hooks & SonarQube MCP Server). Use when the user wants to set up SonarQube integration or asks to configure SonarQube."
-allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(agy:*), Bash(curl:*), Bash(irm:*), Bash(iex:*), Bash(brew:*), Bash(mise:*), Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
+allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(curl:*), Bash(irm:*), Bash(iex:*), Bash(brew:*), Bash(mise:*), Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*)
 ---
 
 # Integrate SonarQube
@@ -104,7 +104,6 @@ Use the current agent's name: `claude`, `copilot`, `codex`, `cursor`, `antigravi
 Exceptions:
 
 - **Cursor:** After the command completes, tell the user to open **Settings → MCP** and enable the `sonarqube` entry.
-- **Gemini CLI (legacy):** Skip the command; the extension's `gemini-extension.json` already configures the SonarQube MCP Server via `sonar run mcp`. Recommend migrating to Antigravity with `agy plugin import gemini`, then `sonar integrate antigravity --non-interactive`.
 - **Factory Droid:** Skip the command; the plugin's `mcp.json` already configures the SonarQube MCP Server via `sonar run mcp`.
 
 After integration completes, tell the user to ensure Docker, Podman, or Nerdctl is running, then restart the current agent session to load the configuration.
@@ -132,15 +131,6 @@ For **Cursor**, insert this message before the container runtime and restart ins
 
 ```
 Enable the sonarqube entry in Cursor Settings → MCP before restarting.
-```
-
-For **Gemini CLI (legacy)**, add:
-
-Consider migrating to Antigravity. To migrate, run:
-
-```bash
-agy plugin import gemini
-sonar integrate antigravity --non-interactive
 ```
 
 If **sonarqube-cli was freshly installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.

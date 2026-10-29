@@ -131,25 +131,6 @@ Or use **`/sonarqube:sonar-integrate`** inside Antigravity for a guided flow. Re
 
 Installing the **whole repo** is acceptable — other agents' dot-folders are inert in Antigravity.
 
-### Migrating from Gemini CLI
-
-Gemini CLI is being replaced by Antigravity. Migrate platform config first (layout, skills paths, and cleanup), then update SonarQube as below.
-
-If you already had the **SonarQube Gemini extension** installed:
-
-```bash
-agy plugin import gemini          # converts legacy extensions → native plugins
-sonar integrate antigravity       # add hooks, instructions, CAG (new vs Gemini)
-```
-
-`agy plugin import gemini` scans legacy Gemini directories and migrates inline `mcpServers` into `mcp_config.json`. Expect output like `✔ mcpServers : 1 server definition migrated to mcp_config.json` for SonarQube.
-
-If you had custom skills under `.gemini/skills/`, move them to `.agents/skills/`.
-
-After verifying Antigravity works, remove any duplicate legacy Gemini extension install if import created a copy.
-
-For a fresh install, use the [recommended flow](#recommended-flow-full-integration) above.
-
 Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ---
@@ -242,13 +223,6 @@ Plugin includes **MCP configuration** (**`kiro-power/mcp.json`**) that runs the 
 
 ---
 
-## Gemini CLI *(legacy)*
-
-**`gemini-extension.json`** and **`GEMINI.md`**. **`sonar auth login`** and **[Usage](#usage)**.
-
-Migrate to **[Antigravity](#antigravity)** with **`agy plugin import gemini`** and **`sonar integrate antigravity`** as described above.
-
----
 ## Usage
 
 Skills are the same across agents. Ask in natural language, invoke skills explicitly, or use the **SonarQube MCP** tools your client shows after MCP starts.
