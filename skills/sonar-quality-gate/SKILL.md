@@ -56,8 +56,8 @@ Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly
 
 | Flag              | CLI option       | MCP parameter (fallback) |
 | ----------------- | ---------------- | ------------------------- |
-| `--branch <name>` | `--branch`       | `branchKey`                |
-| `--pr <id>`        | `--pull-request` | `pullRequestKey`            |
+| `--branch <name>` | `--branch`       | `branch`                   |
+| `--pr <id>`        | `--pull-request` | `pullRequest`              |
 
 `--branch` and `--pr` are mutually exclusive — if the user passes both, stop and ask which one they mean. Omit flags/keys not provided. If the MCP tool uses different parameter names, follow the schema exposed by your SonarQube MCP server.
 
@@ -153,12 +153,11 @@ On a CLI new enough to support it, the same call also returns a **`breakdown`** 
 ```json
 {
   "projectKey": "<only-if-required>",
-  "branchKey": "<name, if --branch was given>",
-  "pullRequestKey": "<id, if --pr was given instead>"
+  "branch": "<name, if --branch was given>"
 }
 ```
 
-Include `branchKey` only when `--branch` was given, and `pullRequestKey` only when `--pr` was given — never both (see Step 2). Omit `projectKey` from the payload when the integration default applies. Omit unused keys.
+For `--pr`, replace `branch` with `pullRequest` and use the SonarQube pull request key as its value. Include the selected context only — never both (see Step 2). Omit `projectKey` from the payload when the integration default applies. Omit unused keys.
 
 The tool returns the same `status`/`conditions` shape as above, but with **no `breakdown`** — see Step 5.
 

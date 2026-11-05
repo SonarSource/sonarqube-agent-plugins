@@ -56,8 +56,10 @@ MCP tools sometimes **do not require** `projectKey` after the sonar-integrate sk
 
 | Flag              | Maps to parameter |
 | ----------------- | ----------------- |
-| `--branch <name>` | `branchKey`       |
-| `--pr <id>`       | `pullRequestKey`  |
+| `--branch <name>` | `branch`          |
+| `--pr <id>`       | `pullRequest`     |
+
+`--branch` and `--pr` are mutually exclusive — if the user passes both, stop and ask which one they mean. Omit both to use the default branch.
 
 ### Step 3: Call `mcp__sonarqube__search_dependency_risks`
 
@@ -66,14 +68,13 @@ Include **`projectKey` only if** you resolved one in Step 1 **and** the tool req
 ```json
 {
   "projectKey": "<only-if-required>",
-  "branchKey": "<name>",       // if --branch was given
-  "pullRequestKey": "<id>",    // if --pr was given
+  "branch": "<name>",       // if --branch was given
   "pageIndex": 1,
   "pageSize": 50
 }
 ```
 
-Omit `projectKey` from the payload when the integration default applies. Omit unused optional fields.
+For `--pr`, replace `branch` with `pullRequest` and use the SonarQube pull request key as its value. Omit `projectKey` from the payload when the integration default applies. Include at most one of `branch` and `pullRequest`, and omit unused optional fields.
 
 If a page returns 50 results, request the next page with `pageIndex` incremented. Stop when a page contains fewer than 50 results, and combine all pages in the order they were returned.
 
@@ -84,6 +85,8 @@ The same command works on SonarQube Server and SonarQube Cloud — `sonar api` r
 ```bash
 sonar api get "/api/v2/sca/issues-releases?projectKey=<project-key>[&branchKey=<name>][&pullRequestKey=<id>]&pageIndex=1&pageSize=50"
 ```
+
+The SCA REST endpoint uses `branchKey` and `pullRequestKey`; the MCP tool uses `branch` and `pullRequest`. Include only the selected context parameter in either path, never both.
 
 Paginate the same way as the MCP call, using `page.total` from the response to know when you have every result. Each entry in `issuesReleases` carries the risk `key`, `status`, `severity`, `vulnerabilityId`, and the package under `release`.
 
