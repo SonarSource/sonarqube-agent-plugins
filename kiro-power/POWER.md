@@ -108,25 +108,27 @@ The CLI uses the same Vortex backend. After a `Vortex is not enabled` error, ski
 ```javascript
 // Search for high-severity security issues
 search_sonar_issues_in_projects({
-    projects: ["my-project"],
+    projectKeys: ["my-project"],
     severities: ["HIGH", "BLOCKER"],
     impactSoftwareQualities: ["SECURITY", "RELIABILITY"],
-    p: 1,
-    ps: 100
+    pageIndex: 1,
+    pageSize: 100
 });
 
 // Filter by issue status
 search_sonar_issues_in_projects({
-    projects: ["my-project"],
+    projectKeys: ["my-project"],
     issueStatuses: ["OPEN", "CONFIRMED"],
     branch: "main"
 });
 
 // Get a specific issue by key
 search_sonar_issues_in_projects({
-    issueKey: "AYz123abc"
+    issueKey: ["AYz123abc"]
 });
 ```
+
+Use either `branch` for branch analysis or `pullRequest` for a SonarQube pull request key, never both in the same call. Omit both to use the default branch.
 
 **Managing Issue Status:**
 
@@ -172,11 +174,13 @@ Use `change_sonar_issue_status` appropriately:
 **Selective Tool Enablement** - Reduce context overhead by enabling only needed toolsets:
 
 ```bash
-# For code analysis workflow
-sonar run mcp --toolsets analysis,issues,quality-gates
+# For code analysis workflow (vortex for advanced analysis, analysis for local recovery)
+sonar run mcp --toolsets vortex,analysis,issues,quality-gates
 ```
 
-Available toolsets: `analysis`, `issues`, `quality-gates`, `rules`, `sources`, `measures`, `languages`, `portfolios`, `system`, `webhooks`, `dependency-risks`. Note: `projects` is always enabled.
+Use `vortex` for advanced analysis. The `analysis` toolset enables local snippet analysis and is required for the local recovery path described above.
+
+Available toolsets include: `vortex`, `analysis`, `issues`, `quality-gates`, `rules`, `sources`, `measures`, `languages`, `portfolios`, `system`, `webhooks`, `dependency-risks`. Note: `projects` is always enabled.
 
 **Read-Only Mode** - Disable write operations for safer exploration:
 
@@ -210,8 +214,8 @@ const analysis = run_advanced_code_analysis({
 ```javascript
 // Step 1: Search for issues in the pull request
 const issues = search_sonar_issues_in_projects({
-    projects: ["my-project"],
-    pullRequestId: "123",
+    projectKeys: ["my-project"],
+    pullRequest: "123",
     severities: ["HIGH", "BLOCKER"],
     impactSoftwareQualities: ["SECURITY", "RELIABILITY"]
 });
@@ -254,7 +258,7 @@ const qgStatus = get_project_quality_gate_status({
 
 // Step 3: Search for unresolved issues
 const issues = search_sonar_issues_in_projects({
-    projects: ["my-project"],
+    projectKeys: ["my-project"],
     severities: ["HIGH", "BLOCKER"],
     issueStatuses: ["OPEN", "CONFIRMED"]
 });
@@ -268,7 +272,7 @@ const issues = search_sonar_issues_in_projects({
 // Step 1: Search for dependency risks (requires Server 2025.4+ Enterprise with Advanced Security)
 const risks = search_dependency_risks({
     projectKey: "my-project",
-    branchKey: "main"
+    branch: "main"
 });
 
 // Step 2: Review high-severity vulnerabilities
@@ -298,14 +302,16 @@ Use this when the user asks "are we vulnerable to this CVE?", wants dependency r
 // Step 1: Fetch OPEN and CONFIRM vulnerability risks, paging until a page has fewer than 50 results
 const risks = search_dependency_risks({
     projectKey: "my-project",
-    branchKey: "main",
+    branch: "main",
     pageIndex: 1,
     pageSize: 50
 });
 
 // Step 2: For each unique package version, get advisory details
 // (vulnerable mechanism, CWEs, fixed versions, withdrawal status)
-const advisory = check_dependency({ /* package, version, package manager */ });
+const advisory = check_dependency({
+    purl: "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1"
+});
 
 // Step 3: Check whether the package ships at runtime (manifest, lockfile, build config)
 // Step 4: Search the codebase for call sites of the vulnerable API or configuration

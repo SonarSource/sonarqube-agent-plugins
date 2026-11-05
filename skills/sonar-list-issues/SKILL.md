@@ -1,7 +1,7 @@
 ---
 name: sonar-list-issues
 description: Search and filter SonarQube issues for a project, branch, or pull request via sonarqube-cli (`-p` is always required on the CLI; resolve the key from user arguments or sonar-project.properties)
-argument-hint: "[project-key?] [--severities values] [--statuses values] [--branch name]"
+argument-hint: "[project-key?] [--severities values] [--statuses values] [--branch name | --pr id] [--file path] [--new-code]"
 allowed-tools: Read, Grep, Bash(sonar:*)
 ---
 
@@ -20,6 +20,9 @@ sonar-list-issues my-project --severities CRITICAL,BLOCKER # filter by severitie
 sonar-list-issues my-project --statuses OPEN,CONFIRMED     # filter by status
 sonar-list-issues my-project --branch main                 # on a specific branch
 sonar-list-issues my-project --pr 42                       # on a pull request
+sonar-list-issues my-project --file src/auth/login.py      # for one file
+sonar-list-issues my-project --file 'src/auth/login form.py' --new-code
+sonar-list-issues my-project --new-code                    # only on new code
 ```
 
 ## Prerequisites
@@ -54,8 +57,12 @@ This flow uses **`sonar list issues`** (CLI), not MCP. The CLI **always** needs 
 | `--statuses <values>`    | `--statuses`       |
 | `--branch <name>`        | `--branch`         |
 | `--pr <id>`              | `--pull-request`   |
+| `--file <path>`          | `--file`           |
+| `--new-code`             | `--new-code` (boolean flag, no value) |
 
-> `sonar list issues` does **not** support filtering by issue type, rule, tag, or component, nor a `--resolved` flag. Only the options above (plus `--format`, `--page`, and `--page-size`) exist. To filter by rule/type/tag/component or to drill into a single file, use the MCP-based skills (e.g. sonar-analyze for a file, or `mcp__sonarqube__search_sonar_issues_in_projects`).
+`--branch` and `--pr` are mutually exclusive — if both are provided, stop and ask which context to use. `--file` accepts a project-relative path or a unique filename. A directory path selects only that directory's own files, not files in subdirectories. `--new-code` limits results to the new code period and takes no value.
+
+> `sonar list issues` does **not** support filtering by issue type, rule, or tag, nor `--component` or `--resolved` flags. Only the options above (plus `--format`, `--page`, and `--page-size`) exist. For additional filtering, inspect the exposed schema of `mcp__sonarqube__search_sonar_issues_in_projects` and use only the parameters it supports.
 
 ### Step 3: Validate arguments
 
@@ -68,16 +75,20 @@ Before building the command, validate each user-supplied value against the follo
 | `--statuses`   | comma-separated subset of: `OPEN`, `CONFIRMED`, `FALSE_POSITIVE`, `ACCEPTED`, `FIXED` |
 | `--branch`     | `^[a-zA-Z0-9_\-\./]+$`                                                                |
 | `--pr`         | digits only                                                                           |
+| `--file`       | non-empty project-relative path or unique name matching `^[a-zA-Z0-9_.][a-zA-Z0-9_\-./ ]*$` (spaces are allowed) |
+| `--new-code`   | boolean flag only; reject any supplied value                                           |
+
+Reject unknown flags and missing option values. For `--file`, this conservative pattern rejects shell metacharacters, quotes, and substitutions; explain rejected paths rather than altering them. Preserve accepted paths exactly, including spaces.
 
 ### Step 4: Run `sonar list issues`
 
-Build and run the command using a shell command. **Always** pass **`-p`** with the key resolved in Step 1.
+Build and run the command using a shell command. **Always** pass **`-p`** with the key resolved in Step 1. Single-quote the validated `--file` value so spaces remain part of one argument; do not interpolate an unvalidated path.
 
 ```bash
-sonar list issues -p <project-key> --format toon [--severities <values>] [--statuses <values>] [--branch <name>] [--pull-request <id>]
+sonar list issues -p <project-key> --format toon [--severities <values>] [--statuses <values>] [--branch <name> | --pull-request <id>] [--file '<path>'] [--new-code]
 ```
 
-Only include optional flags that were provided.
+Only include optional flags that were provided. Emit `--new-code` on its own, without a value.
 
 ### Step 5: Format the results
 

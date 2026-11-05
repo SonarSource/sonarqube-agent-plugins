@@ -149,5 +149,5 @@ If this also fails, show the standard message above — don't guess further comm
 ### Step 4: Next steps
 
 - To write tests for uncovered lines: *"Ask me to add tests for the uncovered lines above."*
-- To check for quality issues in the same file: *"Invoke the sonar-list-issues skill with `--component <file>`."*
+- To check for quality issues in the same file: *"Invoke `sonar-list-issues <resolved-project-key> --file <project-relative-file-path>`."* Resolve the project key first if needed. Pass the file path (e.g. `src/auth/login.py`), not the SonarQube component key (`my-project:src/auth/login.py`); quote paths containing spaces.
 - To check the quality gate: *"Invoke the sonar-quality-gate skill (add a project key only if you are not using the integration default)."*

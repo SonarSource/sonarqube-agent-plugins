@@ -40,7 +40,7 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 - "List all bugs in my codebase"
 - "Find all blocker issues in my codebase"
 
-**What to do:** Invoke the `sonar-list-issues` skill end-to-end. It supports filtering by severity, type, status, rule, tag, component, branch, and pull request, and always passes `-p <project-key>` to the CLI.
+**What to do:** Invoke the `sonar-list-issues` skill end-to-end. It supports severity, status, file or directory (`--file`), new code (`--new-code`), branch, and pull request filters, and always passes `-p <project-key>` to the CLI. Directory filtering includes only the directory's own files. Type, rule, and tag filters are not supported by this CLI command.
 
 ### Code Analysis
 **Example user requests:**
@@ -49,6 +49,8 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 - "Generate a method that does X and analyze it for issues"
 
 **What to do:** Invoke the `sonar-analyze` skill end-to-end. Try `mcp__sonarqube__run_advanced_code_analysis` first. If unavailable or it returns `Vortex is not enabled`, use `mcp__sonarqube__analyze_file_list` (IDE), then `mcp__sonarqube__analyze_code_snippet` if the IDE tool is unavailable. Use the CLI only when no MCP analysis tool is available and no Vortex entitlement error occurred. After an entitlement error with no local MCP tool available, explain that local analysis requires restarting the MCP server with `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` and the `analysis` toolset enabled. Report other errors and stop.
+
+Use the `vortex` toolset for advanced analysis. The `analysis` toolset is required for local snippet recovery.
 
 ### Coverage
 **Example user requests:**

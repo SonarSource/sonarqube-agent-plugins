@@ -64,6 +64,8 @@ After running the sonar-integrate skill, the SonarQube MCP Server often has a **
 
 Cloud stdio selects one analysis path at startup, so an advanced-analysis session may have no local fallback. `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` selects `analyze_code_snippet` directly, bypassing the IDE bridge; the `analysis` toolset must be enabled.
 
+Use the `vortex` toolset for advanced analysis; keep `analysis` enabled when configuring the local snippet recovery path.
+
 Before calling it, detect the current branch name using `git branch --show-current`. If git is unavailable, use `main` as a fallback.
 
 Use the tool's published schema and call with:
