@@ -174,8 +174,8 @@ Use `change_sonar_issue_status` appropriately:
 **Selective Tool Enablement** - Reduce context overhead by enabling only needed toolsets:
 
 ```bash
-# For code analysis workflow
-sonar run mcp --toolsets vortex,issues,quality-gates
+# For code analysis workflow (vortex for advanced analysis, analysis for local recovery)
+sonar run mcp --toolsets vortex,analysis,issues,quality-gates
 ```
 
 Use `vortex` for advanced analysis. The `analysis` toolset enables local snippet analysis and is required for the local recovery path described above.
