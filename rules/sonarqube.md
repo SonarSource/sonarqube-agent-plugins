@@ -18,6 +18,14 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 
 ## How Users Typically Interact
 
+### Onboarding a Repository
+**Example user requests:**
+- "Set up SonarQube for this repository"
+- "Connect this repo to SonarQube"
+- "Find security vulnerabilities in this repo" or "Check this repo's code quality", when it has no `.sonar-config.json` yet
+
+**What to do:** Invoke the `sonar-onboard` skill end-to-end. It runs `sonar init` to sign in, select the organization, link, import or create the project, and report its analysis results. It offers `sonar-integrate` at the end. Use `sonar-integrate` directly only to wire the agent itself (hooks, MCP Server).
+
 ### Finding Projects
 **Example user requests:**
 - "Show me my SonarQube projects"
@@ -117,7 +125,7 @@ After `sonar integrate antigravity`, MCP tools often **do not require** an expli
 ## Common Troubleshooting
 
 ### Authentication or MCP Issues
-- For setup, re-authentication, missing MCP tools, or incomplete wiring, invoke the `sonar-integrate` skill
+- For agent setup, re-authentication, missing MCP tools, or incomplete wiring, invoke the `sonar-integrate` skill. To connect the repository to a SonarQube project, invoke the `sonar-onboard` skill instead
 - Restart the Antigravity session after integrate if MCP tools do not appear
 
 ### Project Not Found

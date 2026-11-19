@@ -239,6 +239,14 @@ MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqub
 /sonarqube:sonar-integrate
 ```
 
+#### Onboard a repository
+
+```
+/sonarqube:sonar-onboard
+/sonarqube:sonar-onboard --path services/api
+/sonarqube:sonar-onboard --monorepo
+```
+
 #### List projects
 
 ```

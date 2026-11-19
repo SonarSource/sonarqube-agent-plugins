@@ -2,7 +2,7 @@
 name: sonar-onboard
 description: "Connects the current repository to a SonarQube project through `sonar init`: signs in, selects the organization, reuses, imports or creates the project, and reports its analysis results. Use when the user asks to set up SonarQube for this repository, onboard or connect it to SonarQube, find security vulnerabilities, or check this repo's code quality, and the repository is not linked to a SonarQube project yet (no `.sonar-config.json`). To wire the agent itself (hooks, MCP Server), use sonar-integrate instead."
 argument-hint: "[--path directory] [--monorepo]"
-allowed-tools: Read, Glob, Bash(sonar:*)
+allowed-tools: Read, Glob, Bash(sonar:*), Bash(which:*), Bash(Get-Command:*), Bash(curl:*), Bash(irm:*), Bash(iex:*), Bash(brew:*), Bash(mise:*)
 ---
 
 # SonarQube — Onboard a repository
@@ -31,7 +31,7 @@ sonar-onboard --monorepo             # onboard several project roots of a monore
 - Always pass `--non-interactive`: a prompt would wait for input you cannot type. When `sonar init` needs an answer, it stops and names the flags that would answer it.
 - Never create, import or link a project without the user confirming a `--dry-run` preview of that exact command.
 - Never run `sonar auth login`, organization creation or a browser authorization yourself, and never ask the user to paste a token into the chat.
-- Never suggest `--create` or `--bind` for a repository that `sonar init` found an existing project for, unless the user explicitly wants a separate project.
+- Never suggest `--create` or `--bind` for a repository that `sonar init` found an existing project for: it only offers `--link` then, and refuses to create a second project. If the user wants a separate project, tell them `sonar init` does not create one for a repository that already has a project.
 - Never delete or rewrite `.sonar-config.json`, projects or credentials to start over.
 - Never run `sonar integrate` or the sonar-integrate skill unless the user accepts it in Step 7. Every exit of this skill ends in Step 7, whether onboarding completed, was cancelled or failed.
 - Never treat the repository as a monorepo on your own: only when the user passed `--monorepo` or said it holds several projects.
@@ -60,7 +60,7 @@ Validate every value before interpolating it into a command. If a value fails, s
 | `.sonar-config.json links '<key>'`, then `no such project exists` or `belongs to another organization` | The mapping exists, but the server cannot confirm the project | Relay the message and its fix hint. Ask whether the key or the active organization is wrong; switch organization as for a repository bound in another organization (below), but leave relinking or deleting `.sonar-config.json` to the user |
 | `Continuing needs an answer`, plus the flags that would answer it      | A decision is needed                            | Step 4                                                                                                                 |
 | `Not signed in`                                                       | No usable login                                 | Step 2                                                                                                                 |
-| `This repository is bound to a project in` another organization       | The repository belongs to another organization  | Switch organization: offer the one the hint names, or the result of `sonar list orgs`, as a selector; on confirmation run `sonar auth org <key>` yourself, then repeat this step |
+| `This repository is bound to a project in organization '<org>'` or `This repository is bound to a project in another organization` | The repository belongs to another organization  | Switch organization: offer the one the hint names, or the result of `sonar list orgs`, as a selector; on confirmation run `sonar auth org <key>` yourself, then repeat this step |
 | `Organization creation is not available`, or the sign-in found no organization | The account has no organization        | Step 3                                                                                                                 |
 
 ### Step 2 — Sign in
@@ -116,7 +116,7 @@ Missing results are not zero findings: `not available`, `No analysis results` or
 Print a summary:
 
 ```
-✅ This repository is set up for SonarQube.
+✅ This repository is set up in SonarQube.
 
   Project:       <project-key> — <dashboard link printed by sonar init>
   Setup:         <linked to an existing project | created and bound to <repository> | created>
