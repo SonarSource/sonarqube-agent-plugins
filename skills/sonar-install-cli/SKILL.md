@@ -6,7 +6,7 @@ allowed-tools: Bash(which:*), Bash(Get-Command:*), Bash(sonar:*), Bash(curl:*), 
 
 # SonarQube — Install or update the CLI
 
-Make sure **sonarqube-cli** is installed and up to date, and report which of these happened: **installed**, **up to date** (or upgraded), **not updated** (the update failed but `sonar` still works), or **not installed** (the user declined, or the install failed).
+Make sure **sonarqube-cli** is installed and up to date, and report which of these happened: **installed**, **up to date** (or upgraded), **not updated** (the update failed but `sonar` still works; also return the manual upgrade command for its install route), or **not installed** (the user declined, or the install failed).
 
 Interaction rule: for every finite decision, always present predefined selector options (single-choice or multi-choice as appropriate) instead of asking for free-form text. If the user gives an invalid answer, re-show the same selector.
 
@@ -27,7 +27,7 @@ First determine how it was installed, because the upgrade path differs:
 
 **If it succeeds:** briefly tell the user the CLI is up to date (or was upgraded). The result is **up to date**.
 
-**If it fails:** show the relevant output and suggest they run the update manually (e.g. offline or network issues). The result is **not updated**, as long as `sonar` remains usable.
+**If it fails:** show the relevant output and suggest they run the upgrade manually in a terminal (e.g. offline or network issues), with the command for the route it was installed with: `sonar update` for the install script, `brew upgrade --cask sonarqube-cli` for Homebrew, `mise upgrade aqua:SonarSource/sonarqube-cli` for mise. Never suggest `sonar update` for a Homebrew or mise install: it refuses to update them. The result is **not updated**, as long as `sonar` remains usable.
 
 Either way, re-run `sonar --version` (or `sonar.exe --version`) yourself. If it now fails, the upgrade left the CLI missing or broken: show the output and go to Step 3 to reinstall it.
 

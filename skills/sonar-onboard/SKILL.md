@@ -70,7 +70,7 @@ Validate every value before interpolating it into a command. If a value fails, s
 
 ### Step 2 — Login
 
-Invoke the sonar-login skill. It selects the connection type, builds the `sonar auth login` command for the user to run, and verifies the login. Once it reports the connected server and organization, repeat Step 1.4. If the user stops without logging in, tell them nothing was set up, that rerunning this skill resumes from the login, and stop: do not offer `sonar integrate`, which needs a login too.
+Invoke the sonar-login skill. It selects the connection type, builds the `sonar auth login` command for the user to run, and verifies the login. Once it reports a successful login (the connected server, plus the organization for SonarQube Cloud), repeat Step 1.4. If the user stops without logging in, tell them nothing was set up, that rerunning this skill resumes from the login, and stop: do not offer `sonar integrate`, which needs a login too.
 
 ### Step 3 — No organization
 

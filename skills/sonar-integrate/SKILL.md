@@ -20,7 +20,7 @@ Invoke the sonar-install-cli skill. It installs the CLI when it is missing, or u
 
 ### Step 2 — Login
 
-Invoke the sonar-login skill. It checks `sonar auth status`, and when the CLI is not logged in, builds the `sonar auth login` command for the user to run and verifies the login. Once it reports the connected server and organization, continue to Step 3. If the user stops without logging in, stop here too.
+Invoke the sonar-login skill. It checks `sonar auth status`, and when the CLI is not logged in, builds the `sonar auth login` command for the user to run and verifies the login. Once it reports a successful login (the connected server, plus the organization for SonarQube Cloud), continue to Step 3. If the user stops without logging in, stop here too.
 
 ---
 
@@ -70,6 +70,6 @@ Enable the sonarqube entry in Cursor Settings → MCP before restarting.
 
 If sonar-install-cli reported **installed** in Step 1, replace the `sonarqube-cli` summary line with `sonarqube-cli: installed`.
 
-If it reported **not updated** in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest `sonar update` in a terminal.
+If it reported **not updated** in Step 1, adjust the summary: omit the `sonarqube-cli` line or state that the CLI was not updated and suggest the manual upgrade command sonar-install-cli returned for its install route.
 
 If any other step failed, note it clearly and suggest the corrective action.
