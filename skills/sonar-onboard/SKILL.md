@@ -1,13 +1,13 @@
 ---
 name: sonar-onboard
-description: "Connects the current repository to a SonarQube project through `sonar init`: signs in, selects the organization, reuses, imports or creates the project, and reports its analysis results. Use when the user asks to set up SonarQube for this repository, onboard or connect it to SonarQube, find security vulnerabilities, or check this repo's code quality, and the repository is not linked to a SonarQube project yet (no `.sonar-config.json`). To wire the agent itself (hooks, MCP Server), use sonar-integrate instead."
+description: "Connects the current repository to a SonarQube project through `sonar init`: logs in, selects the organization, reuses, imports or creates the project, and reports its analysis results. Use when the user asks to set up SonarQube for this repository, onboard or connect it to SonarQube, find security vulnerabilities, or check this repo's code quality, and the repository is not linked to a SonarQube project yet (no `.sonar-config.json`). To wire the agent itself (hooks, MCP Server), use sonar-integrate instead."
 argument-hint: "[--path directory] [--monorepo]"
 allowed-tools: Read, Glob, Bash(sonar:*), Bash(which:*), Bash(Get-Command:*), Bash(curl:*), Bash(irm:*), Bash(iex:*), Bash(brew:*), Bash(mise:*)
 ---
 
 # SonarQube — Onboard a repository
 
-Guide the user through **`sonar init`**, which signs in, selects the organization, links, imports or creates the SonarQube project, and saves the mapping in `.sonar-config.json`. `sonar init` owns the onboarding logic: run it, relay what it reports, and pass the user's decisions to it as flags. Do not recreate its steps with other commands (`sonar import`, `sonar link`, `sonar api`).
+Guide the user through **`sonar init`**, which logs in, selects the organization, links, imports or creates the SonarQube project, and saves the mapping in `.sonar-config.json`. `sonar init` owns the onboarding logic: run it, relay what it reports, and pass the user's decisions to it as flags. Do not recreate its steps with other commands (`sonar import`, `sonar link`, `sonar api`).
 
 `sonar init` keeps everything it completed. Running it again resumes from what is already in place, so a rerun is always how an interrupted or failed onboarding continues.
 
@@ -23,8 +23,8 @@ sonar-onboard --monorepo             # onboard several project roots of a monore
 
 ## Prerequisites
 
-1. Run `sonar --version` (macOS/Linux) or `sonar.exe --version` (Windows) yourself. If `sonar` is not found, follow **only Step 1** of the sonar-integrate skill to install it, then come back here. Do not continue into its later steps: they wire the agent, which the user decides on at the end of this skill.
-2. Run `sonar init --help` yourself. It must list `--dry-run`, `--link`, `--bind`, `--create` and `--scan`, plus `--monorepo` and `--root` for a monorepo. If any is missing, the CLI is too old to preview or to take the user's decision as a flag, and its `sonar init` could create a project without asking. Do **not** run it. Update the CLI as described in Step 1 of the sonar-integrate skill, then check again. Likewise, if `sonar init` rejects a run with `--bind does not apply with --monorepo`, the CLI predates monorepo binding: offer to update it the same way, or to use `--create` instead.
+1. Run `sonar --version` (macOS/Linux) or `sonar.exe --version` (Windows) yourself. If `sonar` is not found, invoke the sonar-install-cli skill, then come back here. If it reports **not installed**, stop.
+2. Run `sonar init --help` yourself. It must list `--dry-run`, `--link`, `--bind`, `--create` and `--scan`, plus `--monorepo` and `--root` for a monorepo. If any is missing, the CLI is too old to preview or to take the user's decision as a flag, and its `sonar init` could create a project without asking. Do **not** run it. Invoke the sonar-install-cli skill to update it, then check again. Likewise, if `sonar init` rejects a run with `--bind does not apply with --monorepo`, the CLI predates monorepo binding: offer to update it the same way, or to use `--create` instead.
 
 ## Guardrails
 
@@ -33,7 +33,7 @@ sonar-onboard --monorepo             # onboard several project roots of a monore
 - Never run `sonar auth login`, organization creation or a browser authorization yourself, and never ask the user to paste a token into the chat.
 - Never suggest `--create` or `--bind` for a repository that `sonar init` found an existing project for: it only offers `--link` then, and refuses to create a second project. If the user wants a separate project, tell them `sonar init` does not create one for a repository that already has a project.
 - Never delete or rewrite `.sonar-config.json`, projects or credentials to start over.
-- Never run `sonar integrate` or the sonar-integrate skill unless the user accepts it in Step 7. Every exit of this skill ends in Step 7, whether onboarding completed, was cancelled or failed.
+- Never run `sonar integrate` or the sonar-integrate skill unless the user accepts it in Step 7. Every exit of this skill ends in Step 7, whether onboarding completed, was cancelled or failed, except when the user is not logged in.
 - Never treat the repository as a monorepo on your own: only when the user passed `--monorepo` or said it holds several projects.
 
 Validate every value before interpolating it into a command. If a value fails, stop and tell the user what was rejected instead of running the command.
@@ -61,11 +61,11 @@ Validate every value before interpolating it into a command. If a value fails, s
 | `Continuing needs an answer`, plus the flags that would answer it      | A decision is needed                            | Step 4                                                                                                                 |
 | `Not signed in`                                                       | No usable login                                 | Step 2                                                                                                                 |
 | `This repository is bound to a project in organization '<org>'` or `This repository is bound to a project in another organization` | The repository belongs to another organization  | Switch organization: offer the one the hint names, or the result of `sonar list orgs`, as a selector; on confirmation run `sonar auth org <key>` yourself, then repeat this step |
-| `Organization creation is not available`, or the sign-in found no organization | The account has no organization        | Step 3                                                                                                                 |
+| `Organization creation is not available`, or the login found no organization | The account has no organization        | Step 3                                                                                                                 |
 
-### Step 2 — Sign in
+### Step 2 — Login
 
-This step requires user interaction: do **not** run the login yourself. Follow **Step 3** of the sonar-integrate skill, which selects the connection type and builds the `sonar auth login` command for the user to run. Once the user confirms they signed in, run `sonar auth status` yourself to verify, then repeat Step 1.3.
+Invoke the sonar-login skill. It selects the connection type, builds the `sonar auth login` command for the user to run, and verifies the login. Once it reports the connected server and organization, repeat Step 1.3. If the user stops without logging in, tell them nothing was set up, that rerunning this skill resumes from the login, and stop: do not offer `sonar integrate`, which needs a login too.
 
 ### Step 3 — No organization
 
@@ -130,10 +130,10 @@ For the gate's conditions or the issue list, invoke the sonar-quality-gate or so
 
 ### When a step fails
 
-Relay the error and its hint as printed. Then tell the user what is already in place (signed in, organization, project, `.sonar-config.json` mapping, analysis), what remains, and the exact command that resumes — usually the same `sonar init` command after the fix the hint names. Do not retry a failing step in a loop. Then go to Step 7.
+Relay the error and its hint as printed. Then tell the user what is already in place (logged in, organization, project, `.sonar-config.json` mapping, analysis), what remains, and the exact command that resumes — usually the same `sonar init` command after the fix the hint names. Do not retry a failing step in a loop. Then go to Step 7.
 
 ### Step 7 — Next step
 
 Every exit of this skill ends here: setup complete, plan cancelled or declined, no organization, or a failed step. Suggest the sonar-integrate skill, which wires this agent to SonarQube: analysis hooks, secrets scanning and the SonarQube MCP Server. When setup did not complete, say that it still works without a SonarQube project or organization, and repeat the command that resumes onboarding. Ask the user (yes/no) whether to run it now. Invoke it only if they say yes; otherwise stop.
 
-Skip this offer only when the `sonar` CLI is not installed.
+Skip this offer when the `sonar` CLI is not installed or the user is not logged in (`sonar auth status` does not report a login, e.g. after a failure that lost it), since `sonar integrate` needs both. Then stop and repeat the resume command.
