@@ -1,6 +1,6 @@
 # Detect build roots
 
-Copied from the `detect-monorepo-projects` skill in [SonarSource/monorepo-project-provisioning](https://github.com/SonarSource/monorepo-project-provisioning/blob/master/detect-monorepo-projects-skill/SKILL.md) (commit `20dc9db`). Steps 2 and 3 are copied verbatim, and their numbering refers to that skill. sonar-onboard leaves out the rest: it needs no organization key, writes no `sonar-monorepo-projects.json`, and derives no project keys, since `sonar init` generates them or the user names one per root. Keep Steps 2 and 3 in sync with the source when it changes.
+Copied from the `detect-monorepo-projects` skill in [SonarSource/monorepo-project-provisioning](https://github.com/SonarSource/monorepo-project-provisioning/blob/master/detect-monorepo-projects-skill/SKILL.md) (commit `20dc9db`). Steps 2 and 3 are copied verbatim, and their numbering refers to that skill. Step 2i is not in the source: sonar-onboard adds it for build systems the source does not scan. sonar-onboard leaves out the rest: it needs no organization key, writes no `sonar-monorepo-projects.json`, and derives no project keys, since `sonar init` generates them or the user names one per root. Keep Steps 2 and 3 in sync with the source when it changes.
 
 The repo root is the repository root, or the `--path` directory the user named. Detection only reads files: never write, move or delete anything while running it.
 
@@ -114,6 +114,17 @@ find . \( -name .venv -o -name venv -o -name node_modules -o -name build -o -nam
 
 ---
 
+### 2i. Other build systems (sonar-onboard addition)
+
+Run after 2a–2h, with the covered set they built. Skip `.git`, `node_modules`, `vendor`, `target`, `build`, `dist`, `bin`, `obj` and `.gradle` while scanning. Each rule adds the directories its manifest declares as members to the covered set, and records every manifest directory that is not in the covered set as a build root:
+
+- **Gradle without settings**: a `build.gradle` or `build.gradle.kts` whose directory is not covered by 2a and has no `settings.gradle[.kts]`. **Name**: the directory name.
+- **Go**: a `go.work` is a build root; its `use` directories are covered. Otherwise each `go.mod` is a build root. **Name**: the last segment of the `module` path.
+- **Rust**: a `Cargo.toml` with a `[workspace]` table is a build root; its `members` globs are covered. Otherwise each `Cargo.toml` with a `[package]` table is a build root. **Name**: `[workspace.package].name` or `[package].name`, else the directory name.
+- **.NET**: a `.sln` or `.slnx` file is a build root; the directories of the projects it lists are covered. Otherwise each directory with a `*.csproj`, `*.fsproj` or `*.vbproj` is a build root. **Name**: the solution or project file name without its extension.
+- **PHP**: each `composer.json`. **Name**: the part of `name` after `/`, else the directory name.
+- **Ruby**: each `Gemfile` or `*.gemspec`. **Name**: the gemspec's `name`, else the directory name.
+
 ## Step 3: Collect build roots and de-duplicate
 
 Merge the results of all rules into a single list keyed by **source path** relative to the repo root. When the same directory was reported by more than one rule (e.g. an Nx workspace layered on top of pnpm, or a JS workspace root that also has its own `pyproject.toml`), keep one entry and prefer the most specific declared name.
@@ -124,4 +135,4 @@ Return the list to sonar-onboard (see **Result** below).
 
 ## Result
 
-Return one entry per build root: its **path** relative to the repo root (`.` for the repo root itself), its **build system** and its **name**. Also return what was checked for: Gradle (`settings.gradle[.kts]`), Maven (`pom.xml`), npm/Yarn (`package.json` `"workspaces"` plus standalone `package.json` with source), pnpm (`pnpm-workspace.yaml`), Nx (`nx.json`), Python (`[tool.uv.workspace]` plus standalone `pyproject.toml` / `setup.py` / `setup.cfg`). Bazel, Pants, Buck, Cargo workspaces, Go modules, .NET solutions and other build systems are not scanned, so a repository using them may report fewer roots than it has.
+Return one entry per build root: its **path** relative to the repo root (`.` for the repo root itself), its **build system** and its **name**. Also return what was checked for: Gradle (`settings.gradle[.kts]`), Maven (`pom.xml`), npm/Yarn (`package.json` `"workspaces"` plus standalone `package.json` with source), pnpm (`pnpm-workspace.yaml`), Nx (`nx.json`), Python (`[tool.uv.workspace]` plus standalone `pyproject.toml` / `setup.py` / `setup.cfg`), standalone Gradle (`build.gradle[.kts]`), Go (`go.work` / `go.mod`), Rust (`Cargo.toml`), .NET (`.sln` / `.slnx` / `*.csproj` / `*.fsproj` / `*.vbproj`), PHP (`composer.json`), Ruby (`Gemfile` / `*.gemspec`). Bazel, Pants, Buck and other build systems are not scanned, so a repository using them may report fewer roots than it has.

@@ -22,7 +22,8 @@ Invoke the `sonar-integrate` skill when another skill surfaces a failure that po
 **Example user requests:**
 - "Set up SonarQube for this repository"
 - "Connect this repo to SonarQube"
-- "Find security vulnerabilities in this repo" or "Check this repo's code quality", when it has no `.sonar-config.json` yet
+- "Find security vulnerabilities in this repo" or "Check this repo's code quality", when it is not linked to a SonarQube project yet
+- "Add the other projects of this monorepo to SonarQube"
 
 **What to do:** Invoke the `sonar-onboard` skill end-to-end. It runs `sonar init` to login, select the organization, link, import or create the project, and report its analysis results. It offers `sonar-integrate` at the end. Use `sonar-integrate` directly only to wire the agent itself (hooks, MCP Server).
 
