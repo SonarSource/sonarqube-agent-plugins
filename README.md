@@ -239,6 +239,26 @@ MCP reference: [SonarQube MCP Server docs](https://docs.sonarsource.com/sonarqub
 /sonarqube:sonar-integrate
 ```
 
+#### Install or update the CLI
+
+```
+/sonarqube:sonar-install-cli
+```
+
+#### Login
+
+```
+/sonarqube:sonar-login
+```
+
+#### Onboard a repository
+
+```
+/sonarqube:sonar-onboard
+/sonarqube:sonar-onboard --path services/api
+/sonarqube:sonar-onboard --monorepo
+```
+
 #### List projects
 
 ```

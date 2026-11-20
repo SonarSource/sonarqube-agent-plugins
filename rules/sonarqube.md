@@ -14,9 +14,18 @@ The `sonar-integrate` skill is a preliminary initialization and recovery skill f
 
 `sonar run mcp` handles container runtime detection (Docker, Podman, Nerdctl) and auth automatically — no environment variables are needed.
 
-Invoke the `sonar-integrate` skill when another skill surfaces a failure that points to one of the conditions above (missing CLI, failed auth, or incomplete integrate wiring).
+Invoke the `sonar-integrate` skill when another skill surfaces a failure that points to one of the conditions above (missing CLI or incomplete integrate wiring). For a failed or expired login alone, invoke the `sonar-login` skill, which `sonar-integrate` and `sonar-onboard` also use to login. For a missing or outdated CLI alone, invoke the `sonar-install-cli` skill, which they use to install or update it.
 
 ## How Users Typically Interact
+
+### Onboarding a Repository
+**Example user requests:**
+- "Set up SonarQube for this repository"
+- "Connect this repo to SonarQube"
+- "Find security vulnerabilities in this repo" or "Check this repo's code quality", when it is not linked to a SonarQube project yet
+- "Add the other projects of this monorepo to SonarQube"
+
+**What to do:** Invoke the `sonar-onboard` skill end-to-end. It runs `sonar init` to login, select the organization, link, import or create the project, and report its analysis results. It offers `sonar-integrate` at the end. Use `sonar-integrate` directly only to wire the agent itself (hooks, MCP Server).
 
 ### Finding Projects
 **Example user requests:**
@@ -117,7 +126,8 @@ After `sonar integrate antigravity`, MCP tools often **do not require** an expli
 ## Common Troubleshooting
 
 ### Authentication or MCP Issues
-- For setup, re-authentication, missing MCP tools, or incomplete wiring, invoke the `sonar-integrate` skill
+- For login or re-authentication, invoke the `sonar-login` skill
+- For agent setup, missing MCP tools, or incomplete wiring, invoke the `sonar-integrate` skill. To connect the repository to a SonarQube project, invoke the `sonar-onboard` skill instead
 - Restart the Antigravity session after integrate if MCP tools do not appear
 
 ### Project Not Found
