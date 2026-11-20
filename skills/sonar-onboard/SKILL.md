@@ -24,7 +24,7 @@ sonar-onboard --monorepo             # onboard several project roots of a monore
 ## Prerequisites
 
 1. Run `sonar --version` (macOS/Linux) or `sonar.exe --version` (Windows) yourself. If `sonar` is not found, invoke the sonar-install-cli skill, then come back here. If it reports **not installed**, stop.
-2. Run `sonar init --help` yourself. It must list `--dry-run`, `--link` and `--bind`, plus `--monorepo` and `--root` for a monorepo. If any is missing, the CLI is too old to preview or to take the user's decision as a flag, and its `sonar init` could create a project without asking. Do **not** run it. Invoke the sonar-install-cli skill to update it, then check again. Likewise, if `sonar init` rejects a run with `--bind does not apply with --monorepo`, the CLI predates monorepo binding: offer to update it the same way, or to map existing projects only (bare `--link`) instead.
+2. If `sonar init` rejects an option as unknown, the CLI is too old for this skill; it stops before doing anything. Invoke the sonar-install-cli skill to update it, then rerun the same command. Likewise, if `sonar init` rejects a run with `--bind does not apply with --monorepo`, the CLI predates monorepo binding: offer to update it the same way, or to map existing projects only (bare `--link`) instead.
 
 ## Guardrails
 
@@ -35,7 +35,7 @@ sonar-onboard --monorepo             # onboard several project roots of a monore
 - Never suggest `--bind` for a repository that `sonar init` found an existing project for: it only offers `--link` then, and refuses to create a second project. If the user wants a separate project, tell them `sonar init` does not create one for a repository that already has a project.
 - Never delete or rewrite `.sonar-config.json`, projects or credentials to start over.
 - Never run `sonar integrate` or the sonar-integrate skill unless the user accepts it in Step 7. Every exit of this skill ends in Step 7, whether onboarding completed, was cancelled or failed, except when the user is not logged in.
-- Never treat the repository as a monorepo on your own: only when the user passed `--monorepo`, said it holds several projects, or chose it in Step 1.2 after detection found several build roots or unmapped ones.
+- Never treat the repository as a monorepo on your own: only when the user passed `--monorepo`, said it holds several projects, or chose it in Step 1.1 after detection found several build roots or unmapped ones.
 
 Validate every value before interpolating it into a command. If a value fails, stop and tell the user what was rejected instead of running the command.
 
@@ -49,28 +49,23 @@ Validate every value before interpolating it into a command. If a value fails, s
 
 ### Step 1 — Inspect the current state
 
-1. Read `.sonar-config.json` at the repository root if it exists, and note the project keys it maps. Also note `sonar.projectKey` from `sonar-project.properties` if present: it is not a setup by itself, but it names a candidate for `--link <key>` in Step 4.
-2. Detect the build roots: follow [references/detect-monorepo-projects.md](references/detect-monorepo-projects.md) on the repository root. It only reads files. Skip it only when the user named one directory with `--path`; run it even when `.sonar-config.json` already maps this directory. Then:
-   - **`.sonar-config.json` already maps one or more roots, and some detected build roots are not mapped:** list the mapped roots and the unmapped ones (path, build system, name), and ask with a selector: **Onboard the remaining roots** (Recommended) / **Leave the setup as it is**. Onboarding them takes the monorepo path in Step 4, with only the unmapped roots and `--bind` as the recommended way to create their projects. The mapped roots are left as they are. If a mapped root is the repository root itself and the unmapped roots sit inside it, say that its project may already analyze their files. Leaving the setup as it is continues with Step 1.3.
-   - **`.sonar-config.json` already maps every detected build root:** continue with Step 1.3, without mentioning the detection.
+1. Detect the build roots: follow [references/detect-monorepo-projects.md](references/detect-monorepo-projects.md) on the repository root. It only reads files. Skip it only when the user named one directory with `--path`. A root counts as mapped when `.sonar-config.json` at the repository root maps it; without that file, nothing is mapped. Then:
+   - **`.sonar-config.json` already maps one or more roots, and some detected build roots are not mapped:** list the mapped roots and the unmapped ones (path, build system, name), and ask with a selector: **Onboard the remaining roots** (Recommended) / **Leave the setup as it is**. Onboarding them takes the monorepo path in Step 4, with only the unmapped roots and `--bind` as the recommended way to create their projects. The mapped roots are left as they are. If a mapped root is the repository root itself and the unmapped roots sit inside it, say that its project may already analyze their files. Leaving the setup as it is continues with Step 1.2.
+   - **`.sonar-config.json` already maps every detected build root:** continue with Step 1.2, without mentioning the detection.
    - **The user asked for a monorepo:** keep the roots for Step 4 → Monorepo. If fewer than two were found, say so and show what was checked for. Then offer a selector: **Onboard as a single project** / **Name the roots myself**.
    - **The user did not ask, nothing is mapped yet, and two or more roots were found:** list them (path, build system, name) and ask with a selector: **Onboard as a single project** / **Onboard as a monorepo, one project per root**, in that order, without marking either as recommended. A monorepo choice keeps the roots for Step 4 → Monorepo.
    - **Otherwise:** continue as a single project, without mentioning the detection.
-3. Run `sonar auth status` yourself. Note the connected server and organization. If not authenticated, go to Step 2.
-4. Run `sonar init --non-interactive --dry-run` yourself, adding `--path <directory>` when the user named another directory, and `--monorepo` (with any `--root` already agreed in Step 4) for a monorepo. A dry run writes nothing. Act on what it reports:
-
-| `sonar init` reports                                                  | Meaning                                         | Next                                                                                                                   |
-| --------------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `Nothing left to set up.`                                             | Already onboarded                               | Step 6, using the mapped project                                                                                       |
-| `.sonar-config.json links '<key>'`, then `no such project exists` or `belongs to another organization` | The mapping exists, but the server cannot confirm the project | Relay the message and its fix hint. Ask whether the key or the active organization is wrong; switch organization as for a repository bound in another organization (below), but leave relinking or deleting `.sonar-config.json` to the user |
-| `Continuing needs an answer`, plus the flags that would answer it      | A decision is needed                            | Step 4                                                                                                                 |
-| `Not signed in`                                                       | No usable login                                 | Step 2                                                                                                                 |
-| `This repository is bound to a project in organization '<org>'` or `This repository is bound to a project in another organization` | The repository belongs to another organization  | Switch organization: offer the one the hint names, or the result of `sonar list orgs`, as a selector; on confirmation run `sonar auth org <key>` yourself, then repeat this step |
-| `Organization creation is not available`, or the login found no organization | The account has no organization        | Step 3                                                                                                                 |
+2. Run `sonar auth status` yourself. Note the connected server and organization. If not authenticated, go to Step 2.
+3. Run `sonar init --non-interactive --dry-run` yourself, adding `--path <directory>` when the user named another directory, and `--monorepo` (with any `--root` already agreed in Step 4) for a monorepo. A dry run writes nothing. Act on what it reports:
+   - **Nothing left to set up:** Step 6, using the mapped project.
+   - **A decision is needed** (it names the flags that would answer it): Step 4.
+   - **Not signed in:** Step 2.
+   - **The account has no organization:** Step 3.
+   - **Anything else:** relay the message and its hint as printed. When the hint names `sonar auth org`, offer the organization it names, or the result of `sonar list orgs`, as a selector; on confirmation run `sonar auth org <key>` yourself, then repeat this step. Leave any other fix, such as relinking `.sonar-config.json`, to the user.
 
 ### Step 2 — Login
 
-Invoke the sonar-login skill. It selects the connection type, builds the `sonar auth login` command for the user to run, and verifies the login. Once it reports a successful login (the connected server, plus the organization for SonarQube Cloud), repeat Step 1.4. If the user stops without logging in, tell them nothing was set up, that rerunning this skill resumes from the login, and stop: do not offer `sonar integrate`, which needs a login too.
+Invoke the sonar-login skill. It selects the connection type, builds the `sonar auth login` command for the user to run, and verifies the login. Once it reports a successful login (the connected server, plus the organization for SonarQube Cloud), repeat Step 1.3. If the user stops without logging in, tell them nothing was set up, that rerunning this skill resumes from the login, and stop: do not offer `sonar integrate`, which needs a login too.
 
 ### Step 3 — No organization
 
@@ -81,15 +76,15 @@ Only an interactive `sonar init` can create a first organization. Ask the user t
 Present only the options `sonar init` named, as a single-choice selector, in the user's terms. Whenever `--bind` is among them, list it first and label it **(Recommended)**; never mark `--link <key>` as recommended over it.
 
 - **`--bind`** — create a new SonarQube Cloud project imported from the repository's DevOps platform. The server analyzes it automatically.
-- **`--link`** — reuse the existing project found for this repository. **`--link <key>`** reuses a project the user names, such as the `sonar.projectKey` found in Step 1. If the user does not know the key, invoke the sonar-list-projects skill.
+- **`--link`** — reuse the existing project found for this repository. **`--link <key>`** reuses a project the user names. If the user does not know the key, suggest `sonar.projectKey` from `sonar-project.properties` when that file exists, or invoke the sonar-list-projects skill.
 
 When `sonar init` names only `--link <key>` (no SonarQube Cloud connection, no git remote, or a remote that is not GitHub or Azure DevOps), the only way forward is to link a project that already exists. If the user has none, tell them `sonar init` cannot create a project for this directory, then go to Step 7.
 
 #### Monorepo
 
-Only for a monorepo the user asked for or chose in Step 1.2 (see Guardrails). A non-interactive `sonar init --monorepo` cannot show its folder tree, and without `--root` it only reports the roots already mapped, so agree on the roots first:
+Only for a monorepo the user asked for or chose in Step 1.1 (see Guardrails). A non-interactive `sonar init --monorepo` cannot show its folder tree, and without `--root` it only reports the roots already mapped, so agree on the roots first:
 
-1. Start from the build roots detected in Step 1.2, leaving out those already mapped in `.sonar-config.json`. If detection was skipped, run it now as described there.
+1. Start from the build roots detected in Step 1.1, leaving out those already mapped in `.sonar-config.json`. If detection was skipped, run it now as described there.
 2. Show them as a multi-choice selector, with all preselected, labelled by path, build system and name. The user can also name other paths, for example for a build system the detection does not scan.
 3. Reuse existing projects without asking. Pass `--root <path>=<key>` for a root whose `sonar-project.properties` names a `sonar.projectKey`, and `--root <path>` for the others. Validate every path and key against the table above. Then run `sonar init --non-interactive --dry-run --monorepo` with these roots, plus `--bind` when binding is possible (SonarQube Cloud with a GitHub or Azure DevOps remote) or bare `--link` otherwise. For every root reported as `Project '<key>' already exists, and nothing says whether <path> belongs to it`, the generated key belongs to an existing project: map the root to it with `--root <path>=<key>`. Do not ask the user about any of this; the Step 5 preview shows every mapping, and **Change the plan** there lets them use other keys.
 4. Only if some chosen roots still have no project, ask how to provision them, as a single-choice selector:
