@@ -10,20 +10,26 @@ Make sure **sonarqube-cli** is logged in, and report the connected server, plus 
 
 Interaction rule: for every finite decision, always present predefined selector options (single-choice or multi-choice as appropriate) instead of asking for free-form text. If the user gives an invalid answer, re-show the same selector.
 
-When another skill invoked this one, return to it once the user is logged in, or once they stop.
+When another skill invoked this one, return to the caller once the requested connection is verified or the user stops. The caller owns the original SonarQube task and any remaining setup.
 
 ## Instructions
 
 ### Step 1 — Check the current login
 
-Run `sonar auth status` yourself. If `sonar` is not found, invoke the sonar-install-cli skill, then run `sonar auth status` again. If it reports **not installed**, stop.
+Run `sonar auth status` yourself. When the caller passed a pending integration, use `sonar auth status --format json` to compare the connected server (including the base path) and Cloud organization with the prepared target. Environment credentials do not activate pending setup. If `sonar` is not found, invoke the sonar-install-cli skill, then check status again. If it reports **not installed**, stop.
 
-- **Logged in:** note the connected server, and the organization for SonarQube Cloud, tell the user, and stop. Login again (Step 2) only when the user asked to re-authenticate or to use another server or organization.
+- **Environment credentials are active for a prepared integration.** Check this first by looking for `source` starting with `env vars:` in the JSON. Ask the user to check `sonar auth status --format json` in a terminal without those overrides. If that terminal already sees a saved login for the prepared connection, proceed to Step 3. Otherwise, guide them through Step 2 in that terminal.
+- **Logged in to the requested connection:** report the server and the Cloud organization. Sign in again only when the user requested re-authentication.
 - **Not logged in:** go to Step 2.
+- **A different login is active:** if the user wants to sign in to the prepared target or explicitly requested another connection, explain the mismatch and ask whether to switch. If they accept, go to Step 2. Otherwise, leave the active connection and pending setup as they are.
 
 ### Step 2 — Build the login command
 
-Ask for the connection type with a single-choice selector:
+If the calling skill provided a pending target, use its server and Cloud organization when present, unless the user explicitly requested another connection. Validate these values before showing a command. Use a valid HTTP(S) URL without credentials, a query, or a fragment, and quote the URL for the user's shell. Check an organization key against the pattern below. If a prepared target is invalid, explain that IT needs to correct it.
+
+For a prepared server, show `sonar auth login --server <url>`. Include `--org <key>` for a prepared Cloud organization. If a Cloud organization was omitted, let the CLI guide the user through its selection in the terminal.
+
+When there's no server or connection type to use, ask the user to select one:
 
 1. SonarQube Cloud - EU (default)
 2. SonarQube Cloud - US
@@ -52,4 +58,6 @@ Tell the user:
 
 ### Step 3 — Verify
 
-Wait for the user to confirm they logged in, then run `sonar auth status` yourself. If it reports the login, note the connected server, and the organization for SonarQube Cloud, and stop. If it does not, show its output and go back to Step 2.
+Wait for the user to confirm they logged in, then run the same auth status check as in Step 1. If it verifies the requested connection, using a saved login when setup is pending, report the server and Cloud organization and return to the caller.
+
+If pending setup still has an `env vars:` source, use the status from the terminal without overrides to verify the saved login. Once it is verified, ask the user to restart the agent from that terminal or resume in another environment without the overrides. Return to the caller with the remaining action so it can preserve the original task. Offer sign-in again only when the status check in the appropriate environment reports a missing or mismatched login.
