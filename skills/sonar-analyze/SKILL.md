@@ -44,7 +44,10 @@ Either way, show the user:
 
 ## Resume after setup
 
-When the CLI is missing, authentication is required, or the SonarQube integration needs setup, ask the user whether to finish setup and continue the requested check. If they accept, invoke the sonar-integrate skill with the original repository, file or change scope, and project and branch options. Resume that same check once its prerequisites are ready. If setup needs a restart, give the user a short prompt with the same scope to use after restarting. If they decline, stop.
+Keep the original repository, files or change scope, project, and branch.
+
+- If the check can use the CLI, ask whether to install the CLI if it is missing or sign in if it needs credentials. Use the sonar-install-cli skill for installation and the sonar-login skill in **authentication-only** mode for sign-in. Once the CLI is ready, retry the same check. A request for one CLI check does not authorize changing the agent's MCP configuration or installing hooks.
+- If the check requires MCP and its configuration is missing or broken, explain that setup or repair writes the current agent's global MCP configuration and can install persistent secrets and analysis hooks. Ask for approval for those changes. If accepted, invoke the sonar-integrate skill with the original scope and the explicit MCP setup or repair intent. If the agent needs a restart, give the user a short prompt to resume the same check afterward.
 
 ## Instructions
 

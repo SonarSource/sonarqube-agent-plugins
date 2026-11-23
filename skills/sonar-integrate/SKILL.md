@@ -8,31 +8,36 @@ allowed-tools: Bash(sonar:*), Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl
 
 Guide the user through installing **sonarqube-cli** if needed, signing in, and setting up SonarQube for their agent. If this skill was invoked during an explicit SonarQube task, keep the original request, repository, and analysis scope in context so you can return to it.
 
+For a blocked check that only needs CLI credentials, use the sonar-login skill in **authentication-only** mode and resume the check. Continue with agent setup or repair when the user asks for it or approves the specific changes. For MCP recovery, confirm the current agent and explain that setup can change its global MCP configuration and install persistent secrets and analysis hooks.
+
 Interaction rule: for every finite decision, always present predefined selector options (single-choice or multi-choice as appropriate) instead of asking for free-form text. If the user gives an invalid answer, show the selector again.
 
 ### Step 1 — Check the CLI and the current agent
 
 Run `sonar --version`. If the CLI is missing, invoke the sonar-install-cli skill. On **not installed**, stop. If the user explicitly asked to update the CLI, use that skill as well. Sign-in uses the installed CLI.
 
-For Factory Droid and Kiro, go directly to the sonar-login skill. Factory Droid uses the plugin's MCP configuration. Kiro uses the SonarQube power. Neither needs an agent installation command.
+For Factory Droid and Kiro, go directly to the sonar-login skill in authentication-only mode. Factory Droid uses the plugin's MCP configuration. Kiro uses the SonarQube power. Neither needs an agent installation command.
 
 For other agents, run `sonar system status --format json`. Find your agent's subcommand ID in `pendingIntegrations` (`claude`, `copilot`, `codex`, `cursor`, `antigravity`, `devin`, `pi`, or `opencode`). A matching entry means the agent already has setup in progress. An older CLI without this report uses the manual flow in Steps 2 and 3. If a previously available status check fails or returns unreadable data, report the error before making installation changes.
 
 ### Step 2 — Sign in
 
-Invoke the sonar-login skill. Pass it the current agent's pending entry if present so it can guide the user to the prepared connection. Continue once this agent can use the requested login. If the user signed in successfully but this agent still uses environment overrides, ask them to restart or resume in the environment with the saved login. Give them a short prompt to resume the original request in the same repository with the same scope. If the user declines, stop and tell them they can pick up setup later.
+Invoke the sonar-login skill. Pass it the current agent's pending entry if present so it can guide the user to the prepared connection. For setup or repair limited to this agent, use authentication-only mode. A normal login can activate all agents prepared for the same connection, so use it for prepared setup only if the user agrees to that scope. Continue once this agent can use the requested login. If the user signed in successfully but this agent still uses environment overrides, ask them to restart or resume in the environment with the saved login. Give them a short prompt to resume the original request in the same repository with the same scope. If the user declines, stop and tell them they can pick up setup later.
 
 ### Step 3 — Check that integration finished
 
 For CLI-managed agents, read `sonar system status --format json` again after sign-in. Use `claude-code` and `copilot-cli` when looking for Claude Code and Copilot CLI in the installed `integrations` list. For other agents, the installed IDs match their subcommand IDs.
 
-- **Still preparing.** If a prepared entry still reports `waiting_for_sign_in`, verify the prepared connection. If sign-in matches and the entry is still present, ask the user to run `sonar integrate --all --non-interactive` to finish setup and then check again. Explain that this can also configure other newly detected agents. Use the same retry for `retry_setup`.
-- **Already integrated.** If there is an installed entry and no pending entry, use the current setup. Run the integration command again only when the user explicitly requests reconfiguration.
-- **New agent.** If neither check reported pending or installed setup, run `sonar integrate <agent> --non-interactive` with the current agent's subcommand ID. On an older CLI without pending integration reporting, keep the sign-in-then-integrate flow and reuse any installed integration the CLI reports.
+- **Still preparing.** If the prepared entry remains, verify the saved login matches the prepared connection. With approval for this agent, ask the user to run `sonar integrate <agent>` in their terminal and check status again.
+- **Already integrated.** Reuse the current setup unless the user requested reconfiguration or approved an MCP repair. In either of those cases, ask the user to run `sonar integrate <agent>` in their terminal and use the customization choices to preserve their existing feature preferences while repairing MCP.
+- **New agent.** With approval for this agent, run `sonar integrate <agent> --non-interactive` with its subcommand ID. On an older CLI, use the same sign-in-then-integrate flow and reuse any installed integration the CLI reports.
 - **Activation could not be confirmed.** If a previously pending entry disappears without an installed integration, or status cannot be read after preparation was detected, tell the user and stop.
 - **Factory Droid or Kiro.** Continue with the respective plugin or power after sign-in. In Kiro, enable the SonarQube power if needed.
 
 ### Step 4 — Continue the original request
+
+
+After a fresh setup or repair, tell the user to ensure Docker, Podman, or Nerdctl is running and restart the agent session to load the MCP configuration. For Cursor, always tell them to enable `sonarqube` in **Settings → MCP** before restarting. If they only requested a CLI check and authentication is ready, the CLI check can proceed while MCP awaits a restart.
 
 If the requested check can run with the authenticated CLI, continue with the same repository, files, and scope. Otherwise, address only the prerequisite blocking the request.
 

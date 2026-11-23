@@ -27,7 +27,7 @@ This skill uses the `sonarqube-cli` command. The CLI must be installed and authe
 > **Possible causes:**
 > - `sonarqube-cli` not installed or not authenticated — invoke the sonar-integrate skill
 
-Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly explain what it does: it checks the SonarQube setup on their machine — installing or updating `sonarqube-cli` and verifying authentication — and re-configures the integration for this agent, including the SonarQube MCP server and secrets-scanning hooks. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then re-check and continue; if they decline, stop.
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly explain what it does: it checks the CLI and authentication. If MCP is missing or misconfigured, explain that repair can change this agent's global MCP configuration and install persistent secrets and analysis hooks. If they confirm, invoke the sonar-integrate skill with explicit MCP repair intent when configuration repair is needed, then follow its steps, then re-check and continue; if they decline, stop.
 
 ## Instructions
 

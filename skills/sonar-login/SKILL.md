@@ -12,6 +12,8 @@ Interaction rule: for every finite decision, always present predefined selector 
 
 When another skill invoked this one, return to the caller once the requested connection is verified or the user stops. The caller owns the original SonarQube task and any remaining setup.
 
+**Authentication-only mode.** For a caller that only needs credentials, inspect `sonar auth login --help` and include `--no-agent-setup` in the command if available. This saves the login while leaving agent configuration and pending setup as they are. If the flag is unavailable, run `sonar system status --format json`. A valid response without `pendingIntegrations` identifies the older flow where plain login is sufficient. If the response reports `pendingIntegrations` or cannot be verified, offer an upgrade or get the user's approval for the agent setup that login can trigger before proceeding.
+
 ## Instructions
 
 ### Step 1 — Check the current login
@@ -43,7 +45,7 @@ Collect what the scenario needs, and validate it before putting it into the comm
 | SonarQube Cloud — US           | organization key + confirm US region (`https://sonarqube.us`) | `^[a-zA-Z0-9_\-]+$`                                     |
 | SonarQube Server               | server URL (e.g. `https://sonarqube.yourcompany.com`)         | `http://` or `https://` URL, no spaces, quotes or `;&|` |
 
-Build the login command and show it to the user:
+Build the login command and show it to the user. In authentication-only mode, follow the flag and compatibility guidance above:
 
 | Scenario             | Command                                                 |
 | -------------------- | ------------------------------------------------------- |
@@ -51,7 +53,7 @@ Build the login command and show it to the user:
 | SonarQube Cloud — US | `sonar auth login -o <org-key> -s https://sonarqube.us` |
 | SonarQube Server     | `sonar auth login -s <server-url>`                      |
 
-Tell the user:
+Apply the authentication-only option to the prepared-target command as well. Then tell the user:
 
 > "Run the command below — it will open your browser to login. The token is stored
 > securely in your system keychain and never appears in this chat."
