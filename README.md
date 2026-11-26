@@ -68,6 +68,7 @@ claude plugin install sonarqube@claude-plugins-official
 |----------------------|---------------------------------------------------------|
 | SonarQube Cloud (EU) | `sonar auth login -o <org-key>`                         |
 | SonarQube Cloud (US) | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+| SonarQube Cloud (AU) | `sonar auth login -o <org-key> -s https://sonarqube.au` |
 | SonarQube Server     | `sonar auth login -s <server-url>`                      |
 
 Optional: add **`sonar-project.properties`** in the project root with `sonar.projectKey`, sources, etc.

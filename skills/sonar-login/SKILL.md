@@ -27,7 +27,8 @@ Ask for the connection type with a single-choice selector:
 
 1. SonarQube Cloud - EU (default)
 2. SonarQube Cloud - US
-3. Self-hosted SonarQube Server
+3. SonarQube Cloud - AU
+4. Self-hosted SonarQube Server
 
 Collect what the scenario needs, and validate it before putting it into the command. If a value fails, tell the user what was rejected and ask again.
 
@@ -35,6 +36,7 @@ Collect what the scenario needs, and validate it before putting it into the comm
 | ------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------- |
 | SonarQube Cloud — EU (default) | organization key (e.g. `my-org`)                              | `^[a-zA-Z0-9_\-]+$`                                     |
 | SonarQube Cloud — US           | organization key + confirm US region (`https://sonarqube.us`) | `^[a-zA-Z0-9_\-]+$`                                     |
+| SonarQube Cloud — AU           | organization key + confirm AU region (`https://sonarqube.au`) | `^[a-zA-Z0-9_\-]+$`                                     |
 | SonarQube Server               | server URL (e.g. `https://sonarqube.yourcompany.com`)         | `http://` or `https://` URL, no spaces, quotes or `;&|` |
 
 Build the login command and show it to the user:
@@ -43,6 +45,7 @@ Build the login command and show it to the user:
 | -------------------- | ------------------------------------------------------- |
 | SonarQube Cloud — EU | `sonar auth login -o <org-key>`                         |
 | SonarQube Cloud — US | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+| SonarQube Cloud — AU | `sonar auth login -o <org-key> -s https://sonarqube.au` |
 | SonarQube Server     | `sonar auth login -s <server-url>`                      |
 
 Tell the user:

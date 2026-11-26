@@ -56,6 +56,7 @@ Always resolve the project key using the following lookup order — **never gues
 
 - Use your organization key from [SonarQube Cloud Organizations](https://sonarcloud.io/account/organizations)
 - Connect to the US instance by setting `SONARQUBE_URL=https://sonarqube.us`
+- Connect to the AU instance by setting `SONARQUBE_URL=https://sonarqube.au`
 - Token should have appropriate permissions for the projects you want to analyze
 
 **For SonarQube Server:**
@@ -344,6 +345,7 @@ Use exactly one verdict per finding:
   | ------------------------------ | ------------------------------------------------------- |
   | SonarQube Cloud — EU (default) | `sonar auth login -o <org-key>`                         |
   | SonarQube Cloud — US           | `sonar auth login -o <org-key> -s https://sonarqube.us` |
+  | SonarQube Cloud — AU           | `sonar auth login -o <org-key> -s https://sonarqube.au` |
   | SonarQube Server               | `sonar auth login -s <server-url>`                      |
 
 **MCP Configuration:**
