@@ -1,24 +1,29 @@
 ---
 name: sonar-analyze
-description: Analyze a file for quality and security issues using SonarQube
-argument-hint: "[file-path]"
+description: Analyze a file or the current git changes for quality and security issues using SonarQube
+argument-hint: "[file-path | current changes]"
 allowed-tools: Read, Glob, Bash(git branch:*), Bash(docker ps:*), Bash(podman ps:*), Bash(nerdctl ps:*), Bash(sonar:*)
 ---
 
 # SonarQube — Code Analysis
 
-Analyze code for quality and security issues using the SonarQube MCP Server.
+Analyze code for quality and security issues. Keep the user's original file or change scope when sign-in interrupts a check.
 
 ## Usage
 
 ```
 sonar-analyze                        # analyze the file currently in context
 sonar-analyze src/auth/login.py      # analyze a specific file
+sonar-analyze current changes       # analyze the current git change set
 ```
 
-## Prerequisites
+## Current git changes
 
-This skill requires the SonarQube MCP Server to be configured and at least one of the tools `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_file_list`, or `mcp__sonarqube__analyze_code_snippet` to be available in your session.
+For an explicit request to check the current changes, run `sonar analyze agentic --format json` from the repository. Use `--staged` when the user specifically asks for staged changes. Apply any supplied project or branch to the same check. If the CLI is missing or requires sign-in, use **Resume after setup** below before retrying. If no project is resolved, offer the existing project-linking flow. Report zero analyzed files, skipped analysis, and failures separately from an analysis with no findings.
+
+## Single-file prerequisites
+
+For a single file, prefer one of `mcp__sonarqube__run_advanced_code_analysis`, `mcp__sonarqube__analyze_file_list`, or `mcp__sonarqube__analyze_code_snippet` when available.
 
 **Before proceeding**, verify at least one of these tools is accessible. If none are, try the CLI fallback in Step 3 before giving up — don't invent other CLI commands (e.g. `sonar mcp call` does not exist).
 
@@ -37,7 +42,12 @@ Either way, show the user:
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key missing or invalid — pass an explicit key if needed, verify `sonar-project.properties`, or re-run the sonar-integrate skill for this project
 
-Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly explain what it does: it checks the SonarQube setup on their machine — installing or updating `sonarqube-cli` and verifying authentication — and re-configures the integration for this agent, including the SonarQube MCP server and secrets-scanning hooks. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running and to restart the agent session so the new MCP tools become available; if they decline, stop.
+## Resume after setup
+
+Keep the original repository, files or change scope, project, and branch.
+
+- If the check can use the CLI, ask whether to install the CLI if it is missing or sign in if it needs credentials. Use the sonar-install-cli skill for installation and the sonar-login skill in **authentication-only** mode for sign-in. Once the CLI is ready, retry the same check. A request for one CLI check does not authorize changing the agent's MCP configuration or installing hooks.
+- If the check requires MCP and its configuration is missing or broken, explain that setup or repair writes the current agent's global MCP configuration and can install persistent secrets and analysis hooks. Ask for approval for those changes. If accepted, invoke the sonar-integrate skill with the original scope and the explicit MCP setup or repair intent. If the agent needs a restart, give the user a short prompt to resume the same check afterward.
 
 ## Instructions
 
@@ -77,7 +87,7 @@ Use the tool's published schema and call with:
 - `fileContent` — full file content; **only pass if the tool requires it** (when the MCP server has a mount, it reads the file directly and this parameter will not be required)
 - `fileScope` — `"TEST"` or `"MAIN"` as a string
 
-**If the tool is unavailable or returns an error containing `Vortex is not enabled`, continue with the local analysis fallbacks below.** Treat that error as Vortex being unavailable for the selected organization. Report other errors, including authentication or unresolved-organization errors, and stop instead of silently falling back.
+**If the tool is unavailable or returns an error containing `Vortex is not enabled`, continue with the local analysis fallbacks below.** Treat that error as Vortex being unavailable for the selected organization. For an authentication error, confirm the CLI needs sign-in with `sonar auth status` and use **Resume after setup** when applicable. Report other errors and stop.
 
 **Prefer `mcp__sonarqube__analyze_file_list` when available** (requires a running SonarQube for IDE instance bridged to this session):
 
@@ -104,7 +114,7 @@ sonar analyze agentic --file <file-path> [--file <other-file-path> ...] --format
 
 This uses the same Vortex backend as `run_advanced_code_analysis` and requires an entitled organization. After a `Vortex is not enabled` error, skip this CLI fallback. If neither local MCP tool is available, explain that the selected organization is not entitled to Vortex. To analyze it locally, restart the MCP server with `SONARQUBE_FORCE_LOCAL_ANALYSIS=true` and the `analysis` toolset enabled; preserve the selected organization when retrying.
 
-If the CLI fallback fails or `sonar` isn't installed/authenticated, show the standard message from Prerequisites — don't guess further commands.
+If the CLI is missing or authentication is required, use **Resume after setup**. If the fallback reports another failure, show the diagnostic.
 
 ### Step 4: Format the results
 

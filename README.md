@@ -43,7 +43,7 @@ sonar integrate pi            # Pi: MCP, hooks, secrets scanning, Vortex analysi
 sonar integrate opencode      # OpenCode: MCP, hooks, secrets scanning, Vortex analysis
 ```
 
-Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill if you prefer a guided flow (install/update CLI, login, then integrate).
+Run these **after** `sonar auth login`. Use the **`/sonarqube:sonar-integrate`** skill to install the CLI if needed, sign in, or request setup or MCP repair for your current agent.
 
 ## Claude Code
 

@@ -39,7 +39,7 @@ Either way, show the user:
 > - Credentials not configured — invoke the sonar-integrate skill
 > - Project key is wrong or no default project in MCP config — pass an explicit key, or verify `sonar-project.properties` / re-run the sonar-integrate skill for this project
 
-Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly explain what it does: it checks the SonarQube setup on their machine — installing or updating `sonarqube-cli` and verifying authentication — and re-configures the integration for this agent, including the SonarQube MCP server and secrets-scanning hooks. If they confirm, invoke the sonar-integrate skill yourself and follow it end-to-end in this session, then ask the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running and to restart the agent session so the new MCP tools become available; if they decline, stop.
+Then ask the user (yes/no) whether to run the sonar-integrate skill now. Briefly explain what it does: it checks the CLI and authentication. If MCP is missing or misconfigured, explain that repair can change this agent's global MCP configuration and install persistent secrets and analysis hooks. If they confirm, invoke the sonar-integrate skill with explicit MCP repair intent when configuration repair is needed, then follow its steps, then ask the user to ensure a container runtime (Docker, Podman, or Nerdctl) is running and to restart the agent session so the new MCP tools become available; if they decline, stop.
 
 ## Instructions
 
