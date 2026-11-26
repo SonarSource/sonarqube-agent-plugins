@@ -10,15 +10,14 @@ SonarQube combines deterministic checks with AI-assisted workflows so quality ru
 
 The Plugin helps agents connect to [SonarQube CLI](https://cli.sonarqube.com/) and [SonarQube MCP Server](https://docs.sonarsource.com/sonarqube-mcp-server) for issue detection, checking project metrics such as test coverage and duplications, fetch dependency risks, etc. Claude Code, Copilot CLI, Codex, Antigravity, Devin, Pi, and OpenCode (through SonarQube CLI) install agent hooks for secrets scanning and, when entitled, Vortex analysis.
 
-How to use: Run `/sonarqube:sonar-integrate` after installation to walk through setup — CLI installation, authentication, and wiring up the MCP Server and hooks. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Vortex analysis enabled, verification happens automatically after each edit with no manual invocation required.
+How to use: Run `/sonarqube:sonar-integrate` after installation for guided setup: CLI integration and hooks locally, or a hosted MCP connection in cloud environments. From there, use slash commands like `/sonarqube:sonar-quality-gate` to check quality gates or interact naturally with prompts like "analyze my code for issues," "show open SonarQube findings," or "check my coverage." With Vortex analysis enabled, verification happens automatically after each edit with no manual invocation required.
 
 ## Prerequisites
 
 - A SonarQube account (**SonarQube Cloud**, **Server**, or **Community Build**). Some features (for example Vortex analysis) depend on your SonarQube Cloud organization settings.
-- **[SonarQube CLI](https://cli.sonarqube.com/)** (`sonar`) on your machine.
-- A **container runtime** (Docker, Podman, or Nerdctl) for the MCP server image.
+- **[SonarQube CLI](https://cli.sonarqube.com/)** (`sonar`) on your machine for local analysis and full integration.
 
-Authenticate once with **`sonar auth login`** (browser flow; credentials stay in your OS keychain). The MCP server uses that login.
+For CLI integration, authenticate once with **`sonar auth login`** (browser flow; credentials stay in your OS keychain). The CLI-managed MCP server uses that login.
 
 Check auth anytime:
 
