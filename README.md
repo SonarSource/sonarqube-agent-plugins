@@ -35,7 +35,7 @@ sonar auth status
 sonar integrate claude        # Claude Code: MCP, hooks, secrets scanning, etc.
 sonar integrate copilot       # GitHub Copilot CLI: MCP, hooks, secrets scanning, etc.
 sonar integrate codex         # Codex: MCP, hooks, secrets scanning, Vortex analysis hook
-sonar integrate antigravity   # Antigravity: hooks, instructions, CAG, MCP patch (after plugin install)
+sonar integrate antigravity   # Antigravity: hooks, instructions, CAG, MCP (after plugin install)
 sonar integrate cursor        # Cursor: MCP, secret-scanning hooks, Vortex analysis instructions
 sonar integrate devin         # Devin: MCP, hooks, secrets scanning, Vortex analysis
 sonar integrate pi            # Pi: MCP, hooks, secrets scanning, Vortex analysis
@@ -92,7 +92,7 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ## Cursor
 
-**`.cursor-plugin/`** with MCP via **`mcp.json`**.
+Plugin bundle: **`.cursor-plugin/`**.
 
 1. Install **SonarQube** plugin through [Cursor's marketplace](https://cursor.com/marketplace/sonarsource):
 
@@ -106,15 +106,15 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ## Antigravity
 
-Repo-root plugin: **`plugin.json`**, **`mcp_config.json`**, **`rules/sonarqube.md`**, and shared **`skills/`**. Hooks and managed instructions are **not** in the plugin bundle—they are installed by **`sonar integrate antigravity`**.
+Repo-root plugin: **`plugin.json`**, **`rules/sonarqube.md`**, and shared **`skills/`**. Run **`sonar integrate antigravity`** to configure MCP, hooks, and managed instructions.
 
 ### Recommended flow (full integration)
 
 ```bash
-# 1. Plugin bundle — skills, rules, MCP
+# 1. Plugin bundle: skills and rules
 agy plugin install https://github.com/SonarSource/sonarqube-agent-plugins
 
-# 2. Auth + hooks / instructions / CAG / MCP patch
+# 2. Auth + hooks / instructions / CAG / MCP
 sonar auth login
 sonar integrate antigravity
 ```
@@ -137,7 +137,7 @@ Same workflows as **[Usage](#usage)** once MCP is connected.
 
 ## Factory Droid
 
-**`.factory-plugin/`** with MCP via **`mcp.json`** and the reviewer in **`droids/`**. No hooks: secrets scanning and Vortex analysis hooks are not available in Droid.
+**`.factory-plugin/`** with the reviewer in **`droids/`**. No hooks: secrets scanning and Vortex analysis hooks are not available in Droid.
 
 1. Install the plugin from the SonarSource marketplace:
 
@@ -148,7 +148,7 @@ droid plugin install sonarqube@sonarqube-agent-plugins
 
    Droid names the marketplace after the repository, not after the `name` in `marketplace.json`, so the plugin is `sonarqube@sonarqube-agent-plugins`.
 
-2. Run **`sonar auth login`**, or invoke the `/sonarqube:sonar-integrate` skill.
+2. Invoke the `/sonarqube:sonar-integrate` skill to set up the connection.
 
 <!-- Maintainers: droids/sonarqube-reviewer.md is the Droid version of agents/sonarqube-reviewer.agent.md. With its own manifest, Droid no longer imports agents/, so the droid keeps Factory frontmatter (Factory tool IDs, mcpServers) and the same body. Its Execute is unrestricted because Factory cannot scope commands per droid; without it the reviewer could not run git diff or sonar. It has no edit tools. Keep the bodies identical, and bump .factory-plugin/ with the other manifests at each release. -->
 
@@ -156,7 +156,7 @@ droid plugin install sonarqube@sonarqube-agent-plugins
 
 ## Devin
 
-**`.devin-plugin/`** with MCP via **`mcp.json`**.
+Plugin bundle: **`.devin-plugin/`**.
 
 1. Install the plugin from GitHub:
 

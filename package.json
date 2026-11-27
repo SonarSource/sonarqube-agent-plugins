@@ -21,11 +21,7 @@
     ".": "./.opencode-plugin/index.ts"
   },
   "pi": {
-    "skills": ["./skills"],
-    "extensions": ["./.pi-plugin/sonar-mcp.ts"]
-  },
-  "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*"
+    "skills": ["./skills"]
   },
   "dependencies": {
     "yaml": "^2.9.1"
