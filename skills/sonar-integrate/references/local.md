@@ -25,7 +25,7 @@ Use the current agent's name: `claude`, `copilot`, `codex`, `cursor`, `antigravi
 Exceptions:
 
 - **Cursor:** After the command completes, tell the user to open **Customize**, find the `sonarqube` MCP server, and turn on its toggle.
-- **Factory Droid:** Skip the command; the plugin's `mcp.json` already configures the SonarQube MCP Server via `sonar run mcp`.
+- **Factory Droid:** Use the agent's MCP settings to add a user-scoped `sonarqube` server with command `sonar` and arguments `["run", "mcp"]`. Reuse an existing entry if present.
 
 After integration, run `sonar system status` to check the reported MCP status. If it uses the container fallback, verify the runtime with `docker ps`, `podman ps`, or `nerdctl ps`. Ask the user to start their runtime if needed. For a hosted connection, proceed without a container runtime. Ask the user to restart the agent session to load the integration.
 

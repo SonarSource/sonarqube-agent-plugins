@@ -24,13 +24,5 @@ export default {
         });
       });
     });
-    await ctx.mcp.transform((editor) => {
-      if (!editor.get("sonarqube")) {
-        editor.set("sonarqube", {
-          type: "local",
-          command: ["sonar", "run", "mcp"],
-        });
-      }
-    });
   },
 } satisfies Plugin.Plugin;
