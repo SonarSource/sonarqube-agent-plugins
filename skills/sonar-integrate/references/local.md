@@ -2,7 +2,7 @@
 
 ### Step 1: Install or update sonarqube-cli
 
-Invoke the sonar-install-cli skill to install the CLI if missing or update it if already installed. Continue to Step 2 when the CLI is available. If machine restrictions prevent installing or running it, offer [hosted MCP setup](cloud.md) for SonarQube Cloud and follow that path instead. For other installation failures, help resolve the error before continuing.
+Invoke the sonar-install-cli skill to install the CLI if missing or update it if already installed. Continue to Step 2 when the CLI is available. If machine restrictions block the CLI, use the SonarQube Cloud URLs in [hosted MCP setup](cloud.md), research the current local agent's MCP configuration, and connect it directly with OAuth instead. For other installation failures, help resolve the error before continuing.
 
 ---
 

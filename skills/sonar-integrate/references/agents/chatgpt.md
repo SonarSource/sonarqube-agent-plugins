@@ -7,4 +7,4 @@ Ask the user to:
 3. Choose OAuth authentication, review the warning, select **I understand and want to continue**, then **Create as a plugin**. Complete any SonarQube sign-in prompt and review the discovered tools.
 4. Install the resulting plugin, start a new chat, and select it with `@`.
 
-Source: [Connect an MCP server in ChatGPT](https://developers.openai.com/plugins/deploy/connect-chatgpt).
+Sources: [Connect an MCP server in ChatGPT](https://developers.openai.com/plugins/deploy/connect-chatgpt), [Codex MCP setup](https://developers.openai.com/codex/mcp/).

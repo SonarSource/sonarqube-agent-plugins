@@ -9,8 +9,9 @@ Use the deployment already specified by the user. Otherwise, ask them to choose:
 | SonarQube Cloud EU | `https://api.sonarcloud.io/mcp` |
 | SonarQube Cloud US | `https://api.sonarqube.us/mcp` |
 | SonarQube Cloud AU | `https://api.sonarqube.au/mcp` |
+| SonarQube Server | Local setup |
 
-For SonarQube Server, direct the user to [local CLI integration](local.md) on their machine and stop this flow.
+For SonarQube Server, explain that connecting directly from the web app currently supports SonarQube Cloud only. Guide the user to install the SonarQube plugin in their local coding agent and run `sonar-integrate` for guided setup. Keep the explanation brief, then end this flow.
 
 ## Configure the agent
 
@@ -19,7 +20,7 @@ Read the current cloud product's reference and guide the user through its connec
 | Agent | Reference |
 | --- | --- |
 | Claude | [claude.md](agents/claude.md) |
-| ChatGPT web | [chatgpt.md](agents/chatgpt.md) |
+| ChatGPT | [chatgpt.md](agents/chatgpt.md) |
 | Cursor | [cursor.md](agents/cursor.md) |
 | Devin | [devin.md](agents/devin.md) |
 

@@ -8,4 +8,4 @@ Ask the user to:
 4. Select **OAuth** authentication and **Personal** access, click **Add**, then **Connect** and sign in.
 5. Click **Test tools** to verify the connection.
 
-Source: [Devin MCP settings](https://docs.devin.ai/work-with-devin/mcp).
+Sources: [Devin MCP settings](https://docs.devin.ai/work-with-devin/mcp), [Devin CLI MCP setup](https://docs.devin.ai/cli/extensibility/mcp/configuration).
